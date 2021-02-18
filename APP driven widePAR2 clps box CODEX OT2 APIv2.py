@@ -12,7 +12,7 @@ class Object:
     pass
 
 ####################MODIFIABLE RUN PARAMETERS#########################
-wellslist = ['A1','A2','A3', 'A4', 'B1', 'B2']
+wellslist = ['A1','A2','A3','A4']
 
 tiprack_starting_pos = {
     "tiprack_10": 'A1',
@@ -40,6 +40,7 @@ default_flow_rate = 50
 well_flow_rate = 5
 sample_flow_rate = 0.2
 wash_volume = 150
+ab_volume=100
 
 ####################! FUNCTIONS - DO NOT MODIFY !######################### 
 def washSamples(pipette, sourceSolutionWell, samples, volume, num_repeats=1, keep_tip = False):
@@ -139,7 +140,7 @@ def run(protocol: protocol_api.ProtocolContext):
     buffers.H2 = buffer_wells['A6']
     buffers.pinkbuffer = buffer_wells['A7']
     buffers.bluebuffer = buffer_wells['A8']
-    buffers.S4 =  buffer_wells['A9'] 
+    buffers.storage =  buffer_wells['A9'] 
 
 #   biorad96 = protocol.load_labware('biorad_96_wellplate_200ul_pcr', labwarePositions.antibodies_plate, 'biorad96')
 
@@ -176,7 +177,7 @@ def run(protocol: protocol_api.ProtocolContext):
     #APPLYING ANTIBODY COCKTAILS TO SAMPLES
     protocol.comment("applying antibodies")
     for i in range (len(wellslist)):
-        washSamples(pipette_300, antibody_wells[i], sample_chambers[i], wash_volume)
+        washSamples(pipette_300, antibody_wells[i], sample_chambers[i], ab_volume)
     #INCUBATING
     protocol.delay(minutes=90, msg = "staining incubation")
 
@@ -257,7 +258,7 @@ def run(protocol: protocol_api.ProtocolContext):
 
     #STORAGE, washing samples every hour for 100 hours 
     for i in range(10):
-        washSamples(pipette_300, buffers.S4, sample_chambers, wash_volume/3, keep_tip=True)
+        washSamples(pipette_300, buffers.storage, sample_chambers, wash_volume/3, keep_tip=True)
         protocol.delay(minutes=90, msg = "storing samples in S4")
 
 
