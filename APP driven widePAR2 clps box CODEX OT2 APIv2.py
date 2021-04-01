@@ -12,7 +12,7 @@ class Object:
     pass
 
 ####################MODIFIABLE RUN PARAMETERS#########################
-wellslist = ['A1','A2','A3','A4']
+wellslist = ['A1','A2','A3','A4','B1','B2']
 
 tiprack_starting_pos = {
     "tiprack_10": 'A1',
@@ -66,6 +66,7 @@ def washSamples(pipette, sourceSolutionWell, samples, volume, num_repeats=1, kee
             stats.volume += volume
     
     if not keep_tip: pipette.drop_tip()
+    if keep_tip: pipette_300.move_to(sample_chambers[0].bottom(60))
     
 def dilute_and_apply_fixative(pipette, sourceSolutionWell, dilutant_buffer_well, samples, volume):
     try:
@@ -123,8 +124,8 @@ def run(protocol: protocol_api.ProtocolContext):
     pipette_300.starting_tip = tiprack_300.well(tiprack_starting_pos['tiprack_300'])
 
 
-    par2 = protocol.load_labware('par2_plastic_wide_cslps', labwarePositions.par2, 'PAR2')
-
+    #par2 = protocol.load_labware('par2_plastic_wide_cslps', labwarePositions.par2, 'PAR2')
+    par2 = protocol.load_labware('par2_cslp_metal_v1', labwarePositions.par2, 'PAR2')
     trough12 = protocol.load_labware('axygen_12well_trough', labwarePositions.buffers_plate, '12-trough buffers reservoir')
 
     custom_96 = protocol.load_labware('black_96', labwarePositions.antibodies_plate, '96-well-plate')
