@@ -137,9 +137,9 @@ def run(protocol: protocol_api.ProtocolContext):
 
     buffer_wells = trough12.wells_by_name()
 
-buffers = Object()
-buffers.White =  buffer_wells['A2']
-buffers.Blue=  buffer_wells['A1']
+    buffers = Object()
+    buffers.White =  buffer_wells['A2']
+    buffers.Blue=  buffer_wells['A1']
 
 #   biorad96 = protocol.load_labware('biorad_96_wellplate_200ul_pcr', labwarePositions.antibodies_plate, 'biorad96')
 
