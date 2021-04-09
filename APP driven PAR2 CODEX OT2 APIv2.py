@@ -71,7 +71,7 @@ def washSamples(pipette, sourceSolutionWell, samples, volume, num_repeats=1, kee
             stats.volume += volume
     
     if not keep_tip: pipette.drop_tip()
-    if keep_tip: pipette.move_to(sample_chambers[0].bottom(60))
+    if keep_tip: pipette.move_to(sourceSolutionWell[length(sourceSolutionWell)-1].bottom(60))
     
 def dilute_and_apply_fixative(pipette, sourceSolutionWell, dilutant_buffer_well, samples, volume):
     try:
