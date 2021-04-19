@@ -2,7 +2,7 @@ from opentrons import protocol_api
 import json
 
 metadata = {
-    'protocolName': 'PAR2 CODEX coverslip staining protocol',
+    'protocolName': 'PAR2 CODEX single stain',
     'author': 'Parhelia Bio <info@parheliabio.com>',
     'description': 'CODEX coverslip staining protocol for EA PAR2 instrument - from tissue rehydration to single-cycle rendering',
     'apiLevel': '2.7'
@@ -180,25 +180,23 @@ def run(protocol: protocol_api.ProtocolContext):
     #INCUBATE
     protocol.delay(minutes=90, msg = "staining incubation")
 
-    #WASHING SAMPLES WITH S2
-    #three individual repeats below is because they need particular incubation time between them
-    protocol.comment("first washing with s2")
+    #WASHING SAMPLES WITH Staining buffer
+    protocol.comment("first washing with Staining buffer")
     washSamples(pipette_300, buffers.Staining, sample_chambers, wash_volume, num_repeats=2)
     #INCUBATE
-    protocol.delay(minutes=5, msg = "first incubation in s2")
+    protocol.delay(minutes=5, msg = "first incubation in Staining Buffer")
 
-    #WASHING SAMPLES WITH S2
-    #three individual repeats below is because they need particular incubation time between them
-    protocol.comment("second washing with s2")
+    #WASHING SAMPLES WITH Staining buffer
+    protocol.comment("second washing with Staining buffer")
     washSamples(pipette_300, buffers.Staining, sample_chambers, wash_volume, num_repeats=2)
     #INCUBATE
-    protocol.delay(minutes=5, msg = "first incubation in s2")
+    protocol.delay(minutes=5, msg = "seciond incubation in Staining buffer")
 
     #POST STAINING FIXING SAMPLES WITH PFA
     protocol.comment("second fix")
     washSamples(pipette_300, buffers.Storage_PFA_4pct, sample_chambers, wash_volume)
     #INCUBATE
-    protocol.delay(minutes=5, msg="second fix incubation")
+    protocol.delay(minutes=5, msg="incubation with fixative")
 
     #WASHING SAMPLES WITH PBS
     protocol.comment("PBS wash")
@@ -208,13 +206,13 @@ def run(protocol: protocol_api.ProtocolContext):
     protocol.comment("applying MeOH")
     washSamples(pipette_300, buffers.MeOH, sample_chambers, wash_volume, num_repeats=1)
     #INCUBATE
-    protocol.delay(minutes=2.5, msg="MeOH incubation")
+    protocol.delay(minutes=2.5, msg="First MeOH incubation")
 
     #FIXING SAMPLES WITH Methanol
     protocol.comment("applying MeOH")
     washSamples(pipette_300, buffers.MeOH, sample_chambers, wash_volume, num_repeats=1)
     #INCUBATE
-    protocol.delay(minutes=2.5, msg="MeOH incubation")
+    protocol.delay(minutes=2.5, msg="Second MeOH incubation")
 
     #WASHING SAMPLES WITH PBS
     protocol.comment("PBS wash")
@@ -224,8 +222,8 @@ def run(protocol: protocol_api.ProtocolContext):
     for i in range (len(wellslist)):
         dilute_and_apply_fixative(pipette_300, reagent_F_wells[i], buffers.PBS, sample_chambers[i], wash_volume)
 
-    protocol.comment("third fix incubation: 10min")
-    protocol.delay(minutes=10, msg = "third fix incubation")
+    protocol.comment("third fix incubation")
+    protocol.delay(minutes=10, msg = "Reagent F incubation")
 
     #WASHING SAMPLES WITH PBS
     protocol.comment("PBS wash")
@@ -250,11 +248,11 @@ def run(protocol: protocol_api.ProtocolContext):
     #INCUBATE
     protocol.delay(minutes=10, msg = "rendering hybridization")
 
-    #WASH SAMPLES IN PINK BUFFER
+    #WASH SAMPLES IN washing_buffer_R2
     protocol.comment("Washing with rendering buffer")
     washSamples(pipette_300, buffers.washing_buffer_R2, sample_chambers, wash_volume, num_repeats=2)
 
     #STORAGE, washing samples every hour for 100 hours 
     for i in range(10):
         washSamples(pipette_300, buffers.storage, sample_chambers, wash_volume/3, keep_tip=True)
-        protocol.delay(minutes=90, msg = "storing samples in S4")
+        protocol.delay(minutes=90, msg = "storing samples in storage buffer")

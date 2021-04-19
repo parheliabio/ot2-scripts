@@ -1,19 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="3f1da4c3-d51e-4a23-9029-cafdead48ca7" name="Default Changelist" comment="renaming labwares">
+    <list default="true" id="3f1da4c3-d51e-4a23-9029-cafdead48ca7" name="Default Changelist" comment="conforming to Akoya nomenclature">
+      <change afterPath="$PROJECT_DIR$/protocols/CODEX multicycle/CODEX multicycle stain.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/protocols/CODEX multicycle/labware layout.xlsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/APP driven PAR2 CODEX OT2 APIv2.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/APP driven PAR2 blue dye demo OT2 APIv2.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/axygen_12well_trough.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/black_96.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ntbk_SLIDE_PAR2 IIHC stain with retreaval OT-2 APIv2.ipynb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ntbk_widePAR2 cslip CODEX stain OT-2 APIv2.ipynb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/par2_cslp_metal_v1.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/par2_plastic_wide_cslps.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/par2_slides_v1.json" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/protocols/CODEX single stain/CODEX single stain.py" beforeDir="false" afterPath="$PROJECT_DIR$/protocols/CODEX single stain/CODEX single stain.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/protocols/blue dye demo/blue dye demo plate layout.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/protocols/blue dye demo/labware layout.xlsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -31,23 +23,29 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="ProjectId" id="1rN7JSxWgv8qkWwmU5cQ7ve19kg" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
+    <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/protocols/blue dye demo" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/protocols/CODEX multicycle" />
     <property name="settings.editor.selected.configurable" value="vcs.Git" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/protocols/CODEX multicycle" />
+      <recent name="$PROJECT_DIR$/protocols" />
       <recent name="$PROJECT_DIR$/protocols/blue dye demo" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/labware" />
       <recent name="$PROJECT_DIR$/protocols/CODEX single stain" />
+      <recent name="$PROJECT_DIR$/labware" />
       <recent name="$PROJECT_DIR$/protocols/blue dye demo" />
       <recent name="$PROJECT_DIR$/protocols" />
       <recent name="$PROJECT_DIR$/jupyter_notebooks" />
@@ -83,7 +81,14 @@
       <option name="project" value="LOCAL" />
       <updated>1618813359558</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="conforming to Akoya nomenclature">
+      <created>1618814255226</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1618814255226</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -98,7 +103,9 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
+    <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <MESSAGE value="renaming labwares" />
-    <option name="LAST_COMMIT_MESSAGE" value="renaming labwares" />
+    <MESSAGE value="conforming to Akoya nomenclature" />
+    <option name="LAST_COMMIT_MESSAGE" value="conforming to Akoya nomenclature" />
   </component>
 </project>
