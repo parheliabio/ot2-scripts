@@ -133,19 +133,19 @@ def run(protocol: protocol_api.ProtocolContext):
     buffer_wells = trough12.wells_by_name()
 
     buffers = Object()
-    buffers.S1_PFA =  buffer_wells['A1']
-    buffers.S2 =  buffer_wells['A2']
+    buffers.Hydration_PFA =  buffer_wells['A1']
+    buffers.Staining =  buffer_wells['A2']
     buffers.PFA_S4 = buffer_wells['A3']
     buffers.MeOH =  buffer_wells['A4']
     buffers.PBS = buffer_wells['A5']
-    buffers.H2 = buffer_wells['A6']
-    buffers.pinkbuffer = buffer_wells['A7']
-    buffers.bluebuffer = buffer_wells['A8']
+    buffers.CODEX_buffer_1x = buffer_wells['A6']
+    buffers.washing_buffer_R2 = buffer_wells['A7']
+    buffers.stripping_buffer_R2 = buffer_wells['A8']
     buffers.storage =  buffer_wells['A9'] 
 
     preblock_wells = black_96.rows()[0]
     antibody_wells = black_96.rows()[1]
-    BS3_wells = black_96.rows()[2]
+    reagent_F_wells = black_96.rows()[2]
     rendering_wells = black_96.rows()[3]
 
     sample_chambers = []
@@ -158,13 +158,13 @@ def run(protocol: protocol_api.ProtocolContext):
 
     #WASHING SAMPLES WITH PFA
     protocol.comment("first fix")
-    washSamples(pipette_300, buffers.S1_PFA, sample_chambers, wash_volume)
+    washSamples(pipette_300, buffers.Hydration_PFA, sample_chambers, wash_volume)
     #INCUBATE
     protocol.delay(minutes=10, msg = "first fix incubation")
 
     #WASHING SAMPLES WITH S2
     protocol.comment("washing in S2")
-    washSamples(pipette_300, buffers.S2, sample_chambers, wash_volume, num_repeats=2)
+    washSamples(pipette_300, buffers.Staining, sample_chambers, wash_volume, num_repeats=2)
 
     #WASHING SAMPLES WITH PREBLOCK
     protocol.comment("preblocking")
@@ -183,14 +183,14 @@ def run(protocol: protocol_api.ProtocolContext):
     #WASHING SAMPLES WITH S2
     #three individual repeats below is because they need particular incubation time between them
     protocol.comment("first washing with s2")
-    washSamples(pipette_300, buffers.S2, sample_chambers, wash_volume, num_repeats=2)
+    washSamples(pipette_300, buffers.Staining, sample_chambers, wash_volume, num_repeats=2)
     #INCUBATE
     protocol.delay(minutes=5, msg = "first incubation in s2")
 
     #WASHING SAMPLES WITH S2
     #three individual repeats below is because they need particular incubation time between them
     protocol.comment("second washing with s2")
-    washSamples(pipette_300, buffers.S2, sample_chambers, wash_volume, num_repeats=2)
+    washSamples(pipette_300, buffers.Staining, sample_chambers, wash_volume, num_repeats=2)
     #INCUBATE
     protocol.delay(minutes=5, msg = "first incubation in s2")
 
@@ -222,7 +222,7 @@ def run(protocol: protocol_api.ProtocolContext):
 
     #DILUTING AND APPLYING THE FIXATIVE
     for i in range (len(wellslist)):
-        dilute_and_apply_fixative(pipette_300, BS3_wells[i], buffers.PBS, sample_chambers[i], wash_volume)
+        dilute_and_apply_fixative(pipette_300, reagent_F_wells[i], buffers.PBS, sample_chambers[i], wash_volume)
 
     protocol.comment("third fix incubation: 10min")
     protocol.delay(minutes=10, msg = "third fix incubation")
@@ -234,14 +234,14 @@ def run(protocol: protocol_api.ProtocolContext):
     #PRE-CLEARING THE TISSUE
     for i in range (3):
         protocol.comment("tissue clearing round" + str(i+1))
-        washSamples(pipette_300, buffers.bluebuffer, sample_chambers, wash_volume, num_repeats=2)
+        washSamples(pipette_300, buffers.stripping_buffer_R2, sample_chambers, wash_volume, num_repeats=2)
         protocol.delay(seconds=30)
-        washSamples(pipette_300, buffers.pinkbuffer, sample_chambers, wash_volume, num_repeats=1)
-        washSamples(pipette_300, buffers.H2, sample_chambers, wash_volume, num_repeats=1)
+        washSamples(pipette_300, buffers.washing_buffer_R2, sample_chambers, wash_volume, num_repeats=1)
+        washSamples(pipette_300, buffers.CODEX_buffer_1x, sample_chambers, wash_volume, num_repeats=1)
 
     #Equilibration in rendering buffer
     protocol.comment("Equilibration in rendering buffer")
-    washSamples(pipette_300, buffers.pinkbuffer, sample_chambers, wash_volume)
+    washSamples(pipette_300, buffers.washing_buffer_R2, sample_chambers, wash_volume)
 
     #RENDERING
     protocol.comment("Applying rendering solution to wells")
@@ -252,7 +252,7 @@ def run(protocol: protocol_api.ProtocolContext):
 
     #WASH SAMPLES IN PINK BUFFER
     protocol.comment("Washing with rendering buffer")
-    washSamples(pipette_300, buffers.pinkbuffer, sample_chambers, wash_volume, num_repeats=2)
+    washSamples(pipette_300, buffers.washing_buffer_R2, sample_chambers, wash_volume, num_repeats=2)
 
     #STORAGE, washing samples every hour for 100 hours 
     for i in range(10):
