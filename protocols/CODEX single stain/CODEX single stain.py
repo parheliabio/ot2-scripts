@@ -133,9 +133,9 @@ def run(protocol: protocol_api.ProtocolContext):
     buffer_wells = trough12.wells_by_name()
 
     buffers = Object()
-    buffers.Hydration_PFA =  buffer_wells['A1']
+    buffers.Hydration_PFA_1pt6pct =  buffer_wells['A1']
     buffers.Staining =  buffer_wells['A2']
-    buffers.PFA_S4 = buffer_wells['A3']
+    buffers.Storage_PFA_4pct = buffer_wells['A3']
     buffers.MeOH =  buffer_wells['A4']
     buffers.PBS = buffer_wells['A5']
     buffers.CODEX_buffer_1x = buffer_wells['A6']
@@ -158,7 +158,7 @@ def run(protocol: protocol_api.ProtocolContext):
 
     #WASHING SAMPLES WITH PFA
     protocol.comment("first fix")
-    washSamples(pipette_300, buffers.Hydration_PFA, sample_chambers, wash_volume)
+    washSamples(pipette_300, buffers.Hydration_PFA_1pt6pct, sample_chambers, wash_volume)
     #INCUBATE
     protocol.delay(minutes=10, msg = "first fix incubation")
 
@@ -196,7 +196,7 @@ def run(protocol: protocol_api.ProtocolContext):
 
     #POST STAINING FIXING SAMPLES WITH PFA
     protocol.comment("second fix")
-    washSamples(pipette_300, buffers.PFA_S4, sample_chambers, wash_volume)
+    washSamples(pipette_300, buffers.Storage_PFA_4pct, sample_chambers, wash_volume)
     #INCUBATE
     protocol.delay(minutes=5, msg="second fix incubation")
 

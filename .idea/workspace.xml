@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="3f1da4c3-d51e-4a23-9029-cafdead48ca7" name="Default Changelist" comment="renaming labwares">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/APP driven PAR2 CODEX OT2 APIv2.py" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/APP driven PAR2 blue dye demo OT2 APIv2.py" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/axygen_12well_trough.json" beforeDir="false" />
@@ -11,6 +12,8 @@
       <change beforePath="$PROJECT_DIR$/par2_cslp_metal_v1.json" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/par2_plastic_wide_cslps.json" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/par2_slides_v1.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/protocols/CODEX single stain/CODEX single stain.py" beforeDir="false" afterPath="$PROJECT_DIR$/protocols/CODEX single stain/CODEX single stain.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/protocols/blue dye demo/blue dye demo plate layout.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/protocols/blue dye demo/labware layout.xlsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -73,7 +76,14 @@
       <option name="project" value="LOCAL" />
       <updated>1618807889739</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="renaming labwares">
+      <created>1618813359558</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1618813359558</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
