@@ -12,7 +12,7 @@ metadata = {
 
 ### !!! IMPORTANT !!! Select the right PAR2 type by uncommenting one of the lines below
 par2_type= 'PAR2(s)_9slides_v1'
-#par2_type= 'PAR2(s)_12coverslips_v1'
+#par2_type= 'PAR2(c)_12coverslips_v1'
 
 ### !!! IMPORTANT !!! Specify the PAR2 positions where your specimens are located
 wellslist = ['A2','A3','A4']
