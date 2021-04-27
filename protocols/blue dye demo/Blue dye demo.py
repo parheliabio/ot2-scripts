@@ -4,20 +4,21 @@ import json
 metadata = {
     'protocolName': 'PAR2 CODEX coverslip staining protocol',
     'author': 'Parhelia Bio <info@parheliabio.com>',
-    'description': 'CODEX coverslip staining protocol for EA PAR2 instrument - from tissue rehydration to single-cycle rendering',
-    'apiLevel': '2.7'
+    'description': 'Parhelia Demo protocol that iteratively exchanges trypan blue dye and clear buffer on one or several samples',
+    'apiLevel': '2.9'
 }
 
 ####################MODIFIABLE RUN PARAMETERS#########################
 
-### !!! IMPORTANT !!! Select the right PAR2 type by uncommenting one of the lines below
-par2_type= 'PAR2(s)_9slides_v1'
-#par2_type= 'PAR2(c)_12coverslips_v1'
+# !!! IMPORTANT !!! Select the right PAR2 type by uncommenting one of the lines below
+#par2_type= 'par2s_9slides'
+par2_type= 'par2c_12coverslips'
 
-### !!! IMPORTANT !!! Specify the PAR2 positions where your specimens are located
+# !!! IMPORTANT !!! Specify the PAR2 positions where your specimens are located,
+# starting with A2 (A1 is reserved for calibration and should not be used for staining)
 wellslist = ['A2','A3','A4']
 
-### !!! IMPORTANT !!! Specify the first non-empty position in the tip rack
+# !!! IMPORTANT !!! Specify the first non-empty position in the tip rack
 tiprack_starting_pos = {
     "tiprack_10": 'A1',
     "tiprack_300": 'A1'
@@ -30,7 +31,8 @@ wash_volume = 200
 class Object:
     pass
 
-pipette_300_location='right'
+pipette_300_location='left'
+pipette_300_GEN = 'GEN2'
 
 labwarePositions = Object()
 labwarePositions.buffers_plate = 1
@@ -81,19 +83,20 @@ def run(protocol: protocol_api.ProtocolContext):
 
     tiprack_300 = protocol.load_labware('opentrons_96_tiprack_300ul', labwarePositions.tiprack_300, 'tiprack 300ul')
 
-    pipette_300 = protocol.load_instrument('p300_single', pipette_300_location, tip_racks = [tiprack_300])
+    pipette_300 = protocol.load_instrument('p300_single_gen2' if pipette_300_GEN == 'GEN2' else 'p300_single', pipette_300_location, tip_racks = [tiprack_300])
     pipette_300.flow_rate.dispense = default_flow_rate
     pipette_300.flow_rate.aspirate = default_flow_rate
     pipette_300.starting_tip = tiprack_300.well(tiprack_starting_pos['tiprack_300'])
 
-    par2 = protocol.load_labware(par2_type, labwarePositions.par2, 'PAR2(c)')
-    trough12 = protocol.load_labware('Parhelia_12well_trough', labwarePositions.buffers_plate, '12-trough buffers reservoir')
+    par2 = protocol.load_labware(par2_type, labwarePositions.par2, 'PAR2')
+    trough12 = protocol.load_labware('parhelia_12trough', labwarePositions.buffers_plate, '12-trough buffers reservoir')
 
     buffer_wells = trough12.wells_by_name()
 
     buffers = Object()
-    buffers.White =  buffer_wells['A2']
-    buffers.Blue=  buffer_wells['A1']
+
+    buffers.clear=  buffer_wells['A1']
+    buffers.blue =  buffer_wells['A2']
 
     sample_chambers = []
 
@@ -103,17 +106,19 @@ def run(protocol: protocol_api.ProtocolContext):
     #################PROTOCOL####################
     protocol.comment("Starting the DEMO BLUE DYE protocol for samples:" + str(sample_chambers))
 
-    print("applying the blue dye")
-    #WASH SAMPLES IN WHITE BUFFER
-    protocol.comment("Washing with white buffer")
-    washSamples(pipette_300, buffers.White, sample_chambers,wash_volume,num_repeats=1)
-
-    #WASH SAMPLES IN BLUE BUFFER
+    #WASH SAMPLES WITH BLUE BUFFER
     protocol.comment("Washing with blue buffer")
-    washSamples(pipette_300, buffers.Blue, sample_chambers,wash_volume,num_repeats=1)
+    washSamples(pipette_300, buffers.blue, sample_chambers, wash_volume, num_repeats=1)
 
-    #WASH SAMPLES IN WHITE BUFFER
-    protocol.comment("Washing with white buffer")
-    washSamples(pipette_300, buffers.White, sample_chambers,wash_volume,num_repeats=2)
+    #WASH SAMPLES WITH CLEAR BUFFER
+    protocol.comment("Washing with clear buffer")
+    washSamples(pipette_300, buffers.clear, sample_chambers, wash_volume, num_repeats=2)
 
+    #WASH SAMPLES WITH BLUE BUFFER
+    protocol.comment("Washing with blue buffer")
+    washSamples(pipette_300, buffers.blue, sample_chambers, wash_volume, num_repeats=1)
+
+    #WASH SAMPLES WITH CLEAR BUFFER
+    protocol.comment("Washing with blue buffer")
+    washSamples(pipette_300, buffers.clear, sample_chambers, wash_volume, num_repeats=1)
 

@@ -5,7 +5,7 @@ metadata = {
     'protocolName': 'PAR2 CODEX single stain',
     'author': 'Parhelia Bio <info@parheliabio.com>',
     'description': 'CODEX coverslip staining protocol for EA PAR2 instrument - from tissue rehydration to single-cycle rendering',
-    'apiLevel': '2.7'
+    'apiLevel': '2.9'
 }
 
 class Object:
@@ -13,14 +13,15 @@ class Object:
 
 ####################MODIFIABLE RUN PARAMETERS#########################
 
-### !!! IMPORTANT !!! Select the right PAR2 type by uncommenting one of the lines below
-#par2_type= 'PAR2(s)_9slides_v1'
-par2_type= 'PAR2(c)_12coverslips_v1'
+# !!! IMPORTANT !!! Select the right PAR2 type by uncommenting one of the lines below
+#par2_type= 'par2s_9slides'
+par2_type= 'par2c_12coverslips'
 
-### !!! IMPORTANT !!! Specify the PAR2 positions where your specimens are located
+# !!! IMPORTANT !!! Specify the PAR2 positions where your specimens are located
+# starting with A2 (A1 is reserved for calibration and should not be used for staining)
 wellslist = ['A2','A3','A4']
 
-### !!! IMPORTANT !!! Specify the first non-empty position in the tip rack
+# !!! IMPORTANT !!! Specify the first non-empty position in the tip rack
 tiprack_starting_pos = {
     "tiprack_10": 'A1',
     "tiprack_300": 'A1'
@@ -32,7 +33,8 @@ wash_volume = 150
 ab_volume=100
 
 ####################LABWARE LAYOUT ON DECK#########################
-pipette_300_location='right'
+pipette_300_location='left'
+pipette_300_GEN = 'GEN2'
 
 labwarePositions = Object()
 labwarePositions.buffers_plate = 1
@@ -120,15 +122,15 @@ def run(protocol: protocol_api.ProtocolContext):
 
     tiprack_300 = protocol.load_labware('opentrons_96_tiprack_300ul', labwarePositions.tiprack_300, 'tiprack 300ul')
 
-    pipette_300 = protocol.load_instrument('p300_single', pipette_300_location, tip_racks = [tiprack_300])
+    pipette_300 = protocol.load_instrument('p300_single_gen2' if pipette_300_GEN == 'GEN2' else 'p300_single', pipette_300_location, tip_racks = [tiprack_300])
     pipette_300.flow_rate.dispense = default_flow_rate
     pipette_300.flow_rate.aspirate = default_flow_rate
     pipette_300.starting_tip = tiprack_300.well(tiprack_starting_pos['tiprack_300'])
 
     par2 = protocol.load_labware(par2_type, labwarePositions.par2, 'PAR2')
-    trough12 = protocol.load_labware('Parhelia_12well_trough', labwarePositions.buffers_plate, '12-trough buffers reservoir')
+    trough12 = protocol.load_labware('parhelia_12trough', labwarePositions.buffers_plate, '12-trough buffers reservoir')
 
-    black_96 = protocol.load_labware('Parhelia_black_96', labwarePositions.antibodies_plate, '96-well-plate')
+    black_96 = protocol.load_labware('parhelia_black_96', labwarePositions.antibodies_plate, '96-well-plate')
 
     buffer_wells = trough12.wells_by_name()
 
@@ -238,6 +240,6 @@ def run(protocol: protocol_api.ProtocolContext):
         washSamples(pipette_300, buffers.CODEX_buffer_1x, sample_chambers, wash_volume, num_repeats=1)
 
     #STORAGE, washing samples every hour for 100 hours 
-    for i in range(100):
+    for i in range(10):
         washSamples(pipette_300, buffers.storage, sample_chambers, wash_volume/3, keep_tip=True)
         protocol.delay(minutes=90, msg = "storing samples in storage buffer")

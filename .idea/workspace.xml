@@ -2,7 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="3f1da4c3-d51e-4a23-9029-cafdead48ca7" name="Default Changelist" comment="conforming to Akoya nomenclature">
+      <change afterPath="$PROJECT_DIR$/protocols/OT-2 logo_Parhelia.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/labware/PAR2(c)_12samples_v1.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/labware/PAR2(s)_9slides_v1.json" beforeDir="false" afterPath="$PROJECT_DIR$/labware/PAR2(s)_9slides_v1.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/labware/Parhelia_12well_trough.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/labware/Parhelia_black_96.json" beforeDir="false" afterPath="$PROJECT_DIR$/labware/Parhelia_black_96.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/protocols/CODEX multicycle/CODEX multicycle stain.py" beforeDir="false" afterPath="$PROJECT_DIR$/protocols/CODEX multicycle/CODEX multicycle stain.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/protocols/CODEX single stain/CODEX single stain.py" beforeDir="false" afterPath="$PROJECT_DIR$/protocols/CODEX single stain/CODEX single stain.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/protocols/blue dye demo/Blue dye demo.py" beforeDir="false" afterPath="$PROJECT_DIR$/protocols/blue dye demo/Blue dye demo.py" afterDir="false" />
@@ -95,7 +100,14 @@
       <option name="project" value="LOCAL" />
       <updated>1618816801485</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="conforming to Akoya nomenclature">
+      <created>1619049619745</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1619049619745</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
