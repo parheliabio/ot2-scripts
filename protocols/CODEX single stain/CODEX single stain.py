@@ -28,7 +28,7 @@ tiprack_starting_pos = {
 }
 
 ### change these as necessary
-ab_incubation_time_minutes = 90
+ab_incubation_time_minutes = 180
 wash_volume = 150
 ab_volume=100
 
@@ -180,7 +180,7 @@ def run(protocol: protocol_api.ProtocolContext):
     for i in range (len(wellslist)):
         washSamples(pipette_300, antibody_wells[i], sample_chambers[i], ab_volume)
     #INCUBATE
-    protocol.delay(minutes=90, msg = "staining incubation")
+    protocol.delay(minutes=ab_incubation_time_minutes, msg = "staining incubation")
 
     #WASHING SAMPLES WITH Staining buffer
     protocol.comment("first washing with Staining buffer")

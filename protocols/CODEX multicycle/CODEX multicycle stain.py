@@ -28,7 +28,7 @@ tiprack_starting_pos = {
 }
 
 ### change these as necessary
-ab_incubation_time_minutes = 90
+ab_incubation_time_minutes = 180
 wash_volume = 150
 ab_volume=100
 
@@ -141,14 +141,11 @@ def run(protocol: protocol_api.ProtocolContext):
     buffers.MeOH =  buffer_wells['A4']
     buffers.PBS = buffer_wells['A5']
     buffers.CODEX_buffer_1x = buffer_wells['A6']
-    buffers.washing_buffer_R2 = buffer_wells['A7']
-    buffers.stripping_buffer_R2 = buffer_wells['A8']
-    buffers.storage =  buffer_wells['A9'] 
+    buffers.storage =  buffer_wells['A7']
 
     preblock_wells = black_96.rows()[0]
     antibody_wells = black_96.rows()[1]
     reagent_F_wells = black_96.rows()[2]
-    rendering_wells = black_96.rows()[3]
 
     sample_chambers = []
 
@@ -180,7 +177,7 @@ def run(protocol: protocol_api.ProtocolContext):
     for i in range (len(wellslist)):
         washSamples(pipette_300, antibody_wells[i], sample_chambers[i], ab_volume)
     #INCUBATE
-    protocol.delay(minutes=90, msg = "staining incubation")
+    protocol.delay(minutes=ab_incubation_time_minutes, msg = "staining incubation")
 
     #WASHING SAMPLES WITH Staining buffer
     protocol.comment("first washing with Staining buffer")
@@ -230,14 +227,6 @@ def run(protocol: protocol_api.ProtocolContext):
     #WASHING SAMPLES WITH PBS
     protocol.comment("PBS wash")
     washSamples(pipette_300, buffers.PBS, sample_chambers, wash_volume, 2)
-
-    #PRE-CLEARING THE TISSUE
-    for i in range (3):
-        protocol.comment("tissue clearing round" + str(i+1))
-        washSamples(pipette_300, buffers.stripping_buffer_R2, sample_chambers, wash_volume, num_repeats=2)
-        protocol.delay(seconds=30)
-        washSamples(pipette_300, buffers.washing_buffer_R2, sample_chambers, wash_volume, num_repeats=1)
-        washSamples(pipette_300, buffers.CODEX_buffer_1x, sample_chambers, wash_volume, num_repeats=1)
 
     #STORAGE, washing samples every hour for 100 hours 
     for i in range(10):
