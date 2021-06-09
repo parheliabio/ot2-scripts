@@ -9,8 +9,6 @@ metadata = {
 
 }
 
-class Object:
-    pass
 
 ####################MODIFIABLE RUN PARAMETERS#########################
 
@@ -46,6 +44,10 @@ ab_incubation_time_minutes = 180
 wash_volume = 150
 ab_volume=100
 
+#Creating a dummy class
+class Object:
+    pass
+
 ####################LABWARE LAYOUT ON DECK#########################
 pipette_300_location='left'
 pipette_300_GEN = 'GEN2'
@@ -57,6 +59,7 @@ labwarePositions.antibodies_plate = 3
 labwarePositions.tiprack_300 = 6
 
 ####################GENERAL SETUP################################
+
 stats = Object()
 stats.volume = 0
 debug = False
