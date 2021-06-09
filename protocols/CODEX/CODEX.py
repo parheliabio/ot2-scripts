@@ -6,6 +6,7 @@ metadata = {
     'author': 'Parhelia Bio <info@parheliabio.com>',
     'description': 'CODEX coverslip staining protocol for EA PAR2 instrument - from tissue rehydration to single-cycle rendering',
     'apiLevel': '2.7'
+
 }
 
 class Object:
