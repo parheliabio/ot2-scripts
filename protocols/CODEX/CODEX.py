@@ -2,10 +2,10 @@ from opentrons import protocol_api
 import json
 
 metadata = {
-    'protocolName': 'PAR2 CODEX single stain',
+    'protocolName': 'PAR2 CODEX',
     'author': 'Parhelia Bio <info@parheliabio.com>',
     'description': 'CODEX coverslip staining protocol for EA PAR2 instrument - from tissue rehydration to single-cycle rendering',
-    'apiLevel': '2.9'
+    'apiLevel': '2.7'
 }
 
 class Object:
@@ -17,8 +17,21 @@ class Object:
 #par2_type= 'par2s_9slides'
 par2_type= 'par2c_12coverslips'
 
-# !!! IMPORTANT !!! Specify the PAR2 positions where your specimens are located
-# starting with A2 (A1 is reserved for calibration and should not be used for staining)
+#The initial 1.6% PFA fixation is skipped for FFPE tissues
+FFPE = False
+
+"""
+Antibody screening involves additional rendering step at the end, where the tissue is cleared and then 
+fluorescent detection probes are applied to the tissue directly in the PAR2 device. 
+If this option is enabled, make sure that 
+    1) detector oligo mixes have been added to the 96-well plate 2)
+"""
+Antibody_Screening = False
+
+""" !!! IMPORTANT !!! Specify the PAR2 positions where your specimens are located,
+starting with A2 (A1 is reserved for calibration and should not be used for staining)
+PAR2 'A' row positions 1-4 correspond to wells A2-A5, whereas 'B' and 'C' row positions 1-4 
+correspond to wells B1-4 and C1-4, respectively """
 wellslist = ['A2','A3','A4']
 
 # !!! IMPORTANT !!! Specify the first non-empty position in the tip rack
@@ -120,6 +133,8 @@ def mix(pipette, sourceSolutionWell, volume, num_repeats):
 def run(protocol: protocol_api.ProtocolContext):
     ###########################LABWARE SETUP#################################
 
+
+
     tiprack_300 = protocol.load_labware('opentrons_96_tiprack_300ul', labwarePositions.tiprack_300, 'tiprack 300ul')
 
     pipette_300 = protocol.load_instrument('p300_single_gen2' if pipette_300_GEN == 'GEN2' else 'p300_single', pipette_300_location, tip_racks = [tiprack_300])
@@ -141,11 +156,14 @@ def run(protocol: protocol_api.ProtocolContext):
     buffers.MeOH =  buffer_wells['A4']
     buffers.PBS = buffer_wells['A5']
     buffers.CODEX_buffer_1x = buffer_wells['A6']
-    buffers.storage =  buffer_wells['A7']
+    buffers.Screening_Buffer = buffer_wells['A7']
+    buffers.Stripping_buffer = buffer_wells['A8']
+    buffers.storage = buffer_wells['A9']
 
     preblock_wells = black_96.rows()[0]
     antibody_wells = black_96.rows()[1]
     reagent_F_wells = black_96.rows()[2]
+    rendering_wells = black_96.rows()[3]
 
     sample_chambers = []
 
@@ -155,11 +173,12 @@ def run(protocol: protocol_api.ProtocolContext):
     #################PROTOCOL####################
     protocol.comment("Starting the CODEX staining protocol for samples:" + str(sample_chambers))
 
-    #WASHING SAMPLES WITH PFA
-    protocol.comment("first fix")
-    washSamples(pipette_300, buffers.Hydration_PFA_1pt6pct, sample_chambers, wash_volume)
-    #INCUBATE
-    protocol.delay(minutes=10, msg = "first fix incubation")
+    if not FFPE:
+        #WASHING SAMPLES WITH PFA
+        protocol.comment("first fix")
+        washSamples(pipette_300, buffers.Hydration_PFA_1pt6pct, sample_chambers, wash_volume)
+        #INCUBATE
+        protocol.delay(minutes=10, msg = "first fix incubation")
 
     #WASHING SAMPLES WITH S2
     protocol.comment("washing in S2")
@@ -189,7 +208,7 @@ def run(protocol: protocol_api.ProtocolContext):
     protocol.comment("second washing with Staining buffer")
     washSamples(pipette_300, buffers.Staining, sample_chambers, wash_volume, num_repeats=2)
     #INCUBATE
-    protocol.delay(minutes=5, msg = "seciond incubation in Staining buffer")
+    protocol.delay(minutes=5, msg = "second incubation in Staining buffer")
 
     #POST STAINING FIXING SAMPLES WITH PFA
     protocol.comment("second fix")
@@ -201,17 +220,12 @@ def run(protocol: protocol_api.ProtocolContext):
     protocol.comment("PBS wash")
     washSamples(pipette_300, buffers.PBS, sample_chambers, wash_volume, num_repeats=2)
 
-    #FIXING SAMPLES WITH Methanol
-    protocol.comment("applying MeOH")
-    washSamples(pipette_300, buffers.MeOH, sample_chambers, wash_volume, num_repeats=1)
-    #INCUBATE
-    protocol.delay(minutes=2.5, msg="First MeOH incubation")
-
-    #FIXING SAMPLES WITH Methanol
-    protocol.comment("applying MeOH")
-    washSamples(pipette_300, buffers.MeOH, sample_chambers, wash_volume, num_repeats=1)
-    #INCUBATE
-    protocol.delay(minutes=2.5, msg="Second MeOH incubation")
+    # FIXING SAMPLES WITH Methanol
+    for i in range(2):
+        protocol.comment("applying MeOH")
+        washSamples(pipette_300, buffers.MeOH, sample_chambers, wash_volume, num_repeats=1)
+        # INCUBATE
+        protocol.delay(minutes=2.5, msg="First MeOH incubation")
 
     #WASHING SAMPLES WITH PBS
     protocol.comment("PBS wash")
@@ -227,6 +241,30 @@ def run(protocol: protocol_api.ProtocolContext):
     #WASHING SAMPLES WITH PBS
     protocol.comment("PBS wash")
     washSamples(pipette_300, buffers.PBS, sample_chambers, wash_volume, 2)
+
+    if Antibody_Screening:
+        #PRE-CLEARING THE TISSUE
+        for i in range (3):
+            protocol.comment("tissue clearing round" + str(i+1))
+            washSamples(pipette_300, buffers.Stripping_buffer, sample_chambers, wash_volume, num_repeats=2)
+            protocol.delay(seconds=30)
+            washSamples(pipette_300, buffers.Screening_Buffer, sample_chambers, wash_volume, num_repeats=1)
+            washSamples(pipette_300, buffers.CODEX_buffer_1x, sample_chambers, wash_volume, num_repeats=1)
+
+        #Equilibration in rendering buffer
+        protocol.comment("Equilibration in rendering buffer")
+        washSamples(pipette_300, buffers.Screening_Buffer, sample_chambers, wash_volume)
+
+        #RENDERING
+        protocol.comment("Applying rendering solution to wells")
+        for i in range (len(wellslist)):
+            washSamples(pipette_300, rendering_wells[i], sample_chambers[i], wash_volume)
+        #INCUBATE
+        protocol.delay(minutes=10, msg = "rendering hybridization")
+
+        #WASH SAMPLES IN 1x CODEX buffer
+        protocol.comment("Washing with rendering buffer")
+        washSamples(pipette_300, buffers.Screening_Buffer, sample_chambers, wash_volume, num_repeats=2)
 
     #STORAGE, washing samples every hour for 100 hours 
     for i in range(10):
