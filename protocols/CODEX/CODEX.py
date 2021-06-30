@@ -28,10 +28,10 @@ If this option is enabled, make sure that
 Antibody_Screening = False
 
 """ !!! IMPORTANT !!! Specify the PAR2 positions where your specimens are located,
-starting with A2 (A1 is reserved for calibration and should not be used for staining)
-PAR2 'A' row positions 1-4 correspond to wells A2-A5, whereas 'B' and 'C' row positions 1-4 
+starting with A1 (A0 is reserved for calibration and should not be used for staining)
+PAR2 'A' row positions 1-4 correspond to wells A1-A4, whereas 'B' and 'C' row positions 1-4 
 correspond to wells B1-4 and C1-4, respectively """
-wellslist = ['A2','A3','A4']
+wellslist = ['A1','A2','A3']
 
 # !!! IMPORTANT !!! Specify the first non-empty position in the tip rack
 tiprack_starting_pos = {

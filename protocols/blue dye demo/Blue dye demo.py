@@ -15,8 +15,8 @@ metadata = {
 par2_type= 'par2c_12coverslips'
 
 # !!! IMPORTANT !!! Specify the PAR2 positions where your specimens are located,
-# starting with A2 (A1 is reserved for calibration and should not be used for staining)
-wellslist = ['A2','A3','A4']
+# starting with A1 (A0 is reserved for calibration and should not be used for staining)
+wellslist = ['A1','A2','A3']
 
 # !!! IMPORTANT !!! Specify the first non-empty position in the tip rack
 tiprack_starting_pos = {
