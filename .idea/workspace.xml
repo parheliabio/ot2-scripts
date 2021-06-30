@@ -3,10 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="3f1da4c3-d51e-4a23-9029-cafdead48ca7" name="Default Changelist" comment="Updated the IMC protocol to introduce an option of a manual pause and a 4C overnight incubation. &#10;Merged the CODEX_single_stain and CODEX_multicycle protocols into one protocol and added the options for FFPE and Antibody_Screening modes in the *MODIFIABLE RUN PARAMETER* section. Setting Antibody_Screening to False makes this protocol run like CODEX_multicycle, setting it to true makes it run like CODEX_single_stain">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/protocols/CODEX/CODEX.py" beforeDir="false" afterPath="$PROJECT_DIR$/protocols/CODEX/CODEX.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/protocols/IMC/IMC staining.py" beforeDir="false" afterPath="$PROJECT_DIR$/protocols/IMC/IMC staining.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/protocols/IMC/labware layout.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/protocols/IMC/labware layout.xlsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/protocols/blue dye demo/Blue dye demo.py" beforeDir="false" afterPath="$PROJECT_DIR$/protocols/blue dye demo/Blue dye demo.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -155,7 +151,14 @@
       <option name="project" value="LOCAL" />
       <updated>1623277838262</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="Updated the IMC protocol to introduce an option of a manual pause and a 4C overnight incubation. &#10;Merged the CODEX_single_stain and CODEX_multicycle protocols into one protocol and added the options for FFPE and Antibody_Screening modes in the *MODIFIABLE RUN PARAMETER* section. Setting Antibody_Screening to False makes this protocol run like CODEX_multicycle, setting it to true makes it run like CODEX_single_stain">
+      <created>1625019389195</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1625019389195</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
