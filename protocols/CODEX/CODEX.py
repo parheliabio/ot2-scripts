@@ -67,7 +67,7 @@ debug = False
 ####################FIXED RUN PARAMETERS#########################
 default_flow_rate = 50
 well_flow_rate = 5
-sample_flow_rate = 0.2
+sample_flow_rate = 0.1
 
 ####################! FUNCTIONS - DO NOT MODIFY !######################### 
 def washSamples(pipette, sourceSolutionWell, samples, volume, num_repeats=1, keep_tip = False):

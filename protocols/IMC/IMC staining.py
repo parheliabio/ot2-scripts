@@ -53,8 +53,7 @@ debug = False
 ####################FIXED RUN PARAMETERS#########################
 default_flow_rate = 50
 well_flow_rate = 5
-sample_flow_rate = 0.2
-
+sample_flow_rate = 0.1
 
 ####################! FUNCTIONS - DO NOT MODIFY !#########################
 def washSamples(pipette, sourceSolutionWell, samples, volume, num_repeats=1, keep_tip=False):
@@ -102,9 +101,10 @@ def run(protocol: protocol_api.ProtocolContext):
     buffers.PBS =  buffer_wells['A2']
     buffers.diH20 = buffer_wells['A3']
 
-    antibody_wells = black_96.rows()[0]
-    nuclear_wells = black_96.rows()[1]
-    RuO4_wells = black_96.rows()[2]
+    blocking_wells = black_96.rows()[0]
+    antibody_wells = black_96.rows()[1]
+    nuclear_wells = black_96.rows()[2]
+    RuO4_wells = black_96.rows()[3]
 
     sample_chambers = []
 
@@ -114,58 +114,64 @@ def run(protocol: protocol_api.ProtocolContext):
     #################PROTOCOL####################
     protocol.comment("Starting the IMC staining protocol for samples:" + str(sample_chambers))
 
-    # STEP1
+    # STEP
     protocol.comment("Washing with diH2O")
     for i in range(2):
         washSamples(pipette_300, buffers.diH20, sample_chambers, wash_volume)
 
-    # STEP2
+    # STEP
     protocol.comment("Washing with PBS")
     for i in range(10):
         washSamples(pipette_300, buffers.PBS, sample_chambers, wash_volume)
         protocol.delay(minutes=1, msg="wash incubation")
 
-    # STEP3
+    # STEP
+    protocol.comment("blocking")
+    for i in range(len(wellslist)):
+        washSamples(pipette_300, blocking_wells[i], sample_chambers[i], ab_volume)
+    protocol.delay(minutes=45, msg="wash incubation")
+
+    # STEP
     protocol.comment("applying antibodies")
     for i in range(len(wellslist)):
         washSamples(pipette_300, antibody_wells[i], sample_chambers[i], ab_volume)
 
     if(Manual_4C):
-        protocol.pause('Please move the box to 4C fridge')
+        protocol.pause("Please move the box to 4C fridge")
     else:
         protocol.delay(minutes=ab_incubation_time_minutes, msg="staining incubation")
 
-    # STEP4
+    # STEP
     protocol.comment("Washing with PBS Triton")
     for i in range(10):
         washSamples(pipette_300, buffers.PBS_Triton, sample_chambers, wash_volume)
-        protocol.delay(minutes=1, msg = "wash incubation")
+        protocol.delay(minutes=1, msg="wash incubation")
 
-    # STEP5
+    # STEP
     protocol.comment("Washing with PBS")
     for i in range(10):
         washSamples(pipette_300, buffers.PBS, sample_chambers, wash_volume)
-        protocol.delay(minutes=1, msg = "wash incubation")
+        protocol.delay(minutes=1, msg="wash incubation")
 
-    # STEP6
+    # STEP
     protocol.comment("applying the nuclear stain")
     for i in range(len(wellslist)):
         washSamples(pipette_300, nuclear_wells[i], sample_chambers[i], ab_volume)
     protocol.delay(minutes=40, msg="nuclear staining incubation")
 
-    # STEP7
+    # STEP
     protocol.comment("Washing with diH2O")
     for i in range(5):
         washSamples(pipette_300, buffers.diH20, sample_chambers, wash_volume)
         protocol.delay(minutes=1, msg="wash incubation")
 
-    # STEP8
+    # STEP
     protocol.comment("applying RuO4 counterstain")
     for i in range(len(wellslist)):
         washSamples(pipette_300, RuO4_wells[i], sample_chambers[i], ab_volume)
     protocol.delay(minutes=3, msg="RuO4 staining incubation")
 
-    # STEP9
+    # STEP
     protocol.comment("Washing with diH2O")
     for i in range(2):
         washSamples(pipette_300, buffers.diH20, sample_chambers, wash_volume)
@@ -173,4 +179,4 @@ def run(protocol: protocol_api.ProtocolContext):
     #STORAGE, washing samples every hour for 10 hours
     for i in range(10):
         washSamples(pipette_300, buffers.diH20, sample_chambers, wash_volume/3, keep_tip=True)
-        protocol.delay(minutes=90, msg = "storing samples in storage buffer")
+        protocol.delay(minutes=90, msg="storing samples in storage buffer")

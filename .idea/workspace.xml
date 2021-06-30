@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="3f1da4c3-d51e-4a23-9029-cafdead48ca7" name="Default Changelist" comment="Edits as per Derek Oldridge's suggestions">
+    <list default="true" id="3f1da4c3-d51e-4a23-9029-cafdead48ca7" name="Default Changelist" comment="Updated the IMC protocol to introduce an option of a manual pause and a 4C overnight incubation. &#10;Merged the CODEX_single_stain and CODEX_multicycle protocols into one protocol and added the options for FFPE and Antibody_Screening modes in the *MODIFIABLE RUN PARAMETER* section. Setting Antibody_Screening to False makes this protocol run like CODEX_multicycle, setting it to true makes it run like CODEX_single_stain">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/protocols/CODEX multicycle/CODEX multicycle stain.py" beforeDir="false" afterPath="$PROJECT_DIR$/protocols/IMC/IMC staining.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/protocols/CODEX multicycle/labware layout.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/protocols/IMC/labware layout.xlsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/protocols/CODEX single stain/CODEX single stain.py" beforeDir="false" afterPath="$PROJECT_DIR$/protocols/CODEX/CODEX.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/protocols/CODEX single stain/labware layout.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/protocols/CODEX/labware layout.xlsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/protocols/CODEX/CODEX.py" beforeDir="false" afterPath="$PROJECT_DIR$/protocols/CODEX/CODEX.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/protocols/IMC/IMC staining.py" beforeDir="false" afterPath="$PROJECT_DIR$/protocols/IMC/IMC staining.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/protocols/IMC/labware layout.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/protocols/IMC/labware layout.xlsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/protocols/blue dye demo/Blue dye demo.py" beforeDir="false" afterPath="$PROJECT_DIR$/protocols/blue dye demo/Blue dye demo.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -134,7 +134,28 @@
       <option name="project" value="LOCAL" />
       <updated>1622794828824</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="Edits as per Derek Oldridge's suggestions">
+      <created>1623275917833</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1623275917833</updated>
+    </task>
+    <task id="LOCAL-00009" summary="Updated the IMC protocol to introduce an option of a manual pause and a 4C overnight incubation. &#10;Merged the CODEX_single_stain and CODEX_multicycle protocols into one protocol and added the options for FFPE and Antibody_Screening modes in the *MODIFIABLE RUN PARAMETER* section. Setting Antibody_Screening to False makes this protocol run like CODEX_multicycle, setting it to true makes it run like CODEX_single_stain">
+      <created>1623276093585</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1623276093585</updated>
+    </task>
+    <task id="LOCAL-00010" summary="Updated the IMC protocol to introduce an option of a manual pause and a 4C overnight incubation. &#10;Merged the CODEX_single_stain and CODEX_multicycle protocols into one protocol and added the options for FFPE and Antibody_Screening modes in the *MODIFIABLE RUN PARAMETER* section. Setting Antibody_Screening to False makes this protocol run like CODEX_multicycle, setting it to true makes it run like CODEX_single_stain">
+      <created>1623277838262</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1623277838262</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -154,6 +175,7 @@
     <MESSAGE value="renaming labwares" />
     <MESSAGE value="conforming to Akoya nomenclature" />
     <MESSAGE value="Edits as per Derek Oldridge's suggestions" />
-    <option name="LAST_COMMIT_MESSAGE" value="Edits as per Derek Oldridge's suggestions" />
+    <MESSAGE value="Updated the IMC protocol to introduce an option of a manual pause and a 4C overnight incubation. &#10;Merged the CODEX_single_stain and CODEX_multicycle protocols into one protocol and added the options for FFPE and Antibody_Screening modes in the *MODIFIABLE RUN PARAMETER* section. Setting Antibody_Screening to False makes this protocol run like CODEX_multicycle, setting it to true makes it run like CODEX_single_stain" />
+    <option name="LAST_COMMIT_MESSAGE" value="Updated the IMC protocol to introduce an option of a manual pause and a 4C overnight incubation. &#10;Merged the CODEX_single_stain and CODEX_multicycle protocols into one protocol and added the options for FFPE and Antibody_Screening modes in the *MODIFIABLE RUN PARAMETER* section. Setting Antibody_Screening to False makes this protocol run like CODEX_multicycle, setting it to true makes it run like CODEX_single_stain" />
   </component>
 </project>
