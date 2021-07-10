@@ -39,6 +39,11 @@ tiprack_starting_pos = {
     "tiprack_300": 'A1'
 }
 
+# In case the dispensing tip arrives to slide or cslp with a given mistake – this factor,
+# listed in mm, can be used for making the z-correction. E.g.
+# sample_z_correction_factor=-4 will lower the dispensing point by 4mm.
+sample_z_correction_factor=0
+
 ### change these as necessary
 ab_incubation_time_minutes = 180
 wash_volume = 150
@@ -86,7 +91,7 @@ def washSamples(pipette, sourceSolutionWell, samples, volume, num_repeats=1, kee
         for s in samples:
     #Washing sample:
             pipette.aspirate(volume, sourceSolutionWell, rate=well_flow_rate)
-            pipette.dispense(volume, s, rate=sample_flow_rate).blow_out()
+            pipette.dispense(volume, s.bottom(sample_z_correction_factor), rate=sample_flow_rate).blow_out()
             stats.volume += volume
     
     if not keep_tip: pipette.drop_tip()
