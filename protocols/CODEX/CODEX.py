@@ -28,16 +28,21 @@ If this option is enabled, make sure that
 Antibody_Screening = False
 
 """ !!! IMPORTANT !!! Specify the PAR2 positions where your specimens are located,
-starting with A2 (A1 is reserved for calibration and should not be used for staining)
-PAR2 'A' row positions 1-4 correspond to wells A2-A5, whereas 'B' and 'C' row positions 1-4 
+starting with A1 (A0 is reserved for calibration and should not be used for staining)
+PAR2 'A' row positions 1-4 correspond to wells A1-A4, whereas 'B' and 'C' row positions 1-4 
 correspond to wells B1-4 and C1-4, respectively """
-wellslist = ['A2','A3','A4']
+wellslist = ['A1','A2','A3']
 
 # !!! IMPORTANT !!! Specify the first non-empty position in the tip rack
 tiprack_starting_pos = {
     "tiprack_10": 'A1',
     "tiprack_300": 'A1'
 }
+
+# In case the dispensing tip arrives to slide or cslp with a given mistake – this factor,
+# listed in mm, can be used for making the z-correction. E.g.
+# sample_z_correction_factor=-4 will lower the dispensing point by 4mm.
+sample_z_correction_factor=0
 
 ### change these as necessary
 ab_incubation_time_minutes = 180
@@ -86,7 +91,7 @@ def washSamples(pipette, sourceSolutionWell, samples, volume, num_repeats=1, kee
         for s in samples:
     #Washing sample:
             pipette.aspirate(volume, sourceSolutionWell, rate=well_flow_rate)
-            pipette.dispense(volume, s, rate=sample_flow_rate).blow_out()
+            pipette.dispense(volume, s.bottom(sample_z_correction_factor), rate=sample_flow_rate).blow_out()
             stats.volume += volume
     
     if not keep_tip: pipette.drop_tip()

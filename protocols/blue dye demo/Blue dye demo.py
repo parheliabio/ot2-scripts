@@ -15,14 +15,19 @@ metadata = {
 par2_type= 'par2c_12coverslips'
 
 # !!! IMPORTANT !!! Specify the PAR2 positions where your specimens are located,
-# starting with A2 (A1 is reserved for calibration and should not be used for staining)
-wellslist = ['A2','A3','A4']
+# starting with A1 (A0 is reserved for calibration and should not be used for staining)
+wellslist = ['A1','A2','A3']
 
 # !!! IMPORTANT !!! Specify the first non-empty position in the tip rack
 tiprack_starting_pos = {
     "tiprack_10": 'A1',
     "tiprack_300": 'A1'
 }
+
+# In case the dispensing tip arrives to slide or cslp with a given mistake – this factor,
+# listed in mm, can be used for fine z-correction. E.g.
+# sample_z_correction_factor=-4 will lower the dispensing point by 4mm.
+sample_z_correction_factor=0
 
 ## Feel free to play with this setting and see what is the smallest volume required to get acceptably clean sample washing
 wash_volume = 200
@@ -69,7 +74,7 @@ def washSamples(pipette, sourceSolutionWell, samples, volume, num_repeats=1, kee
         for s in samples:
     #        print("Washing sample:" + str(s))
             pipette.aspirate(volume, sourceSolutionWell, rate=well_flow_rate)
-            pipette.dispense(volume, s, rate=sample_flow_rate).blow_out()
+            pipette.dispense(volume, s.bottom(sample_z_correction_factor), rate=sample_flow_rate).blow_out()
             stats.volume += volume
     
     if not keep_tip: pipette.drop_tip()
