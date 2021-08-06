@@ -14,7 +14,7 @@ metadata = {
 
 # !!! IMPORTANT !!! Select the right PAR2 type by uncommenting one of the lines below
 #par2_type= 'par2s_9slides'
-par2_type= 'par2c_12coverslips'
+par2_type = 'par2c_12coverslips'
 
 #The initial 1.6% PFA fixation is skipped for FFPE tissues
 FFPE = False
@@ -41,8 +41,13 @@ tiprack_starting_pos = {
 
 ### change these as necessary
 ab_incubation_time_minutes = 180
-wash_volume = 150
-ab_volume=100
+wash_volume = 50
+ab_volume=30
+
+####################FIXED RUN PARAMETERS#########################
+default_flow_rate = 50
+well_flow_rate = 5
+sample_flow_rate = 0.05
 
 #Creating a dummy class
 class Object:
@@ -63,11 +68,6 @@ labwarePositions.tiprack_300 = 6
 stats = Object()
 stats.volume = 0
 debug = False
-
-####################FIXED RUN PARAMETERS#########################
-default_flow_rate = 50
-well_flow_rate = 5
-sample_flow_rate = 0.1
 
 ####################! FUNCTIONS - DO NOT MODIFY !######################### 
 def washSamples(pipette, sourceSolutionWell, samples, volume, num_repeats=1, keep_tip = False):
