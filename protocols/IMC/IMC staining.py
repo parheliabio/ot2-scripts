@@ -18,8 +18,9 @@ par2_type= 'par2s_9slides'
 
 Manual_4C = True
 
-""" !!! IMPORTANT !!! Sample list to be stained """
-wellslist = ['A1','A2','A3']
+# !!! IMPORTANT !!! Specify the PAR2 positions where your specimens are located,
+# starting with A1 (A0 is reserved for calibration and should not be used for staining)
+wellslist = ['A2','A3','A4']
 
 # !!! IMPORTANT !!! Specify the first non-empty position in the tip rack
 tiprack_starting_pos = {
@@ -33,7 +34,7 @@ wash_volume = 150
 ab_volume = 120
 
 ####################LABWARE LAYOUT ON DECK#########################
-pipette_300_location='left'
+pipette_300_location='right'
 pipette_300_GEN = 'GEN2'
 
 labwarePositions = Object()
@@ -126,7 +127,7 @@ def run(protocol: protocol_api.ProtocolContext):
     protocol.comment("blocking")
     for i in range(len(wellslist)):
         washSamples(pipette_300, blocking_wells[i], sample_chambers[i], ab_volume)
-    protocol.delay(minutes=45, msg="wash incubation")
+        protocol.delay(minutes=45, msg="wash incubation")
 
     # STEP
     protocol.comment("applying antibodies")
