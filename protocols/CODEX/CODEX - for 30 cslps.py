@@ -14,7 +14,7 @@ metadata = {
 
 # !!! IMPORTANT !!! Select the right PAR2 type by uncommenting one of the lines below
 #par2_type= 'par2s_9slides'
-par2_type= 'par2c_12coverslips'
+par2_type= 'PAR2c_30coverslips'
 
 #The initial 1.6% PFA fixation is skipped for FFPE tissues
 FFPE = False
@@ -25,13 +25,13 @@ fluorescent detection probes are applied to the tissue directly in the PAR2 devi
 If this option is enabled, make sure that 
     1) detector oligo mixes have been added to the 96-well plate 2)
 """
-Antibody_Screening = False
+Antibody_Screening = True
 
 """ !!! IMPORTANT !!! Specify the PAR2 positions where your specimens are located,
 starting with A1 (A0 is reserved for calibration and should not be used for staining)
 PAR2 'A' row positions 1-4 correspond to wells A1-A4, whereas 'B' and 'C' row positions 1-4 
 correspond to wells B1-4 and C1-4, respectively """
-wellslist = ['A1','A2','A3']
+wellslist = ['A2','A3']
 
 # !!! IMPORTANT !!! Specify the first non-empty position in the tip rack
 tiprack_starting_pos = {
@@ -39,23 +39,19 @@ tiprack_starting_pos = {
     "tiprack_300": 'A1'
 }
 
-# In case the dispensing tip arrives to slide or cslp with a given mistake – this factor,
-# listed in mm, can be used for making the z-correction. E.g.
-# sample_z_correction_factor=-4 will lower the dispensing point by 4mm.
-sample_z_correction_factor=0
-
 ### change these as necessary
 ab_incubation_time_minutes = 180
-wash_volume = 150
-ab_volume=100
+wash_volume = 60
+ab_volume=40
+extra_bottom_gap=0
 
 #Creating a dummy class
 class Object:
     pass
 
 ####################LABWARE LAYOUT ON DECK#########################
-pipette_300_location='left'
-pipette_300_GEN = 'GEN2'
+pipette_300_location='right'
+pipette_300_GEN = 'GEN1'
 
 labwarePositions = Object()
 labwarePositions.buffers_plate = 1
@@ -75,25 +71,29 @@ well_flow_rate = 5
 sample_flow_rate = 0.1
 
 ####################! FUNCTIONS - DO NOT MODIFY !######################### 
-def washSamples(pipette, sourceSolutionWell, samples, volume, num_repeats=1, keep_tip = False):
+def washSamples(pipette, sourceSolutionWell, samples, volume, num_repeats=1, dispense_bottom_gap=0, keep_tip = False):
 
     try:
         iter(samples)
+        #print('samples are iterable')
     except TypeError:
-        samples = [samples]
-    
-    if not pipette.has_tip: pipette.pick_up_tip()
-    
-    if len(samples)==0:
+        #print('samples arent iterable')
         samples = [samples]
 
+    pipette.pick_up_tip()
+
+#    if(len(samples)==0):
+#       samples = [samples]
+#    print("Replacing solution on samples:" +str(samples) + " len=" + str(len(samples)))
     for i in range(0, num_repeats):
+        print ("Iteration:"+ str(i))
         for s in samples:
-    #Washing sample:
+            print(s)
+            print ("Washing sample:" + str(s))
             pipette.aspirate(volume, sourceSolutionWell, rate=well_flow_rate)
-            pipette.dispense(volume, s.bottom(sample_z_correction_factor), rate=sample_flow_rate).blow_out()
+            pipette.dispense(volume, s.bottom(dispense_bottom_gap), rate=sample_flow_rate).blow_out()
             stats.volume += volume
-    
+
     if not keep_tip: pipette.drop_tip()
     if keep_tip: pipette.move_to(samples[len(samples)-1].bottom(60))
     
@@ -185,97 +185,101 @@ def run(protocol: protocol_api.ProtocolContext):
     if not FFPE:
         #WASHING SAMPLES WITH PFA
         protocol.comment("first fix")
-        washSamples(pipette_300, buffers.Hydration_PFA_1pt6pct, sample_chambers, wash_volume)
+        washSamples(pipette_300, buffers.Hydration_PFA_1pt6pct, buffers.Hydration_PFA_1pt6pct, 0,1,extra_bottom_gap)
+        washSamples(pipette_300, buffers.Hydration_PFA_1pt6pct, sample_chambers, wash_volume,1,extra_bottom_gap)
         #INCUBATE
         protocol.delay(minutes=10, msg = "first fix incubation")
 
     #WASHING SAMPLES WITH S2
     protocol.comment("washing in S2")
-    washSamples(pipette_300, buffers.Staining, sample_chambers, wash_volume, num_repeats=2)
+    washSamples(pipette_300, buffers.Staining, buffers.Staining, 0, 1,extra_bottom_gap)
+    washSamples(pipette_300, buffers.Staining, sample_chambers, wash_volume, 2,extra_bottom_gap)
 
     #WASHING SAMPLES WITH PREBLOCK
     protocol.comment("preblocking")
     for i in range (len(wellslist)):
-        washSamples(pipette_300, preblock_wells[i], sample_chambers[i], wash_volume)
+        washSamples(pipette_300, preblock_wells[i], sample_chambers[i], wash_volume,1,extra_bottom_gap)
     #INCUBATE
     protocol.delay(minutes=15, msg = "preblocking incubation")
 
     #APPLYING ANTIBODY COCKTAILS TO SAMPLES
     protocol.comment("applying antibodies")
     for i in range (len(wellslist)):
-        washSamples(pipette_300, antibody_wells[i], sample_chambers[i], ab_volume)
+        washSamples(pipette_300, antibody_wells[i], sample_chambers[i], ab_volume,1,extra_bottom_gap)
     #INCUBATE
     protocol.delay(minutes=ab_incubation_time_minutes, msg = "staining incubation")
 
-    #WASHING SAMPLES WITH Staining buffer
-    protocol.comment("first washing with Staining buffer")
-    washSamples(pipette_300, buffers.Staining, sample_chambers, wash_volume, num_repeats=2)
-    #INCUBATE
-    protocol.delay(minutes=5, msg = "first incubation in Staining Buffer")
+    for i in range(2):
+        #WASHING SAMPLES WITH Staining buffer
+        protocol.comment("first washing with Staining buffer")
+        washSamples(pipette_300, buffers.Staining, sample_chambers, wash_volume,2,extra_bottom_gap)
+        #INCUBATE
+        protocol.delay(minutes=5, msg = "first incubation in Staining Buffer")
 
-    #WASHING SAMPLES WITH Staining buffer
-    protocol.comment("second washing with Staining buffer")
-    washSamples(pipette_300, buffers.Staining, sample_chambers, wash_volume, num_repeats=2)
-    #INCUBATE
-    protocol.delay(minutes=5, msg = "second incubation in Staining buffer")
 
     #POST STAINING FIXING SAMPLES WITH PFA
     protocol.comment("second fix")
-    washSamples(pipette_300, buffers.Storage_PFA_4pct, sample_chambers, wash_volume)
+    washSamples(pipette_300, buffers.Storage_PFA_4pct, buffers.Storage_PFA_4pct, 0,1,extra_bottom_gap)
+    washSamples(pipette_300, buffers.Storage_PFA_4pct, sample_chambers, wash_volume,1,extra_bottom_gap)
     #INCUBATE
     protocol.delay(minutes=5, msg="incubation with fixative")
 
     #WASHING SAMPLES WITH PBS
     protocol.comment("PBS wash")
-    washSamples(pipette_300, buffers.PBS, sample_chambers, wash_volume, num_repeats=2)
+    washSamples(pipette_300, buffers.PBS, buffers.PBS, 0,2,extra_bottom_gap)
+    washSamples(pipette_300, buffers.PBS, sample_chambers, wash_volume,2,extra_bottom_gap)
 
     # FIXING SAMPLES WITH Methanol
+    washSamples(pipette_300, buffers.MeOH, buffers.MeOH, 0,1,extra_bottom_gap)
     for i in range(2):
         protocol.comment("applying MeOH")
-        washSamples(pipette_300, buffers.MeOH, sample_chambers, wash_volume, num_repeats=1)
+        washSamples(pipette_300, buffers.MeOH, sample_chambers, wash_volume,1,extra_bottom_gap)
         # INCUBATE
         protocol.delay(minutes=2.5, msg="First MeOH incubation")
 
     #WASHING SAMPLES WITH PBS
     protocol.comment("PBS wash")
-    washSamples(pipette_300, buffers.PBS, sample_chambers, wash_volume, num_repeats=2)
+    washSamples(pipette_300, buffers.PBS, sample_chambers, wash_volume,2,extra_bottom_gap)
 
     #DILUTING AND APPLYING THE FIXATIVE
     for i in range (len(wellslist)):
-        dilute_and_apply_fixative(pipette_300, reagent_F_wells[i], buffers.PBS, sample_chambers[i], wash_volume)
+        dilute_and_apply_fixative(pipette_300, reagent_F_wells[i], buffers.PBS, sample_chambers[i], 150)
 
     protocol.comment("third fix incubation")
     protocol.delay(minutes=10, msg = "Reagent F incubation")
 
     #WASHING SAMPLES WITH PBS
     protocol.comment("PBS wash")
-    washSamples(pipette_300, buffers.PBS, sample_chambers, wash_volume, 2)
+    washSamples(pipette_300, buffers.PBS, sample_chambers, wash_volume,2,extra_bottom_gap)
 
     if Antibody_Screening:
+        washSamples(pipette_300, buffers.Stripping_buffer, buffers.Stripping_buffer, 0,1,extra_bottom_gap)
+        washSamples(pipette_300, buffers.Screening_Buffer, buffers.Screening_Buffer, 0,1,extra_bottom_gap)
         #PRE-CLEARING THE TISSUE
         for i in range (3):
             protocol.comment("tissue clearing round" + str(i+1))
-            washSamples(pipette_300, buffers.Stripping_buffer, sample_chambers, wash_volume, num_repeats=2)
+            washSamples(pipette_300, buffers.Stripping_buffer, sample_chambers, wash_volume,2,extra_bottom_gap)
             protocol.delay(seconds=30)
-            washSamples(pipette_300, buffers.Screening_Buffer, sample_chambers, wash_volume, num_repeats=1)
-            washSamples(pipette_300, buffers.CODEX_buffer_1x, sample_chambers, wash_volume, num_repeats=1)
+            washSamples(pipette_300, buffers.Screening_Buffer, sample_chambers, wash_volume,1,extra_bottom_gap)
+            washSamples(pipette_300, buffers.CODEX_buffer_1x, sample_chambers, wash_volume,1,extra_bottom_gap)
 
         #Equilibration in rendering buffer
         protocol.comment("Equilibration in rendering buffer")
-        washSamples(pipette_300, buffers.Screening_Buffer, sample_chambers, wash_volume)
+        washSamples(pipette_300, buffers.Screening_Buffer, sample_chambers, wash_volume,1,extra_bottom_gap)
 
         #RENDERING
         protocol.comment("Applying rendering solution to wells")
         for i in range (len(wellslist)):
-            washSamples(pipette_300, rendering_wells[i], sample_chambers[i], wash_volume)
+            washSamples(pipette_300, rendering_wells[i], sample_chambers[i], wash_volume,1,extra_bottom_gap)
         #INCUBATE
         protocol.delay(minutes=10, msg = "rendering hybridization")
 
         #WASH SAMPLES IN 1x CODEX buffer
         protocol.comment("Washing with rendering buffer")
-        washSamples(pipette_300, buffers.Screening_Buffer, sample_chambers, wash_volume, num_repeats=2)
+        washSamples(pipette_300, buffers.Screening_Buffer, sample_chambers, wash_volume,2,extra_bottom_gap)
 
     #STORAGE, washing samples every hour for 100 hours 
+    washSamples(pipette_300, buffers.storage, buffers.storage, 0,1,extra_bottom_gap)
     for i in range(10):
-        washSamples(pipette_300, buffers.storage, sample_chambers, wash_volume/3, keep_tip=True)
+        washSamples(pipette_300, buffers.storage, sample_chambers, wash_volume/3,1,extra_bottom_gap, keep_tip=True)
         protocol.delay(minutes=90, msg = "storing samples in storage buffer")

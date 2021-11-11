@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="3f1da4c3-d51e-4a23-9029-cafdead48ca7" name="Default Changelist" comment="Changed A1's to A0's in slide and cslp labwares">
-      <change afterPath="$PROJECT_DIR$/jupyter_notebooks/SLIDE_PAR2 OPAL.ipynb" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/labware/PAR2(s)_9slides_v1-grey.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/labware/PAR2(s)_9slides_v2-blue.json" afterDir="false" />
+    <list default="true" id="3f1da4c3-d51e-4a23-9029-cafdead48ca7" name="Default Changelist" comment="1.calibration position A1 is renamed to A0. This allows the first row of samples to start from A1&#10;2. New versions of slide labware tailored to 4.3. software update are introduced. Please download them and replace in the OT2 app (by deleting the existing files and adding new ones – using remove-add dialogue of the app)&#10;3. sample_z_correction_factor is introduced. Use it in case the adjustment to z-position of tip over the sample is needed.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/jupyter_notebooks/ntbk_SLIDE_PAR2 IIHC stain with retreaval OT-2 APIv2.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/jupyter_notebooks/ntbk_SLIDE_PAR2 IIHC stain with retreaval OT-2 APIv2.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/protocols/CODEX/CODEX.py" beforeDir="false" afterPath="$PROJECT_DIR$/protocols/CODEX/CODEX.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/protocols/blue dye demo/Blue dye demo.py" beforeDir="false" afterPath="$PROJECT_DIR$/protocols/blue dye demo/Blue dye demo.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/labware/PAR2(c)_12coverslips_v1.json" beforeDir="false" afterPath="$PROJECT_DIR$/labware/PAR2(c)_12coverslips_v1.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/labware/Parhelia_12trough_reservoir.json" beforeDir="false" afterPath="$PROJECT_DIR$/labware/Parhelia_12trough_reservoir.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/labware/Parhelia_black_96.json" beforeDir="false" afterPath="$PROJECT_DIR$/labware/Parhelia_black_96.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/protocols/CODEX/CODEX.py" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -37,11 +35,12 @@
     <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/protocols/IMC/IMC staining.py" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/protocols/CODEX" />
     <property name="settings.editor.selected.configurable" value="vcs.Git" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\iovga\PycharmProjects\ot2-scripts\protocols\CODEX" />
       <recent name="C:\Users\Dana\PycharmProjects\ot2-scripts\protocols" />
       <recent name="$PROJECT_DIR$/protocols/CODEX multicycle" />
       <recent name="$PROJECT_DIR$/protocols" />
@@ -171,7 +170,14 @@
       <option name="project" value="LOCAL" />
       <updated>1625025467553</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="1.calibration position A1 is renamed to A0. This allows the first row of samples to start from A1&#10;2. New versions of slide labware tailored to 4.3. software update are introduced. Please download them and replace in the OT2 app (by deleting the existing files and adding new ones – using remove-add dialogue of the app)&#10;3. sample_z_correction_factor is introduced. Use it in case the adjustment to z-position of tip over the sample is needed.">
+      <created>1625894978681</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1625894978681</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -193,6 +199,7 @@
     <MESSAGE value="Edits as per Derek Oldridge's suggestions" />
     <MESSAGE value="Updated the IMC protocol to introduce an option of a manual pause and a 4C overnight incubation. &#10;Merged the CODEX_single_stain and CODEX_multicycle protocols into one protocol and added the options for FFPE and Antibody_Screening modes in the *MODIFIABLE RUN PARAMETER* section. Setting Antibody_Screening to False makes this protocol run like CODEX_multicycle, setting it to true makes it run like CODEX_single_stain" />
     <MESSAGE value="Changed A1's to A0's in slide and cslp labwares" />
-    <option name="LAST_COMMIT_MESSAGE" value="Changed A1's to A0's in slide and cslp labwares" />
+    <MESSAGE value="1.calibration position A1 is renamed to A0. This allows the first row of samples to start from A1&#10;2. New versions of slide labware tailored to 4.3. software update are introduced. Please download them and replace in the OT2 app (by deleting the existing files and adding new ones – using remove-add dialogue of the app)&#10;3. sample_z_correction_factor is introduced. Use it in case the adjustment to z-position of tip over the sample is needed." />
+    <option name="LAST_COMMIT_MESSAGE" value="1.calibration position A1 is renamed to A0. This allows the first row of samples to start from A1&#10;2. New versions of slide labware tailored to 4.3. software update are introduced. Please download them and replace in the OT2 app (by deleting the existing files and adding new ones – using remove-add dialogue of the app)&#10;3. sample_z_correction_factor is introduced. Use it in case the adjustment to z-position of tip over the sample is needed." />
   </component>
 </project>
