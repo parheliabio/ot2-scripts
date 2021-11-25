@@ -66,8 +66,8 @@ def washSamples(pipette, sourceSolutionWell, samples, volume, num_repeats=1, dis
     except TypeError:
         # print('samples arent iterable')
         samples = [samples]
-
-    pipette.pick_up_tip()
+    if not pipette.has_tip:
+        pipette.pick_up_tip()
 
     #    if(len(samples)==0):
     #       samples = [samples]

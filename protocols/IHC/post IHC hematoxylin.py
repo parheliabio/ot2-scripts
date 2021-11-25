@@ -65,7 +65,8 @@ def washSamples(pipette, sourceSolutionWell, samples, volume, num_repeats=1, dis
         #print('samples arent iterable')
         samples = [samples]
 
-    pipette.pick_up_tip()
+    if not pipette.has_tip:
+        pipette.pick_up_tip()
 
 #    if(len(samples)==0):
 #       samples = [samples]
@@ -144,7 +145,7 @@ def run(protocol: protocol_api.ProtocolContext):
 
     trough12 = protocol.load_labware('parhelia_12trough', labwarePositions.buffers_reservoir, '12-trough buffers reservoir')
     if (not retreaval):
-        par2 = protocol.load_labware('parhelia_12trough', labwarePositions.buffers_reservoir, '12-trough buffers reservoir')
+        par2 = protocol.load_labware('par2s_9slides_blue_v2', labwarePositions.par2, 'par2s_9slides_blue_v2')
     if retreaval:
         temp_mod = protocol.load_module('temperature module', labwarePositions.heatmodule)
 
