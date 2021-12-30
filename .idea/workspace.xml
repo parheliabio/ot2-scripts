@@ -2,13 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="3f1da4c3-d51e-4a23-9029-cafdead48ca7" name="Default Changelist" comment="1.calibration position A1 is renamed to A0. This allows the first row of samples to start from A1&#10;2. New versions of slide labware tailored to 4.3. software update are introduced. Please download them and replace in the OT2 app (by deleting the existing files and adding new ones – using remove-add dialogue of the app)&#10;3. sample_z_correction_factor is introduced. Use it in case the adjustment to z-position of tip over the sample is needed.">
+      <change afterPath="$PROJECT_DIR$/labware/PAR2(s)_9slides_wLid_v1.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/labware/par2s_9slides_wlid_v1" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/protocols/IHC/IHC with lid.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/protocols/CODEX/CODEX - for 12 cslps.py" beforeDir="false" afterPath="$PROJECT_DIR$/protocols/CODEX/CODEX - for 12 cslps.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/protocols/CODEX/CODEX - for 30 cslps.py" beforeDir="false" afterPath="$PROJECT_DIR$/protocols/CODEX/CODEX - for 30 cslps.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/protocols/CODEX/CODEX - for 9 slides.py" beforeDir="false" afterPath="$PROJECT_DIR$/protocols/CODEX/CODEX - for 9 slides.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/protocols/IHC/IHC.py" beforeDir="false" afterPath="$PROJECT_DIR$/protocols/IHC/IHC.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/protocols/IHC/post IHC hematoxylin.py" beforeDir="false" afterPath="$PROJECT_DIR$/protocols/IHC/post IHC hematoxylin.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/protocols/OPAL/Opal.py" beforeDir="false" afterPath="$PROJECT_DIR$/protocols/OPAL/Opal.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -25,6 +22,14 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="GitSEFilterConfiguration">
+    <file-type-list>
+      <filtered-out-file-type name="LOCAL_BRANCH" />
+      <filtered-out-file-type name="REMOTE_BRANCH" />
+      <filtered-out-file-type name="TAG" />
+      <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
+    </file-type-list>
+  </component>
   <component name="ProjectId" id="1rN7JSxWgv8qkWwmU5cQ7ve19kg" />
   <component name="ProjectLevelVcsManager">
     <ConfirmationsSetting value="2" id="Add" />
@@ -37,16 +42,16 @@
     <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/protocols/CODEX" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/labware" />
     <property name="settings.editor.selected.configurable" value="vcs.Git" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\iovga\PycharmProjects\ot2-scripts\labware" />
       <recent name="C:\Users\iovga\PycharmProjects\ot2-scripts\protocols\CODEX" />
       <recent name="C:\Users\Dana\PycharmProjects\ot2-scripts\protocols" />
       <recent name="$PROJECT_DIR$/protocols/CODEX multicycle" />
       <recent name="$PROJECT_DIR$/protocols" />
-      <recent name="$PROJECT_DIR$/protocols/blue dye demo" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\Dana\PycharmProjects\ot2-scripts\protocols\CODEX multicycle" />
@@ -200,7 +205,14 @@
       <option name="project" value="LOCAL" />
       <updated>1637736846651</updated>
     </task>
-    <option name="localTasksCounter" value="17" />
+    <task id="LOCAL-00017" summary="1.calibration position A1 is renamed to A0. This allows the first row of samples to start from A1&#10;2. New versions of slide labware tailored to 4.3. software update are introduced. Please download them and replace in the OT2 app (by deleting the existing files and adding new ones – using remove-add dialogue of the app)&#10;3. sample_z_correction_factor is introduced. Use it in case the adjustment to z-position of tip over the sample is needed.">
+      <created>1637808170941</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1637808170941</updated>
+    </task>
+    <option name="localTasksCounter" value="18" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
