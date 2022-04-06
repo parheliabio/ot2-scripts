@@ -10,11 +10,11 @@ metadata = {
 }
 ####################MODIFIABLE RUN PARAMETERS#########################
 
-retreaval = True
+retreaval = False
 
-wellslist = ['A2', 'A3', 'C2']
+wellslist = ['A2']
 
-type_of_96well_plate = 'parhelia_red_96'
+type_of_96well_plate = 'parhelia_red_96_with_strip'
 type_of_par2 = 'par2s_9slides_wlid_v1'
 
 tiprack_starting_pos = {
@@ -84,7 +84,8 @@ def washSamples(pipette, sourceSolutionWell, samples, volume, num_repeats=1, dis
         # print('samples arent iterable')
         samples = [samples]
 
-    pipette.pick_up_tip()
+    if not pipette.has_tip:
+        pipette.pick_up_tip()
 
     #    if(len(samples)==0):
     #       samples = [samples]
@@ -207,7 +208,7 @@ def run(protocol: protocol_api.ProtocolContext):
     openPar2(protocol,pipette_300, par2)
 
     if retreaval:
-        washSamples(pipette_300, buffers.retreaval, buffers.retreaval, 2, 1, extra_bottom_gap)
+        washSamples(pipette_300, buffers.retreaval, buffers.retreaval, 2, 1, extra_bottom_gap+15)
         washSamples(pipette_300, buffers.retreaval, sample_chambers, wash_volume, 2, extra_bottom_gap)
 
         closePar2(protocol,pipette_300, par2)
@@ -226,14 +227,16 @@ def run(protocol: protocol_api.ProtocolContext):
 
     # WASHING SAMPLES WITH TBS
     print("washing in TBS")
-    washSamples(pipette_300, buffers.TBS_wash, buffers.TBS_wash, 2, 1, extra_bottom_gap)
+    washSamples(pipette_300, buffers.TBS_wash, buffers.TBS_wash, 2, 1, extra_bottom_gap+15)
     washSamples(pipette_300, buffers.TBS_wash, sample_chambers, wash_volume, 2, extra_bottom_gap)
 
     # Preblocking
     print("preblocking")
     print(len(wellslist))
+
     for i in range(len(wellslist)):
         print(i)
+        washSamples(pipette_300, preblock_wells[i], preblock_wells[i], 2, 1, extra_bottom_gap + 15)
         washSamples(pipette_300, preblock_wells[i], sample_chambers[i], wash_volume, 1, extra_bottom_gap)
     print("preblocking incubation: 15 min")
     protocol.delay(minutes=15)
@@ -242,6 +245,7 @@ def run(protocol: protocol_api.ProtocolContext):
     print("applying antibodies")
     for i in range(len(wellslist)):
         print(i)
+        washSamples(pipette_300, antibody_wells[i], antibody_wells[i], 2, 1, extra_bottom_gap+15)
         washSamples(pipette_300, antibody_wells[i], sample_chambers[i], wash_volume, 1, extra_bottom_gap)
     closePar2(protocol,pipette_300, par2)
     # INCUBATE FOR DESIRED TIME
@@ -259,6 +263,7 @@ def run(protocol: protocol_api.ProtocolContext):
     # APPLYING enzyme blocking
     print("applying enzyme blocking")
     for i in range(len(wellslist)):
+        washSamples(pipette_300, enzymeblock_wells[i], enzymeblock_wells[i], 2, 1, extra_bottom_gap+15)
         washSamples(pipette_300, enzymeblock_wells[i], sample_chambers[i], wash_volume, 1, extra_bottom_gap)
     # INCUBATE 10 MIN
     print("hrp blocking incubation: 10min")
@@ -268,6 +273,7 @@ def run(protocol: protocol_api.ProtocolContext):
     # APPLYING HRP SECONDARY ANTIBODY COCKTAILS TO SAMPLES
     print("applying hrpsecondaryab")
     for i in range(len(wellslist)):
+        washSamples(pipette_300, hrpsecondaryab_wells[i], hrpsecondaryab_wells[i], 2, 1, extra_bottom_gap+15)
         washSamples(pipette_300, hrpsecondaryab_wells[i], sample_chambers[i], wash_volume, 1, extra_bottom_gap)
     closePar2(protocol,pipette_300, par2)
     # INCUBATE FOR DESIRED TIME
@@ -283,13 +289,15 @@ def run(protocol: protocol_api.ProtocolContext):
 
     # DILUTING AND APPLYING THE DAB
     for i in range(len(wellslist)):
+        washSamples(pipette_300, substrate_wells[i], substrate_wells[i], 2, 1, extra_bottom_gap+15)
+        washSamples(pipette_300, DAB_wells[i], DAB_wells[i], 2, 1, extra_bottom_gap + 15)
         dilute_and_apply_fixative(pipette_300, DAB_wells[i], substrate_wells[i], sample_chambers[i], 200)
 
     print("developing substrate")
 
     protocol.delay(minutes=10)
 
-    washSamples(pipette_300, buffers.water, buffers.water, 2, 1, extra_bottom_gap)
+    washSamples(pipette_300, buffers.water, buffers.water, 2, 1, extra_bottom_gap+15)
     washSamples(pipette_300, buffers.water, sample_chambers, wash_volume, 5, extra_bottom_gap)
 
     closePar2(protocol,pipette_300, par2)
