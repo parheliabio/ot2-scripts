@@ -6,51 +6,69 @@ metadata = {
     'author': 'Parhelia Bio <info@parheliabio.com>',
     'description': 'CODEX coverslip staining protocol for EA PAR2 instrument - from tissue rehydration to single-cycle rendering',
     'apiLevel': '2.7'
-
 }
-
 
 ####################MODIFIABLE RUN PARAMETERS#########################
 
-# !!! IMPORTANT !!! Select the right PAR2 type by uncommenting one of the lines below
-#par2_type= 'par2s_9slides'
-par2_type= 'PAR2c_12coverslips'
-
-#The initial 1.6% PFA fixation is skipped for FFPE tissues
-FFPE = False
-
-"""
-Antibody screening involves additional rendering step at the end, where the tissue is cleared and then 
-fluorescent detection probes are applied to the tissue directly in the PAR2 device. 
-If this option is enabled, make sure that 
-    1) detector oligo mixes have been added to the 96-well plate 2)
-"""
-Antibody_Screening = True
+# The type of Parhelia Omni-Stainer
+### VERAO VAR NAME='Device type' TYPE=CHOICE OPTIONS=['PAR2c_12coverslips', 'PAR2s_9slides']
+omniStainer_type = 'PAR2c_12coverslips_gray'
 
 """ !!! IMPORTANT !!! Specify the PAR2 positions where your specimens are located,
 starting with A1 (A0 is reserved for calibration and should not be used for staining)
-PAR2 'A' row positions 1-4 correspond to wells A1-A4, whereas 'B' and 'C' row positions 1-4 
+PAR2 'A' row positions 1-4 correspond to wells A1-A4, whereas 'B' and 'C' row positions 1-4
 correspond to wells B1-4 and C1-4, respectively """
-wellslist = ['A2','A3']
 
-# !!! IMPORTANT !!! Specify the first non-empty position in the tip rack
-tiprack_starting_pos = {
-    "tiprack_10": 'A1',
-    "tiprack_300": 'A1'
-}
+
+
+#The initial 1.6% PFA fixation is skipped for FFPE tissues
+### VERAO VAR NAME='FFPE' TYPE=BOOLEAN
+FFPE = False
+
+"""
+Antibody screening involves additional rendering step at the end, where the tissue is cleared and then
+fluorescent detection probes are applied to the tissue directly in the PAR2 device.
+If this option is enabled, make sure that
+    1) detector oligo mixes have been added to the 96-well plate
+    2) hybridization and stripping buffers have been added to the 12-trough
+    see labware_layout.xlsx for details
+"""
+### VERAO VAR NAME='Antibody Screening Mode' TYPE=BOOLEAN
+Antibody_Screening = False
+
+### VERAO VAR NAME='Number of Samples' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE
+num_samples = 12
+
+### VERAO VAR NAME='Tiprack starting position' TYPE=NUMBER LBOUND=1 UBOUND=95 DECIMAL=FALSE
+tiprack_300_starting_pos = 1
 
 ### change these as necessary
+
+### VERAO VAR NAME='Antibody incubation time (minutes)' TYPE=NUMBER LBOUND=30 UBOUND=360 DECIMAL=FALSE
 ab_incubation_time_minutes = 180
+
+### VERAO VAR NAME='Sample wash volume' TYPE=NUMBER LBOUND=50 UBOUND=350 DECIMAL=FALSE
 wash_volume = 150
-ab_volume=100
-extra_bottom_gap=0
+
+### VERAO VAR NAME='Antibody mix volume' TYPE=NUMBER LBOUND=50 UBOUND=350 DECIMAL=FALSE
+ab_volume = 100
+
+### VERAO VAR NAME='Extra bottom gap (um, for calibration debugging)' TYPE=NUMBER LBOUND=0 UBOUND=100 DECIMAL=FALSE
+extra_bottom_gap = 0
+
+### VERAO VAR NAME='Sample flow rate' TYPE=NUMBER LBOUND=0.05 UBOUND=1 DECIMAL=TRUE INCREMENT=0.05
+sample_flow_rate = 0.2
 
 #Creating a dummy class
 class Object:
     pass
 
 ####################LABWARE LAYOUT ON DECK#########################
-pipette_300_location='right'
+### VERAO VAR NAME='P300 mounting' TYPE=CHOICE OPTIONS=['right', 'left']
+pipette_300_location = 'right'
+
+
+### VERAO VAR NAME='P300 model' TYPE=CHOICE OPTIONS=['GEN2', 'GEN1']
 pipette_300_GEN = 'GEN1'
 
 labwarePositions = Object()
@@ -68,17 +86,19 @@ debug = False
 ####################FIXED RUN PARAMETERS#########################
 default_flow_rate = 50
 well_flow_rate = 5
-sample_flow_rate = 0.2
 
-####################! FUNCTIONS - DO NOT MODIFY !######################### 
+####################! FUNCTIONS - DO NOT MODIFY !#########################
 def washSamples(pipette, sourceSolutionWell, samples, volume, num_repeats=1, dispense_bottom_gap=0, keep_tip = False):
 
     try:
         iter(samples)
-        #print('samples are iterable')
+        print('samples are iterable')
     except TypeError:
-        #print('samples arent iterable')
+        print('samples arent iterable')
         samples = [samples]
+
+    print ('Samples are:')
+    print (samples)
 
     if not pipette.has_tip:
         pipette.pick_up_tip()
@@ -97,15 +117,15 @@ def washSamples(pipette, sourceSolutionWell, samples, volume, num_repeats=1, dis
 
     if not keep_tip: pipette.drop_tip()
     if keep_tip: pipette.move_to(samples[len(samples)-1].bottom(60))
-    
+
 def dilute_and_apply_fixative(pipette, sourceSolutionWell, dilutant_buffer_well, samples, volume):
     try:
         iter(samples)
     except TypeError:
         samples = [samples]
-    
+
     if not pipette.has_tip: pipette.pick_up_tip()
-    
+
     if(len(samples)==0):
         samples = [samples]
 
@@ -120,19 +140,19 @@ def dilute_and_apply_fixative(pipette, sourceSolutionWell, dilutant_buffer_well,
         pipette.aspirate(volume, sourceSolutionWell, rate=well_flow_rate)
         pipette.dispense(volume, s, rate=sample_flow_rate).blow_out()
         stats.volume += volume
-    
+
     pipette.drop_tip()
-    
+
 def mix(pipette, sourceSolutionWell, volume, num_repeats):
-   
+
     if not pipette.has_tip: pipette.pick_up_tip()
-    
+
     #print ("Mixing solution in samples:" +str(sourceSolutionWell))
     for i in range(0, num_repeats):
     #    print ("Iteration:"+ str(i))
         pipette.aspirate(volume, sourceSolutionWell, rate=2)
         pipette.dispense(volume, sourceSolutionWell, rate=2)
-    
+
     pipette.drop_tip()
 
 
@@ -143,16 +163,16 @@ def mix(pipette, sourceSolutionWell, volume, num_repeats):
 def run(protocol: protocol_api.ProtocolContext):
     ###########################LABWARE SETUP#################################
 
-
-
     tiprack_300 = protocol.load_labware('opentrons_96_tiprack_300ul', labwarePositions.tiprack_300, 'tiprack 300ul')
 
     pipette_300 = protocol.load_instrument('p300_single_gen2' if pipette_300_GEN == 'GEN2' else 'p300_single', pipette_300_location, tip_racks = [tiprack_300])
     pipette_300.flow_rate.dispense = default_flow_rate
     pipette_300.flow_rate.aspirate = default_flow_rate
-    pipette_300.starting_tip = tiprack_300.well(tiprack_starting_pos['tiprack_300'])
+    pipette_300.starting_tip = tiprack_300.wells()[tiprack_300_starting_pos-1]
 
-    par2 = protocol.load_labware(par2_type, labwarePositions.par2, 'PAR2')
+    par2 = protocol.load_labware(omniStainer_type, labwarePositions.par2, 'PAR2')
+    wellslist=list(par2.wells_by_name().keys())
+    wellslist = wellslist[1:num_samples+1]
     trough12 = protocol.load_labware('parhelia_12trough', labwarePositions.buffers_plate, '12-trough buffers reservoir')
 
     black_96 = protocol.load_labware('parhelia_black_96', labwarePositions.antibodies_plate, '96-well-plate')
@@ -179,6 +199,13 @@ def run(protocol: protocol_api.ProtocolContext):
 
     for well in wellslist:
         sample_chambers.append(par2.wells_by_name()[well])
+
+    print("wellslist is:")
+    print(wellslist)
+    print("par2.wells_by_name are:")
+    print(par2.wells_by_name())
+    print ("sample_chambers are:")
+    print (sample_chambers)
 
     #################PROTOCOL####################
     protocol.comment("Starting the CODEX staining protocol for samples:" + str(sample_chambers))
@@ -279,8 +306,9 @@ def run(protocol: protocol_api.ProtocolContext):
         protocol.comment("Washing with rendering buffer")
         washSamples(pipette_300, buffers.Screening_Buffer, sample_chambers, wash_volume,2,extra_bottom_gap)
 
-    #STORAGE, washing samples every hour for 100 hours 
+    #STORAGE, washing samples every hour for 100 hours
     washSamples(pipette_300, buffers.storage, buffers.storage, 0,1,extra_bottom_gap)
+
     for i in range(10):
         washSamples(pipette_300, buffers.storage, sample_chambers, wash_volume/3,1,extra_bottom_gap, keep_tip=True)
         protocol.delay(minutes=90, msg = "storing samples in storage buffer")
