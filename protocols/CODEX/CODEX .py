@@ -14,6 +14,12 @@ metadata = {
 ### VERAO VAR NAME='Device type' TYPE=CHOICE OPTIONS=['PAR2c_12coverslips', 'PAR2s_9slides']
 omniStainer_type = 'PAR2c_12coverslips_gray'
 
+### VERAO VAR NAME='Lid on the box' TYPE=CHOICE OPTIONS=['yes', 'no']
+lid = 'no'
+
+### VERAO VAR NAME='Well plate type' TYPE=CHOICE OPTIONS=['parhelia_black_96', 'parhelia_red_96', 'parhelia_red_96_with_strip']
+type_of_96well_plate = 'parhelia_red_96_with_strip'
+
 """ !!! IMPORTANT !!! Specify the PAR2 positions where your specimens are located,
 starting with A1 (A0 is reserved for calibration and should not be used for staining)
 PAR2 'A' row positions 1-4 correspond to wells A1-A4, whereas 'B' and 'C' row positions 1-4
@@ -41,8 +47,6 @@ num_samples = 12
 
 ### VERAO VAR NAME='Tiprack starting position' TYPE=NUMBER LBOUND=1 UBOUND=95 DECIMAL=FALSE
 tiprack_300_starting_pos = 1
-
-### change these as necessary
 
 ### VERAO VAR NAME='Antibody incubation time (minutes)' TYPE=NUMBER LBOUND=30 UBOUND=360 DECIMAL=FALSE
 ab_incubation_time_minutes = 180
