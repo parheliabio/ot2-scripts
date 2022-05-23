@@ -17,7 +17,7 @@ retreaval = False
 omniStainer_type = 'par2s_9slides_whilid_v1'
 
 ### VERAO VAR NAME='Lid on the box' TYPE=CHOICE OPTIONS=['yes', 'no']
-lid = 'yes',
+lid = 'yes'
 
 ### VERAO VAR NAME='Well plate type' TYPE=CHOICE OPTIONS=['parhelia_black_96', 'parhelia_red_96', 'parhelia_red_96_with_strip']
 type_of_96well_plate = 'parhelia_red_96_with_strip'
