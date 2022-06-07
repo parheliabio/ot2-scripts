@@ -11,7 +11,7 @@ metadata = {
 ####################MODIFIABLE RUN PARAMETERS#########################
 
 # The type of Parhelia Omni-Stainer
-### VERAO VAR NAME='Device type' TYPE=CHOICE OPTIONS=['PAR2c_12coverslips','par2s_9slides_whilid_v1','PAR2c_12coverslips_gray']
+### VERAO VAR NAME='Device type' TYPE=CHOICE OPTIONS=['PAR2c_12coverslips', 'par2s_9slides_whilid_v1', 'PAR2c_12coverslips_gray']
 omniStainer_type = 'par2s_9slides_whilid_v1'
 
 ### VERAO VAR NAME='Lid on the box' TYPE=CHOICE OPTIONS=['yes', 'no']
@@ -36,15 +36,15 @@ Antibody_Screening = True
 type_of_96well_plate = 'parhelia_red_96_with_strip'
 
 ### VERAO VAR NAME='Number of Samples' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE
-num_samples = 3
+num_samples = 4
 
 ### VERAO VAR NAME='Tiprack starting position' TYPE=NUMBER LBOUND=1 UBOUND=95 DECIMAL=FALSE
 tiprack_300_starting_pos = 1
 
 ### change these as necessary
 
-### VERAO VAR NAME='Antibody incubation time (minutes)' TYPE=NUMBER LBOUND=30 UBOUND=360 DECIMAL=FALSE
-ab_incubation_time_minutes = 180
+### VERAO VAR NAME='Antibody incubation time (minutes)' TYPE=NUMBER LBOUND=30 UBOUND=1000 DECIMAL=FALSE
+ab_incubation_time_minutes = 480
 
 ### VERAO VAR NAME='Sample wash volume' TYPE=NUMBER LBOUND=50 UBOUND=350 DECIMAL=FALSE
 wash_volume = 200
@@ -55,7 +55,7 @@ ab_volume = 150
 ### VERAO VAR NAME='Extra bottom gap (um, for calibration debugging)' TYPE=NUMBER LBOUND=0 UBOUND=100 DECIMAL=FALSE
 extra_bottom_gap = 0
 
-### VERAO VAR NAME='Sample flow rate' TYPE=NUMBER LBOUND=0.05 UBOUND=1 DECIMAL=TRUE INCREMENT=0.05
+### VERAO VAR NAME='Sample flow rate' TYPE=NUMBER LBOUND=0.05 UBOUND=1.0 DECIMAL=TRUE INCREMENT=0.05
 sample_flow_rate = 0.1
 
 #Creating a dummy class
@@ -376,7 +376,7 @@ def run(protocol: protocol_api.ProtocolContext):
 
     #STORAGE, washing samples every hour for 100 hours
     washSamples(pipette_300, buffers.storage, buffers.storage, 2,1,extra_bottom_gap+21)
-    washSamples(pipette_300, buffers.storage, sample_chambers, wash_volume,2,extra_bottom_gap, keep_tip=True)
+    washSamples(pipette_300, buffers.storage, sample_chambers, wash_volume,2,extra_bottom_gap)
 
 
     if lid=='yes':
