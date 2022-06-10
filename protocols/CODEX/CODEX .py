@@ -11,11 +11,11 @@ metadata = {
 ####################MODIFIABLE RUN PARAMETERS#########################
 
 # The type of Parhelia Omni-Stainer
-### VERAO VAR NAME='Device type' TYPE=CHOICE OPTIONS=['PAR2c_12coverslips', 'par2s_9slides_whilid_v1', 'PAR2c_12coverslips_gray']
-omniStainer_type = 'par2s_9slides_whilid_v1'
+### VERAO VAR NAME='Device type' TYPE=CHOICE OPTIONS=['PAR2c_12coverslips', 'par2s_9slides']
+omniStainer_type = 'PAR2c_12coverslips'
 
-### VERAO VAR NAME='Lid on the box' TYPE=CHOICE OPTIONS=['yes', 'no']
-lid = 'yes'
+### VERAO VAR NAME='Thermal lid on the box' TYPE=BOOLEAN
+lid = False
 
 #The initial 1.6% PFA fixation is skipped for FFPE tissues
 ### VERAO VAR NAME='FFPE' TYPE=BOOLEAN
@@ -33,7 +33,7 @@ If this option is enabled, make sure that
 Antibody_Screening = True
 
 ### VERAO VAR NAME='Well plate type' TYPE=CHOICE OPTIONS=['parhelia_black_96', 'parhelia_red_96', 'parhelia_red_96_with_strip']
-type_of_96well_plate = 'parhelia_red_96_with_strip'
+type_of_96well_plate = 'parhelia_black_96'
 
 ### VERAO VAR NAME='Number of Samples' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE
 num_samples = 4
@@ -47,10 +47,10 @@ tiprack_300_starting_pos = 1
 ab_incubation_time_minutes = 480
 
 ### VERAO VAR NAME='Sample wash volume' TYPE=NUMBER LBOUND=50 UBOUND=350 DECIMAL=FALSE
-wash_volume = 200
+wash_volume = 150
 
 ### VERAO VAR NAME='Antibody mix volume' TYPE=NUMBER LBOUND=50 UBOUND=350 DECIMAL=FALSE
-ab_volume = 150
+ab_volume = 70
 
 ### VERAO VAR NAME='Extra bottom gap (um, for calibration debugging)' TYPE=NUMBER LBOUND=0 UBOUND=100 DECIMAL=FALSE
 extra_bottom_gap = 0
@@ -227,7 +227,7 @@ def run(protocol: protocol_api.ProtocolContext):
     #################PROTOCOL####################
     protocol.comment("Starting the CODEX staining protocol for samples:" + str(sample_chambers))
 
-    if lid=='yes':
+    if lid:
         openPar2(protocol, pipette_300, par2)
 
     if not FFPE:
@@ -255,14 +255,14 @@ def run(protocol: protocol_api.ProtocolContext):
         washSamples(pipette_300, preblock_wells[i], sample_chambers[i], wash_volume,1,extra_bottom_gap)
     #INCUBATE
 
-    if lid=='yes':
+    if lid:
         closePar2(protocol, pipette_300, par2)
 
     protocol.delay(minutes=15, msg = "preblocking incubation")
 
     #APPLYING ANTIBODY COCKTAILS TO SAMPLES
 
-    if lid=='yes':
+    if lid:
         openPar2(protocol, pipette_300, par2)
 
     protocol.comment("applying the abs")
@@ -277,13 +277,13 @@ def run(protocol: protocol_api.ProtocolContext):
         washSamples(pipette_300, antibody_wells[i], sample_chambers[i], ab_volume,1,extra_bottom_gap)
     #INCUBATE
 
-    if lid=='yes':
+    if lid:
         closePar2(protocol, pipette_300, par2)
 
     protocol.delay(minutes=ab_incubation_time_minutes, msg = "staining incubation")
 
 
-    if lid=='yes':
+    if lid:
         openPar2(protocol, pipette_300, par2)
 
     for i in range(2):
@@ -329,14 +329,14 @@ def run(protocol: protocol_api.ProtocolContext):
 
     protocol.comment("third fix incubation")
 
-    if lid=='yes':
+    if lid:
         closePar2(protocol, pipette_300, par2)
 
     protocol.delay(minutes=10, msg = "Reagent F incubation")
 
     #WASHING SAMPLES WITH PBS
 
-    if lid=='yes':
+    if lid:
         openPar2(protocol, pipette_300, par2)
 
     protocol.comment("PBS wash")
@@ -379,10 +379,9 @@ def run(protocol: protocol_api.ProtocolContext):
     washSamples(pipette_300, buffers.storage, sample_chambers, wash_volume,2,extra_bottom_gap)
 
 
-    if lid=='yes':
+    if lid:
         closePar2(protocol, pipette_300, par2)
-
-    if lid!='yes':
+    else:
         for i in range(10):
             washSamples(pipette_300, buffers.storage, sample_chambers, wash_volume/3,1,extra_bottom_gap, keep_tip=True)
             protocol.delay(minutes=90, msg = "storing samples in storage buffer")
