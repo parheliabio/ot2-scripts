@@ -12,7 +12,7 @@ metadata = {
 ### VERAO VAR NAME='ANTIGEN RETRIEVAL' TYPE=BOOLEAN
 retrieval = False
 
-### VERAO VAR NAME='Device type' TYPE=CHOICE OPTIONS=['PAR2c_12coverslips', 'PAR2c_12coverslips_gray', 'PAR2s_9slides', 'par2s_9slides_whilid_v1']
+### VERAO VAR NAME='Device type' TYPE=CHOICE OPTIONS=['par2s_9slides_blue_v3', 'PAR2c_12coverslips', 'PAR2c_12coverslips_gray', 'PAR2s_9slides', 'par2s_9slides_whilid_v1']
 omniStainer_type = 'PAR2c_12coverslips_gray'
 
 ### VERAO VAR NAME='Lid on the box' TYPE=CHOICE OPTIONS=['yes', 'no']

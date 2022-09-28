@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="3f1da4c3-d51e-4a23-9029-cafdead48ca7" name="Default Changelist" comment="1.calibration position A1 is renamed to A0. This allows the first row of samples to start from A1&#10;2. New versions of slide labware tailored to 4.3. software update are introduced. Please download them and replace in the OT2 app (by deleting the existing files and adding new ones – using remove-add dialogue of the app)&#10;3. sample_z_correction_factor is introduced. Use it in case the adjustment to z-position of tip over the sample is needed.">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="3f1da4c3-d51e-4a23-9029-cafdead48ca7" name="Default Changelist" comment="1.calibration position A1 is renamed to A0. This allows the first row of samples to start from A1&#10;2. New versions of slide labware tailored to 4.3. software update are introduced. Please download them and replace in the OT2 app (by deleting the existing files and adding new ones – using remove-add dialogue of the app)&#10;3. sample_z_correction_factor is introduced. Use it in case the adjustment to z-position of tip over the sample is needed." />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -251,7 +249,14 @@
       <option name="project" value="LOCAL" />
       <updated>1654638824194</updated>
     </task>
-    <option name="localTasksCounter" value="24" />
+    <task id="LOCAL-00024" summary="1.calibration position A1 is renamed to A0. This allows the first row of samples to start from A1&#10;2. New versions of slide labware tailored to 4.3. software update are introduced. Please download them and replace in the OT2 app (by deleting the existing files and adding new ones – using remove-add dialogue of the app)&#10;3. sample_z_correction_factor is introduced. Use it in case the adjustment to z-position of tip over the sample is needed.">
+      <created>1660883136848</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1660883136848</updated>
+    </task>
+    <option name="localTasksCounter" value="25" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
