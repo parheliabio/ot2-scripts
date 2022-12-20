@@ -17,10 +17,10 @@
 	"D3"]],
 	"brand": {
 		"brand": "Parhelia",
-		"brandId": ["OMNI-S 12 slides"]
+		"brandId": ["Omni-Stainer with Thermal Sheath for 12 slides"]
 	},
 	"metadata": {
-		"displayName": "Parhelia OMNI-S 12 slides",
+		"displayName": "Parhelia Omni-Stainer with Thermal Sheath for 12 slides",
 		"displayCategory": "wellPlate",
 		"displayVolumeUnits": "µL",
 		"tags": []
@@ -178,13 +178,13 @@
 	},
 	"groups": [{
 		"metadata": {
-			"displayName": "Parhelia OMNI-S 12 slides",
+			"displayName": "Parhelia Omni-Stainer with Thermal Sheath for 12 slides",
 			"displayCategory": "wellPlate",
 			"wellBottomShape": "flat"
 		},
 		"brand": {
 			"brand": "Parhelia",
-			"brandId": ["OMNI-S 12 slides"]
+			"brandId": ["Omni-Stainer with Thermal Sheath for 12 slides"]
 		},
 		"wells": ["A1",
 		"A2",
