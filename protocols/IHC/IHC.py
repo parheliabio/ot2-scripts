@@ -1,10 +1,8 @@
-from opentrons import protocol_api
-import json
 
 metadata = {
-    'protocolName': 'PAR2 IHC',
+    'protocolName': 'Parhelia IHC',
     'author': 'Parhelia Bio <info@parheliabio.com>',
-    'description': 'IHC staining protocol for EA PAR2 instrument',
+    'description': 'IHC staining protocol for Parhelia Omni-stainer',
     'apiLevel': '2.7'
 
 }
@@ -12,17 +10,23 @@ metadata = {
 ### VERAO VAR NAME='ANTIGEN RETRIEVAL' TYPE=BOOLEAN
 retrieval = False
 
-### VERAO VAR NAME='Device type' TYPE=CHOICE OPTIONS=['par2s_9slides_blue_v3', 'PAR2c_12coverslips', 'PAR2c_12coverslips_gray', 'PAR2s_9slides', 'par2s_9slides_whilid_v1']
-omniStainer_type = 'PAR2c_12coverslips_gray'
+### VERAO VAR NAME='shall the protocol PAUSE at the primary ab incubation step?' TYPE=BOOLEAN
+protocol_pause = False
 
-### VERAO VAR NAME='Lid on the box' TYPE=CHOICE OPTIONS=['yes', 'no']
-lid = 'no'
+### VERAO VAR NAME='Perform Hematoxylin staining after the IHC' TYPE=BOOLEAN
+perform_hematoxylin_staining = False
 
-### VERAO VAR NAME='Well plate type' TYPE=CHOICE OPTIONS=['parhelia_black_96', 'parhelia_red_96', 'parhelia_red_96_with_strip']
-type_of_96well_plate = 'parhelia_red_96_with_strip'
+### VERAO VAR NAME='Hematoxylin source' TYPE=CHOICE OPTIONS=['from reagent trough', 'from pcr strip']
+hematoxylin_source = 'from pcr strip'
+
+### VERAO VAR NAME='Device type' TYPE=CHOICE OPTIONS=['omni_stainer_s12_slides', 'omni_stainer_s12_slides_with_thermosheath', 'omni_stainer_c12_cslps', 'omni_stainer_c12_cslps_with_thermosheath', 'par2s_9slides_blue_v3', 'PAR2c_12coverslips']
+omnistainer_type = 'omni_stainer_s12_slides'
+
+### VERAO VAR NAME='Well plate type' TYPE=CHOICE OPTIONS=['parhelia_skirted_96', 'parhelia_skirted_96_with_strips', 'parhelia_black_96']
+type_of_96well_plate = 'parhelia_skirted_96_with_strips'
 
 ### VERAO VAR NAME='Number of Samples' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE
-num_samples = 2
+num_samples = 4
 
 
 ### VERAO VAR NAME='Tiprack starting position' TYPE=NUMBER LBOUND=1 UBOUND=95 DECIMAL=FALSE
@@ -38,34 +42,21 @@ tiprack_starting_pos = {
 primary_ab_incubation_time_minutes = 480
 
 ### VERAO VAR NAME='Secondary antibody incubation time (minutes)' TYPE=NUMBER LBOUND=30 UBOUND=1440 DECIMAL=FALSE
-secondary_ab_incubation_time_minutes = 30
+secondary_ab_incubation_time_minutes = 90
 
-# debug mode skips all incubations, prints out additional info
-debug = False
-
-####################FIXED RUN PARAMETERS#########################
-
-API_VERSION = '2.7'
-default_flow_rate = 50
-well_flow_rate = 5
 ### VERAO VAR NAME='Sample flow rate' TYPE=NUMBER LBOUND=0.05 UBOUND=1.0 DECIMAL=TRUE INCREMENT=0.05
 sample_flow_rate = 0.2
 
 USE_TROUGH = True
 
-### VERAO VAR NAME='Sample wash volume' TYPE=NUMBER LBOUND=50 UBOUND=350 DECIMAL=FALSE
-wash_volume = 150
+### VERAO VAR NAME='Sample wash volume (ul)' TYPE=NUMBER LBOUND=50 UBOUND=350 DECIMAL=FALSE
+wash_volume = 200
 
-### VERAO VAR NAME='Antibody mix volume' TYPE=NUMBER LBOUND=50 UBOUND=350 DECIMAL=FALSE
+### VERAO VAR NAME='Antibody mix volume (ul)' TYPE=NUMBER LBOUND=50 UBOUND=350 DECIMAL=FALSE
 ab_volume = 150
 
 ### VERAO VAR NAME='Extra bottom gap (for calibration debugging)' TYPE=NUMBER LBOUND=0 UBOUND=100 DECIMAL=FALSE
 extra_bottom_gap = 0
-
-
-class Object:
-    pass
-
 
 ####################LABWARE LAYOUT ON DECK#########################
 ### VERAO VAR NAME='P300 mounting' TYPE=CHOICE OPTIONS=['right', 'left']
@@ -74,139 +65,52 @@ pipette_300_location = 'right'
 ### VERAO VAR NAME='P300 model' TYPE=CHOICE OPTIONS=['GEN2', 'GEN1']
 pipette_300_GEN = 'GEN1'
 
+if pipette_300_GEN == 'GEN2':
+    pipette_type = 'p300_single_gen2'
+else:
+    pipette_type = 'p300_single'
+
+
+### VERAO VAR NAME='labwarePositions.buffers_plate' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE
+buffers_plate_position = 1
+
+### VERAO VAR NAME='labwarePositions.omnistainer' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE
+omnistainer_position = 2
+
+### VERAO VAR NAME='labwarePositions.ihc_reagents_plate' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE
+ihc_reagents_plate_position = 3
+
+### VERAO VAR NAME='labwarePositions.tiprack_300' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE
+tiprack_300_position = 6
+
 labwarePositions = Object()
-labwarePositions.buffers_reservoir = 1
-labwarePositions.par2 = 9
-labwarePositions.antibodies_plate = 3
-labwarePositions.tiprack_300 = 6
-labwarePositions.heatmodule = 8
-
-####################GENERAL SETUP################################
-
-
-stats = Object()
-stats.volume = 0
-
-
-####################! FUNCTIONS - DO NOT MODIFY !#########################
-
-def openPar2(protocol, pipette, covered_lbwr):
-    pipette.pick_up_tip()
-    pipette.move_to(covered_lbwr.wells()[len(covered_lbwr.wells()) - 2].bottom(0))
-    pipette.move_to(covered_lbwr.wells()[len(covered_lbwr.wells()) - 1].bottom(0), force_direct=True)
-    protocol.delay(seconds=1)
-    pipette.drop_tip()
-
-
-def closePar2(protocol, pipette, covered_lbwr):
-    pipette.pick_up_tip()
-    pipette.move_to(covered_lbwr.wells()[len(covered_lbwr.wells()) - 2].bottom(0))
-    pipette.move_to(covered_lbwr.wells()[len(covered_lbwr.wells()) - 3].bottom(0), force_direct=True)
-    protocol.delay(seconds=1)
-    pipette.drop_tip()
-
-
-def washSamples(pipette, sourceSolutionWell, samples, volume, num_repeats=1, dispense_bottom_gap=0, keep_tip=False):
-    try:
-        iter(samples)
-        # print('samples are iterable')
-    except TypeError:
-        # print('samples arent iterable')
-        samples = [samples]
-
-    if not pipette.has_tip:
-        pipette.pick_up_tip()
-
-    #    if(len(samples)==0):
-    #       samples = [samples]
-    #    print("Replacing solution on samples:" +str(samples) + " len=" + str(len(samples)))
-    for i in range(0, num_repeats):
-        print("Iteration:" + str(i))
-        for s in samples:
-            print(s)
-            print("Washing sample:" + str(s))
-            pipette.aspirate(volume, sourceSolutionWell, rate=well_flow_rate)
-            pipette.dispense(volume, s.bottom(dispense_bottom_gap), rate=sample_flow_rate).blow_out()
-            stats.volume += volume
-
-    if not keep_tip: pipette.drop_tip()
-    if keep_tip: pipette.move_to(samples[len(samples) - 1].bottom(60))
-
-
-def dilute_and_apply_fixative(pipette, sourceSolutionWell, dilutant_buffer_well, samples, volume):
-    try:
-        iter(samples)
-        # print('samples are iterable')
-    except TypeError:
-        # print('samples arent iterable')
-        samples = [samples]
-    if not pipette.has_tip:
-        pipette.pick_up_tip()
-
-    #    if(len(samples)==0):
-    #        samples = [samples]
-    #    print("Applying fixative to samples:" +str(samples) + " len=" + str(len(samples)))
-
-    for s in samples:
-        print("Diluting fixative: " + str(s))
-        pipette.aspirate(volume + 50, dilutant_buffer_well, rate=well_flow_rate)
-        pipette.dispense(volume + 50, sourceSolutionWell, rate=well_flow_rate)
-        for iterator in range(0, 3):
-            print("Mixing: " + str(iterator + 1))
-            pipette.aspirate(volume, sourceSolutionWell, rate=well_flow_rate)
-            pipette.dispense(volume, sourceSolutionWell, rate=well_flow_rate)
-        print("Applying fixative to sample: " + str(s))
-        pipette.aspirate(volume, sourceSolutionWell, rate=well_flow_rate)
-        pipette.dispense(volume, s, rate=sample_flow_rate).blow_out()
-        stats.volume += volume
-
-    pipette.drop_tip()
-
-
-def mix(pipette, sourceSolutionWell, volume, num_repeats):
-    pipette.pick_up_tip()
-
-    print("Mixing solution in samples:" + str(sourceSolutionWell))
-    for i in range(0, num_repeats):
-        print("Iteration:" + str(i))
-        pipette.aspirate(volume, sourceSolutionWell, rate=2)
-        pipette.dispense(volume, sourceSolutionWell, rate=2)
-
-    pipette.drop_tip()
-
-
+labwarePositions.buffers_plate = buffers_plate_position
+labwarePositions.omnistainer = omnistainer_position
+labwarePositions.ihc_reagents_plate = ihc_reagents_plate_position
+labwarePositions.tiprack_300 = tiprack_300_position
 ###########################LABWARE SETUP#################################
 
 def run(protocol: protocol_api.ProtocolContext):
-    if debug: print(protocol)
 
-    tiprack_300 = protocol.load_labware('opentrons_96_tiprack_300ul', labwarePositions.tiprack_300, "tiprack 300ul")
+    ###########################LABWARE SETUP#################################
 
-    if debug: print(tiprack_300)
-    pipette_300 = protocol.load_instrument('p300_single_gen2' if pipette_300_GEN == 'GEN2' else 'p300_single',
-                                           pipette_300_location, tip_racks=[tiprack_300])
-    #    pipette_300 = protocol.load_instrument('p300_single', 'right', tip_racks=[tiprack_300])
+    tiprack_300 = protocol.load_labware('opentrons_96_tiprack_300ul', labwarePositions.tiprack_300, 'tiprack 300ul')
+
+    pipette_300 = protocol.load_instrument(pipette_type, pipette_300_location, tip_racks = [tiprack_300])
     pipette_300.flow_rate.dispense = default_flow_rate
     pipette_300.flow_rate.aspirate = default_flow_rate
-    pipette_300.starting_tip = tiprack_300.wells()[tiprack_300_starting_pos - 1]
-    # pipette_300.starting_tip = tiprack_300.well(tiprack_starting_pos['tiprack_300'])
+    pipette_300.starting_tip = tiprack_300.wells()[tiprack_300_starting_pos-1]
 
-    if debug: print(pipette_300)
+    trough12 = protocol.load_labware('parhelia_12trough', labwarePositions.buffers_plate, '12-trough buffers reservoir')
 
-    black_96 = protocol.load_labware(type_of_96well_plate, labwarePositions.antibodies_plate, type_of_96well_plate)
+    IHC_reagents_96plate = protocol.load_labware(type_of_96well_plate, labwarePositions.ihc_reagents_plate, type_of_96well_plate)
 
-    trough12 = protocol.load_labware('parhelia_12trough', labwarePositions.buffers_reservoir,
-                                     '12-trough buffers reservoir')
     if (not retrieval):
-        par2 = protocol.load_labware(omniStainer_type, labwarePositions.par2,
-                                     omniStainer_type)
+        omnistainer = protocol.load_labware(omnistainer_type, labwarePositions.omnistainer, 'Omni-stainer')
+
     if retrieval:
         temp_mod = protocol.load_module('temperature module', labwarePositions.heatmodule)
-
-        par2 = temp_mod.load_labware(omniStainer_type)
-    wellslist=list(par2.wells_by_name().keys())
-    wellslist = wellslist[1:num_samples+1]
-    if debug: print(par2)
+        omnistainer = temp_mod.load_labware(omnistainer_type)
 
     buffer_wells = trough12.wells_by_name()
 
@@ -221,32 +125,30 @@ def run(protocol: protocol_api.ProtocolContext):
     buffers.eth_100perc = buffer_wells['A8']
     buffers.hematoxylin = buffer_wells['A12']
 
-    preblock_wells = black_96.rows()[0]
-    antibody_wells = black_96.rows()[5]
-    enzymeblock_wells = black_96.rows()[1]
-    hrpsecondaryab_wells = black_96.rows()[2]
-    substrate_wells = black_96.rows()[3]
-    DAB_wells = black_96.rows()[4]
+    preblock_wells = IHC_reagents_96plate.rows()[0]
+    antibody_wells = IHC_reagents_96plate.rows()[5]
+    enzymeblock_wells = IHC_reagents_96plate.rows()[1]
+    hrpsecondaryab_wells = IHC_reagents_96plate.rows()[2]
+    substrate_wells = IHC_reagents_96plate.rows()[3]
+    DAB_wells = IHC_reagents_96plate.rows()[4]
+    hematoxylin_wells = IHC_reagents_96plate.rows()[7]
 
-    sample_chambers = []
-
-    for well in wellslist:
-        sample_chambers.append(par2.wells_by_name()[well])
+    sample_chambers = getOmnistainerWellsList(omnistainer, num_samples)
 
     if debug: print(sample_chambers)
 
     #################PROTOCOL####################
     protocol.home()
 
-    if lid=='yes':
-        openPar2(protocol, pipette_300, par2)
+    if 'thermosheath' in omnistainer_type:
+        openShutter(protocol, pipette_300, omnistainer)
 
     if retrieval:
         washSamples(pipette_300, buffers.retrieval, buffers.retrieval, 2, 1, extra_bottom_gap + 18)
         washSamples(pipette_300, buffers.retrieval, sample_chambers, wash_volume, 2, extra_bottom_gap)
 
-        if lid=='yes':
-            closePar2(protocol, pipette_300, par2)
+        if 'thermosheath' in omnistainer_type:
+            closeShutter(protocol, pipette_300, omnistainer)
 
         temp_mod.set_temperature(95)
         print("retrieval")
@@ -258,26 +160,42 @@ def run(protocol: protocol_api.ProtocolContext):
         print("cooling down to RT")
         temp_mod.set_temperature(25)
         protocol.delay(minutes=20)
-        if lid=='yes':
-            openPar2(protocol, pipette_300, par2)
+        if 'thermosheath' in omnistainer_type:
+            openShutter(protocol, pipette_300, omnistainer)
 
     # WASHING SAMPLES WITH TBS
     print("washing in TBS")
     washSamples(pipette_300, buffers.TBS_wash, buffers.TBS_wash, 2, 1, extra_bottom_gap + 18)
     washSamples(pipette_300, buffers.TBS_wash, sample_chambers, wash_volume, 2, extra_bottom_gap)
 
+
+    # APPLYING enzyme blocking
+    print("puncturing enzyme blocking wells")
+    for i in range(num_samples):
+        washSamples(pipette_300, enzymeblock_wells[i], enzymeblock_wells[i], 2, 1, extra_bottom_gap + 18, keep_tip=True)
+    pipette_300.drop_tip()
+
+    print("applying enzyme blocking")
+    for i in range(num_samples):
+        washSamples(pipette_300, enzymeblock_wells[i], sample_chambers[i], ab_volume, 1, extra_bottom_gap)
+    # INCUBATE 10 MIN
+    print("hrp blocking incubation: 10min")
+    protocol.delay(minutes=10)
+
+    washSamples(pipette_300, buffers.TBS_wash, sample_chambers, wash_volume, 3, extra_bottom_gap)
+
+
     # Preblocking
     print("preblocking")
-    print(len(wellslist))
 
     print("puncturing preblock wells")
-    for i in range(len(wellslist)):
+    for i in range(num_samples):
         print(i)
         washSamples(pipette_300, preblock_wells[i], preblock_wells[i], 2, 1, extra_bottom_gap + 18, keep_tip=True)
     pipette_300.drop_tip()
 
     print("applying the preblock")
-    for i in range(len(wellslist)):
+    for i in range(num_samples):
         print(i)
         washSamples(pipette_300, preblock_wells[i], sample_chambers[i], ab_volume, 1, extra_bottom_gap)
     print("preblocking incubation: 15 min")
@@ -286,20 +204,24 @@ def run(protocol: protocol_api.ProtocolContext):
     # APPLYING ANTIBODY COCKTAILS TO SAMPLES
 
     print("puncturing and applying abs")
-    for i in range(len(wellslist)):
+    for i in range(num_samples):
         print(i)
-        washSamples(pipette_300, antibody_wells[i], antibody_wells[i], 2, 1, extra_bottom_gap + 18, keep_tip=True)
+        washSamples(pipette_300, antibody_wells[i], antibody_wells[i], 2, 1, extra_bottom_gap + 18)
         washSamples(pipette_300, antibody_wells[i], sample_chambers[i], ab_volume, 1, extra_bottom_gap)
 
-    if lid=='yes':
-        closePar2(protocol, pipette_300, par2)
+    if 'thermosheath' in omnistainer_type:
+        closeShutter(protocol, pipette_300, omnistainer)
 
     # INCUBATE FOR DESIRED TIME
     print("staining incubation: " + str(primary_ab_incubation_time_minutes) + "min")
-    protocol.delay(minutes=primary_ab_incubation_time_minutes)
 
-    if lid=='yes':
-        openPar2(protocol, pipette_300, par2)
+    if protocol_pause:
+        protocol.pause(msg = "The protocol is paused for primary antibody incubation")
+    if not protocol_pause:
+        protocol.delay(minutes=primary_ab_incubation_time_minutes, msg = "staining incubation")
+
+    if 'thermosheath' in omnistainer_type:
+        openShutter(protocol, pipette_300, omnistainer)
 
     # WASHING SAMPLES WITH TBS
     # three individual repeats below is because they need particular incubation time between them
@@ -308,40 +230,25 @@ def run(protocol: protocol_api.ProtocolContext):
         washSamples(pipette_300, buffers.TBS_wash, sample_chambers, wash_volume, 1, extra_bottom_gap)
         protocol.delay(minutes=3)
 
-    # APPLYING enzyme blocking
-    print("puncturing enzyme blocking wells")
-    for i in range(len(wellslist)):
-        washSamples(pipette_300, enzymeblock_wells[i], enzymeblock_wells[i], 2, 1, extra_bottom_gap + 18, keep_tip=True)
-    pipette_300.drop_tip()
-
-    print("applying enzyme blocking")
-    for i in range(len(wellslist)):
-        washSamples(pipette_300, enzymeblock_wells[i], sample_chambers[i], ab_volume, 1, extra_bottom_gap)
-    # INCUBATE 10 MIN
-    print("hrp blocking incubation: 10min")
-    protocol.delay(minutes=10)
-
-    washSamples(pipette_300, buffers.TBS_wash, sample_chambers, wash_volume, 3, extra_bottom_gap)
-
     # APPLYING HRP SECONDARY ANTIBODY COCKTAILS TO SAMPLES
     print("puncturing hrpsecondaryab wells")
-    for i in range(len(wellslist)):
+    for i in range(num_samples):
         washSamples(pipette_300, hrpsecondaryab_wells[i], hrpsecondaryab_wells[i], 2, 1, extra_bottom_gap + 18,
                     keep_tip=True)
     pipette_300.drop_tip()
 
     print("applying hrpsecondaryab")
-    for i in range(len(wellslist)):
+    for i in range(num_samples):
         washSamples(pipette_300, hrpsecondaryab_wells[i], sample_chambers[i], ab_volume, 1, extra_bottom_gap)
-    if lid=='yes':
-        closePar2(protocol, pipette_300, par2)
+    if 'thermosheath' in omnistainer_type:
+        closeShutter(protocol, pipette_300, omnistainer)
 
     # INCUBATE FOR DESIRED TIME
     print("staining incubation: " + str(secondary_ab_incubation_time_minutes) + "min")
     protocol.delay(minutes=secondary_ab_incubation_time_minutes)
 
-    if lid=='yes':
-        openPar2(protocol, pipette_300, par2)
+    if 'thermosheath' in omnistainer_type:
+        openShutter(protocol, pipette_300, omnistainer)
 
     # three individual repeats below is because they need particular incubation time between them
     print("washing with TBS")
@@ -351,15 +258,15 @@ def run(protocol: protocol_api.ProtocolContext):
 
     # DILUTING AND APPLYING THE DAB
     print("puncturing the DAB wells")
-    for i in range(len(wellslist)):
+    for i in range(num_samples):
         washSamples(pipette_300, DAB_wells[i], DAB_wells[i], 2, 1, extra_bottom_gap + 18)
     print("puncturing the substrate wells")
-    for i in range(len(wellslist)):
+    for i in range(num_samples):
         washSamples(pipette_300, substrate_wells[i], substrate_wells[i], 2, 1, extra_bottom_gap + 18, keep_tip=True)
     pipette_300.drop_tip()
 
     print("applying DAB")
-    for i in range(len(wellslist)):
+    for i in range(num_samples):
         dilute_and_apply_fixative(pipette_300, DAB_wells[i], substrate_wells[i], sample_chambers[i], wash_volume)
 
     print("developing substrate")
@@ -368,5 +275,43 @@ def run(protocol: protocol_api.ProtocolContext):
 
     washSamples(pipette_300, buffers.water, buffers.water, 2, 1, extra_bottom_gap + 18)
     washSamples(pipette_300, buffers.water, sample_chambers, wash_volume, 5, extra_bottom_gap)
-    if lid=='yes':
-        closePar2(protocol, pipette_300, par2)
+
+    #HEMATOXYLIN STAINING
+    if perform_hematoxylin_staining:
+        if 'thermosheath' in omnistainer_type:
+            openShutter(protocol, pipette_300, omnistainer)
+        if hematoxylin_source == 'from reagent trough':
+            washSamples(pipette_300, buffers.hematoxylin, buffers.hematoxylin, 2, 1,extra_bottom_gap)
+            washSamples(pipette_300, buffers.hematoxylin, sample_chambers, wash_volume, 1,extra_bottom_gap)
+            protocol.delay(minutes=hematoxylin_incubation_time_minutes)
+        if hematoxylin_source == 'from pcr strip':
+            print("puncturing the hematoxylin wells")
+            for i in range(len(wellslist)):
+                washSamples(pipette_300, hematoxylin_wells[i], hematoxylin_wells[i], 2, 1, extra_bottom_gap + 23,keep_tip=True)
+            pipette_300.drop_tip()
+            print("applying hematoxylin")
+            for i in range(len(wellslist)):
+                washSamples(pipette_300, hematoxylin_wells[i], sample_chambers[i], ab_volume, 1, extra_bottom_gap)
+        protocol.delay(seconds=hematoxylin_incubation_time_seconds)
+
+    #WASHING SAMPLES WITH WATER
+    #three individual repeats below is because they need particular incubation time between them
+        print("washing with TBS")
+        washSamples(pipette_300, buffers.storage, buffers.storage, 2, 1, extra_bottom_gap)
+        for i in range (3):
+            washSamples(pipette_300, buffers.storage, sample_chambers, wash_volume, 2, extra_bottom_gap)
+            protocol.delay(minutes=3)
+
+        washSamples(pipette_300, buffers.eth_70perc, buffers.eth_70perc, 2, 1,extra_bottom_gap)
+        washSamples(pipette_300, buffers.eth_70perc, sample_chambers, wash_volume, 3,extra_bottom_gap)
+        washSamples(pipette_300, buffers.eth_80perc, buffers.eth_80perc, 2, 1,extra_bottom_gap)
+        washSamples(pipette_300, buffers.eth_80perc, sample_chambers, wash_volume, 3,extra_bottom_gap)
+        washSamples(pipette_300, buffers.eth_95perc, buffers.eth_95perc, 2, 1,extra_bottom_gap)
+        washSamples(pipette_300, buffers.eth_95perc, sample_chambers, wash_volume, 3,extra_bottom_gap)
+        washSamples(pipette_300, buffers.eth_100perc, buffers.eth_100perc, 2, 1,extra_bottom_gap)
+        washSamples(pipette_300, buffers.eth_100perc, sample_chambers, wash_volume, 3,extra_bottom_gap)
+
+
+    if 'thermosheath' in omnistainer_type:
+        closeShutter(protocol, pipette_300, omnistainer)
+

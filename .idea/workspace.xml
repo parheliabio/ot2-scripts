@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
   <component name="ChangeListManager">
-    <list default="true" id="3f1da4c3-d51e-4a23-9029-cafdead48ca7" name="Default Changelist" comment="allowed to keep tip in dilute and apply" />
+    <list default="true" id="3f1da4c3-d51e-4a23-9029-cafdead48ca7" name="Default Changelist" comment="allowed to keep tip in dilute and apply">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/protocols/IHC/IHC.py" beforeDir="false" afterPath="$PROJECT_DIR$/protocols/IHC/IHC.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/protocols/IHC/labware layout IHC.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/protocols/IHC/labware layout IHC.xlsx" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -293,7 +300,14 @@
       <option name="project" value="LOCAL" />
       <updated>1671593618413</updated>
     </task>
-    <option name="localTasksCounter" value="30" />
+    <task id="LOCAL-00030" summary="allowed to keep tip in dilute and apply">
+      <created>1672033220336</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1672033220336</updated>
+    </task>
+    <option name="localTasksCounter" value="31" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -315,6 +329,7 @@
     <MESSAGE value="Updated the IMC protocol to introduce an option of a manual pause and a 4C overnight incubation. &#10;Merged the CODEX_single_stain and CODEX_multicycle protocols into one protocol and added the options for FFPE and Antibody_Screening modes in the *MODIFIABLE RUN PARAMETER* section. Setting Antibody_Screening to False makes this protocol run like CODEX_multicycle, setting it to true makes it run like CODEX_single_stain" />
     <MESSAGE value="Changed A1's to A0's in slide and cslp labwares" />
     <MESSAGE value="1.calibration position A1 is renamed to A0. This allows the first row of samples to start from A1&#10;2. New versions of slide labware tailored to 4.3. software update are introduced. Please download them and replace in the OT2 app (by deleting the existing files and adding new ones – using remove-add dialogue of the app)&#10;3. sample_z_correction_factor is introduced. Use it in case the adjustment to z-position of tip over the sample is needed." />
-    <option name="LAST_COMMIT_MESSAGE" value="1.calibration position A1 is renamed to A0. This allows the first row of samples to start from A1&#10;2. New versions of slide labware tailored to 4.3. software update are introduced. Please download them and replace in the OT2 app (by deleting the existing files and adding new ones – using remove-add dialogue of the app)&#10;3. sample_z_correction_factor is introduced. Use it in case the adjustment to z-position of tip over the sample is needed." />
+    <MESSAGE value="allowed to keep tip in dilute and apply" />
+    <option name="LAST_COMMIT_MESSAGE" value="allowed to keep tip in dilute and apply" />
   </component>
 </project>
