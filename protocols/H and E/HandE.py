@@ -1,4 +1,115 @@
 
+## VERAO GLOBAL
+
+### GLOBAL FUNCTIONS - AUTO-GENERATED - DO NOT MODIFY ###
+from opentrons import protocol_api
+import json
+
+class Object:
+    pass
+
+####################GENERAL SETUP################################
+stats = Object()
+stats.volume = 0
+debug = False
+
+####################FIXED RUN PARAMETERS#########################
+default_flow_rate = 50
+well_flow_rate = 5
+sample_flow_rate = 0.2
+extra_bottom_gap=0
+
+def washSamples(pipette, sourceSolutionWell, samples, volume, num_repeats=1, height_offset=0, keep_tip=False):
+    try:
+        iter(samples)
+    except TypeError:
+        samples = [samples]
+
+    print('Samples are:')
+    print(samples)
+
+    if not pipette.has_tip:
+        pipette.pick_up_tip()
+
+    height_offset += extra_bottom_gap
+
+    for i in range(0, num_repeats):
+        for s in samples:
+            print(s)
+            print("Washing sample:" + str(s))
+            pipette.aspirate(volume, sourceSolutionWell, rate=well_flow_rate)
+            pipette.dispense(volume, s.bottom(height_offset), rate=sample_flow_rate)
+            stats.volume += volume
+
+    if not keep_tip: pipette.drop_tip()
+
+def puncture_wells(pipette, wells, height_offset=0):
+    try:
+        iter(wells)
+    except TypeError:
+        wells = [wells]
+    for well in wells:
+        washSamples(pipette, well, well, 1, 1, height_offset, keep_tip=True)
+
+def dilute_and_apply_fixative(pipette, sourceSolutionWell, dilutant_buffer_well, samples, volume, height_offset=0, keep_tip=False):
+
+    if not pipette.has_tip: pipette.pick_up_tip()
+    # Diluting fixative:
+    pipette.aspirate(volume, dilutant_buffer_well, rate=well_flow_rate)
+    pipette.dispense(volume, sourceSolutionWell, rate=well_flow_rate)
+    for iterator in range(0, 3):
+        pipette.aspirate(volume, sourceSolutionWell, rate=well_flow_rate)
+        pipette.dispense(volume, sourceSolutionWell, rate=well_flow_rate)
+    if not keep_tip: pipette.drop_tip()
+
+    washSamples(pipette, sourceSolutionWell, samples, volume, height_offset, keep_tip)
+
+
+def getOmnistainerWellsList(omnistainer, num_samples):
+    sample_chambers = []
+
+    if (len(omnistainer.wells_by_name()) < num_samples):
+        raise Exception("number of wells in the Omni-Stainer less than num_samples")
+
+    wellslist = list(omnistainer.wells_by_name().keys())
+    wellslist = wellslist[1:num_samples + 1]
+
+    for well in wellslist:
+        sample_chambers.append(omnistainer.wells_by_name()[well])
+
+    print("omnistainer.wells_by_name are:")
+    print(omnistainer.wells_by_name())
+    print("sample_chambers are:")
+    print(sample_chambers)
+    return sample_chambers
+
+def mix(pipette, sourceSolutionWell, volume, num_repeats):
+    if not pipette.has_tip: pipette.pick_up_tip()
+
+    for i in range(0, num_repeats):
+        pipette.aspirate(volume, sourceSolutionWell, rate=2)
+        pipette.dispense(volume, sourceSolutionWell, rate=2)
+
+    pipette.drop_tip()
+
+def openShutter(protocol, pipette, covered_lbwr, keep_tip=False):
+    if not pipette.has_tip:
+        pipette.pick_up_tip()
+    pipette.move_to(covered_lbwr.wells()[len(covered_lbwr.wells()) - 2].bottom(0))
+    pipette.move_to(covered_lbwr.wells()[len(covered_lbwr.wells()) - 1].bottom(0), force_direct=True)
+    protocol.delay(seconds=1)
+    if not keep_tip: pipette.drop_tip()
+
+
+def closeShutter(protocol, pipette, covered_lbwr, keep_tip=False):
+    if not pipette.has_tip:
+        pipette.pick_up_tip()
+    pipette.move_to(covered_lbwr.wells()[len(covered_lbwr.wells()) - 2].bottom(0))
+    pipette.move_to(covered_lbwr.wells()[len(covered_lbwr.wells()) - 3].bottom(0), force_direct=True)
+    protocol.delay(seconds=1)
+    if not keep_tip: pipette.drop_tip()
+
+### END VERAO GLOBAL
 
 metadata = {
     'protocolName': 'Parhelia Hematoxylin and Eosin staining',
@@ -14,8 +125,8 @@ retrieval = False
 ### VERAO VAR NAME='Device type' TYPE=CHOICE OPTIONS=['omni_stainer_s12_slides', 'omni_stainer_s12_slides_with_thermosheath', 'omni_stainer_c12_cslps', 'omni_stainer_c12_cslps_with_thermosheath', 'par2s_9slides_blue_v3', 'PAR2c_12coverslips']
 omnistainer_type = 'omni_stainer_s12_slides'
 
-### VERAO VAR NAME='Well plate type' TYPE=CHOICE OPTIONS=['parhelia_skirted_96', 'parhelia_skirted_96_with_strips', 'parhelia_black_96']
-type_of_96well_plate = 'parhelia_skirted_96_with_strips'
+### VERAO VAR NAME='Well plate type' TYPE=CHOICE OPTIONS=['parhelia_IHC_reagents_96plate', 'parhelia_red_96', 'parhelia_red_96_with_strip']
+type_of_96well_plate = 'parhelia_red_96_with_strip'
 
 ### VERAO VAR NAME='Number of Samples' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE
 num_samples = 4
@@ -129,8 +240,8 @@ def run(protocol: protocol_api.ProtocolContext):
     buffers = Object()
 
     buffers.water =  buffer_wells['A1']
-    buffers.clearing = buffer_wells['A2']
-    buffers.blueing = buffer_wells['A3']
+    buffers.clearing = buffer_Wells['A2']
+    buffers.blueing = buffer_Wells['A3']
     buffers.eth_70perc =  buffer_wells['A4']
     buffers.eth_80perc =  buffer_wells['A5']
     buffers.eth_95perc =  buffer_wells['A6']
@@ -139,7 +250,7 @@ def run(protocol: protocol_api.ProtocolContext):
     buffers.hematoxylin = buffer_wells['A9']
 
     buffers.eosin = buffer_wells['A11']
-    buffers.clear_rite= buffer_wells['A12']
+    buffers.clear_rite= buffer_Wells['A12']
 
     clearing_wells = hande_reagents_96plate.rows()[0]
     blueing_wells = hande_reagents_96plate.rows()[1]
@@ -156,16 +267,16 @@ def run(protocol: protocol_api.ProtocolContext):
 
 #WASHING SAMPLES WITH WATER
 
-    puncture_wells(pipette_300, buffers.water, height_offset=30)
-    pipette_300.drop_tip()
-    washSamples(pipette_300, buffers.water, sample_chambers, wash_volume, 2)
+        puncture_wells(pipette_300, buffers.water, height_offset=30)
+        pipette_300.drop_tip()
+        washSamples(pipette_300, buffers.water, sample_chambers, wash_volume, 2)
 
 #Staining the samples with hematoxylin
     if hematoxylin_source == 'from reagent trough':
         puncture_wells(pipette_300, buffers.hematoxylin, height_offset=30)
         pipette_300.drop_tip()
         washSamples(pipette_300, buffers.hematoxylin, sample_chambers, wash_volume, 1)
-        protocol.delay(seconds=hematoxylin_incubation_time_seconds)
+        protocol.delay(minutes=hematoxylin_incubation_time_minutes)
     if hematoxylin_source == 'from pcr strip':
         protocol.comment("puncturing the hematoxylin wells")
         puncture_wells(pipette_300, hematoxylin_wells, height_offset=18)
@@ -187,7 +298,7 @@ def run(protocol: protocol_api.ProtocolContext):
         puncture_wells(pipette_300, buffers.clearing, height_offset=30)
         pipette_300.drop_tip()
         washSamples(pipette_300, buffers.clearing, sample_chambers, wash_volume, 1)
-        protocol.delay(seconds=clearing_incubation_time_seconds)
+        protocol.delay(seconds=clearing_incubation_time_minutes)
     if clearing_source == 'from pcr strip':
         protocol.comment("puncturing the clearing wells")
         puncture_wells(pipette_300, clearing_wells, height_offset=18)
@@ -196,7 +307,7 @@ def run(protocol: protocol_api.ProtocolContext):
         for i in range(len(sample_chambers)):
             washSamples(pipette_300, clearing_wells[i], sample_chambers[i], ab_volume, 1, keep_tip=True)
         pipette_300.drop_tip()
-    protocol.delay(seconds=clearing_incubation_time_seconds)
+    protocol.delay(seconds=clearing_incubation_time_minutes)
 
 #WASHING SAMPLES WITH WATER
     for i in range (2):
@@ -207,7 +318,7 @@ def run(protocol: protocol_api.ProtocolContext):
         puncture_wells(pipette_300, buffers.blueing, height_offset=30)
         pipette_300.drop_tip()
         washSamples(pipette_300, buffers.blueing, sample_chambers, wash_volume, 1)
-        protocol.delay(seconds=blueing_incubation_time_seconds)
+        protocol.delay(seconds=blueing_incubation_time_minutes)
     if blueing_source == 'from pcr strip':
         protocol.comment("puncturing the blueing wells")
         puncture_wells(pipette_300, blueing_wells, height_offset=18)
@@ -240,7 +351,7 @@ def run(protocol: protocol_api.ProtocolContext):
         puncture_wells(pipette_300, buffers.eosin, height_offset=30)
         pipette_300.drop_tip()
         washSamples(pipette_300, buffers.eosin, sample_chambers, wash_volume, 1)
-        protocol.delay(seconds=eosin_incubation_time_seconds)
+        protocol.delay(seconds=eosin_incubation_time_minutes)
     if eosin_source == 'from pcr strip':
         protocol.comment("puncturing the eosin wells")
         puncture_wells(pipette_300, eosin_wells, height_offset=18)
@@ -251,8 +362,8 @@ def run(protocol: protocol_api.ProtocolContext):
         pipette_300.drop_tip()
     protocol.delay(seconds=eosin_incubation_time_seconds)
 
-    washSamples(pipette_300, buffers.eth_95perc, sample_chambers, wash_volume, 2,extra_bottom_gap)
-    washSamples(pipette_300, buffers.eth_100perc, sample_chambers, wash_volume, 2,extra_bottom_gap)
+    washSamples(pipette_300, buffers.eth_95perc, sample_chambers, wash_volume, 3,extra_bottom_gap)
+    washSamples(pipette_300, buffers.eth_100perc, sample_chambers, wash_volume, 3,extra_bottom_gap)
 
     washSamples(pipette_300, buffers.clear_rite, sample_chambers, wash_volume, 2,extra_bottom_gap)
 
