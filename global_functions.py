@@ -48,7 +48,8 @@ def puncture_wells(pipette, wells, height_offset=0, keep_tip=False):
     except TypeError:
         wells = [wells]
     for well in wells:
-        washSamples(pipette, well, well, 1, 1, height_offset, keep_tip=keep_tip)
+        washSamples(pipette, well, well, 1, 1, height_offset, keep_tip=True)
+    if not keep_tip: pipette.drop_tip()
 
 def dilute_and_apply_fixative(pipette, sourceSolutionWell, dilutant_buffer_well, samples, volume, height_offset=0, keep_tip=False):
 
