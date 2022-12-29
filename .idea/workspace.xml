@@ -4,11 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3f1da4c3-d51e-4a23-9029-cafdead48ca7" name="Default Changelist" comment="IHC protocol switched for stainworks and layout updated">
-      <change afterPath="$PROJECT_DIR$/protocols/H and E/HandE.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/protocols/H and E/labware layout HandE.xlsx" afterDir="false" />
+    <list default="true" id="3f1da4c3-d51e-4a23-9029-cafdead48ca7" name="Default Changelist" comment="Created H&amp;E protocol and layout">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/protocols/IHC/IHC.py" beforeDir="false" afterPath="$PROJECT_DIR$/protocols/IHC/IHC.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/global_functions.py" beforeDir="false" afterPath="$PROJECT_DIR$/global_functions.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -44,13 +42,13 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "last_opened_file_path": "/Users/Yury/PycharmProjects/ot2-scripts/protocols/H and E"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/Yury/PycharmProjects/ot2-scripts/protocols/H and E&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/protocols/H and E" />
@@ -316,7 +314,14 @@
       <option name="project" value="LOCAL" />
       <updated>1672204062615</updated>
     </task>
-    <option name="localTasksCounter" value="32" />
+    <task id="LOCAL-00032" summary="Created H&amp;E protocol and layout">
+      <created>1672287998572</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1672287998572</updated>
+    </task>
+    <option name="localTasksCounter" value="33" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -340,6 +345,7 @@
     <MESSAGE value="1.calibration position A1 is renamed to A0. This allows the first row of samples to start from A1&#10;2. New versions of slide labware tailored to 4.3. software update are introduced. Please download them and replace in the OT2 app (by deleting the existing files and adding new ones – using remove-add dialogue of the app)&#10;3. sample_z_correction_factor is introduced. Use it in case the adjustment to z-position of tip over the sample is needed." />
     <MESSAGE value="allowed to keep tip in dilute and apply" />
     <MESSAGE value="IHC protocol switched for stainworks and layout updated" />
-    <option name="LAST_COMMIT_MESSAGE" value="IHC protocol switched for stainworks and layout updated" />
+    <MESSAGE value="Created H&amp;E protocol and layout" />
+    <option name="LAST_COMMIT_MESSAGE" value="Created H&amp;E protocol and layout" />
   </component>
 </project>
