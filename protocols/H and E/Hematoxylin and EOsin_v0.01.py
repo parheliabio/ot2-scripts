@@ -157,19 +157,16 @@ def run(protocol: protocol_api.ProtocolContext):
 #WASHING SAMPLES WITH WATER
 
     puncture_wells(pipette_300, buffers.water, height_offset=30)
-    pipette_300.drop_tip()
     washSamples(pipette_300, buffers.water, sample_chambers, wash_volume, 2)
 
 #Staining the samples with hematoxylin
     if hematoxylin_source == 'from reagent trough':
         puncture_wells(pipette_300, buffers.hematoxylin, height_offset=30)
-        pipette_300.drop_tip()
         washSamples(pipette_300, buffers.hematoxylin, sample_chambers, wash_volume, 1)
         protocol.delay(seconds=hematoxylin_incubation_time_seconds)
     if hematoxylin_source == 'from pcr strip':
         protocol.comment("puncturing the hematoxylin wells")
         puncture_wells(pipette_300, hematoxylin_wells, height_offset=18)
-        pipette_300.drop_tip()
         protocol.comment("applying hematoxylin")
         for i in range(len(sample_chambers)):
             washSamples(pipette_300, hematoxylin_wells[i], sample_chambers[i], ab_volume, 1, keep_tip=True)
@@ -191,7 +188,6 @@ def run(protocol: protocol_api.ProtocolContext):
     if clearing_source == 'from pcr strip':
         protocol.comment("puncturing the clearing wells")
         puncture_wells(pipette_300, clearing_wells, height_offset=18)
-        pipette_300.drop_tip()
         protocol.comment("applying clearing")
         for i in range(len(sample_chambers)):
             washSamples(pipette_300, clearing_wells[i], sample_chambers[i], ab_volume, 1, keep_tip=True)
@@ -205,13 +201,11 @@ def run(protocol: protocol_api.ProtocolContext):
 #Blueing the samples
     if blueing_source == 'from reagent trough':
         puncture_wells(pipette_300, buffers.blueing, height_offset=30)
-        pipette_300.drop_tip()
         washSamples(pipette_300, buffers.blueing, sample_chambers, wash_volume, 1)
         protocol.delay(seconds=blueing_incubation_time_seconds)
     if blueing_source == 'from pcr strip':
         protocol.comment("puncturing the blueing wells")
         puncture_wells(pipette_300, blueing_wells, height_offset=18)
-        pipette_300.drop_tip()
         protocol.comment("applying blueing")
         for i in range(len(sample_chambers)):
             washSamples(pipette_300, blueing_wells[i], sample_chambers[i], ab_volume, 1, keep_tip=True)
@@ -223,13 +217,12 @@ def run(protocol: protocol_api.ProtocolContext):
         washSamples(pipette_300, buffers.water, sample_chambers, wash_volume, 2)
 
     puncture_wells(pipette_300, buffers.clear_rite, height_offset=30)
-    pipette_300.drop_tip()
 
-    puncture_wells(pipette_300, buffers.eth_100perc, height_offset=30)
-    puncture_wells(pipette_300, buffers.eth_95perc, height_offset=30)
-    puncture_wells(pipette_300, buffers.eth_80perc, height_offset=30)
+    puncture_wells(pipette_300, buffers.eth_100perc, height_offset=30, keep_tip=True)
+    puncture_wells(pipette_300, buffers.eth_95perc, height_offset=30, keep_tip=True)
+    puncture_wells(pipette_300, buffers.eth_80perc, height_offset=30, keep_tip=True)
     puncture_wells(pipette_300, buffers.eth_70perc, height_offset=30)
-    pipette_300.drop_tip()
+
 
     washSamples(pipette_300, buffers.eth_70perc, sample_chambers, wash_volume, 3,extra_bottom_gap)
     washSamples(pipette_300, buffers.eth_80perc, sample_chambers, wash_volume, 3,extra_bottom_gap)
@@ -238,13 +231,11 @@ def run(protocol: protocol_api.ProtocolContext):
 #Staining with eosin
     if eosin_source == 'from reagent trough':
         puncture_wells(pipette_300, buffers.eosin, height_offset=30)
-        pipette_300.drop_tip()
         washSamples(pipette_300, buffers.eosin, sample_chambers, wash_volume, 1)
         protocol.delay(seconds=eosin_incubation_time_seconds)
     if eosin_source == 'from pcr strip':
         protocol.comment("puncturing the eosin wells")
         puncture_wells(pipette_300, eosin_wells, height_offset=18)
-        pipette_300.drop_tip()
         protocol.comment("applying eosin")
         for i in range(len(sample_chambers)):
             washSamples(pipette_300, eosin_wells[i], sample_chambers[i], ab_volume, 1, keep_tip=True)

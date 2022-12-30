@@ -1,3 +1,5 @@
+
+
 metadata = {
     'protocolName': 'Parhelia CODEX v11',
     'author': 'Parhelia Bio <info@parheliabio.com>',
@@ -10,6 +12,7 @@ metadata = {
 # The type of Parhelia Omni-Stainer
 ### VERAO VAR NAME='Device type' TYPE=CHOICE OPTIONS=['omni_stainer_s12_slides', 'omni_stainer_s12_slides_with_thermosheath', 'omni_stainer_c12_cslps', 'omni_stainer_c12_cslps_with_thermosheath', 'par2s_9slides_blue_v3', 'PAR2c_12coverslips']
 omnistainer_type = 'omni_stainer_s12_slides'
+
 
 ### VERAO VAR NAME='Well plate type' TYPE=CHOICE OPTIONS=['parhelia_skirted_96', 'parhelia_skirted_96_with_strips', 'parhelia_black_96']
 type_of_96well_plate = 'parhelia_skirted_96_with_strips'
@@ -67,22 +70,28 @@ else:
     pipette_type = 'p300_single'
 
 
-labwarePositions = Object()
 
 ### VERAO VAR NAME='Deck position: 12-trough buffers reservoir' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE
-labwarePositions.buffers_plate = 1
+buffers_plate_position = 1
 
 ### VERAO VAR NAME='Deck position: Parhelia Omni-stainer' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE
-labwarePositions.omnistainer = 2
+omnistainer_position = 2
 
 ### VERAO VAR NAME='Deck position: Preblock/Antibody/F reagents plate' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE
-labwarePositions.codex_reagents_plate = 3
+codex_reagents_plate_position = 3
 
 ### VERAO VAR NAME='Deck position: 300ul tip rack' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE
-labwarePositions.tiprack_300_1 = 6
+tiprack_300_1_position = 6
 
 ### VERAO VAR NAME='Deck position: 300ul tip rack#2' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE
-labwarePositions.tiprack_300_2 = 9
+tiprack_300_2_position = 9
+
+labwarePositions = Object()
+labwarePositions.buffers_plate = buffers_plate_position
+labwarePositions.omnistainer = omnistainer_position
+labwarePositions.codex_reagents_plate = codex_reagents_plate_position
+labwarePositions.tiprack_300_1 = tiprack_300_1_position
+labwarePositions.tiprack_300_2 = tiprack_300_2_position
 
 
 # protocol run function. the part after the colon lets your editor know
@@ -126,11 +135,11 @@ def run(protocol: protocol_api.ProtocolContext):
     protocol.comment("Starting the CODEX staining protocol for samples:" + str(sample_chambers))
 
     if 'thermosheath' in omnistainer_type:
-        openShutter(protocol, pipette_300, omnistainer)
+        openShutter(protocol, pipette_300, omnistainer, keep_tip=True)
     if not FFPE:
         #WASHING SAMPLES WITH PFA
         protocol.comment("puncturing first fix")
-        puncture_wells(pipette_300, buffers.Hydration_PFA_1pt6pct)
+        puncture_wells(pipette_300, buffers.Hydration_PFA_1pt6pct, height_offset=30)
         protocol.comment("first fix")
         washSamples(pipette_300, buffers.Hydration_PFA_1pt6pct, sample_chambers, wash_volume, 1)
         #INCUBATE
@@ -138,20 +147,18 @@ def run(protocol: protocol_api.ProtocolContext):
 
     #WASHING SAMPLES WITH S2
     protocol.comment("puncture S2")
-    puncture_wells(pipette_300, buffers.Staining)
+    puncture_wells(pipette_300, buffers.Staining, height_offset=30)
     protocol.comment("wash in S2")
-    washSamples(pipette_300, buffers.Staining, sample_chambers, wash_volume, 2)
+    washSamples(pipette_300, buffers.Staining, sample_chambers, wash_volume, 2, keep_tip=True)
 
     #PUNCTURING THE PREBLOCK
     protocol.comment("puncturing the preblock")
     puncture_wells(pipette_300, preblock_wells, height_offset=18)
-    pipette_300.drop_tip()
 
     #WASHING SAMPLES WITH PREBLOCK
     protocol.comment("preblocking")
     for i in range (num_samples):
         washSamples(pipette_300, preblock_wells[i], sample_chambers[i], wash_volume, 1, keep_tip=True)
-    pipette_300.drop_tip()
     #INCUBATE
 
     if 'thermosheath' in omnistainer_type:
@@ -167,12 +174,12 @@ def run(protocol: protocol_api.ProtocolContext):
     protocol.comment("applying antibodies")
     for i in range (num_samples):
         protocol.comment("puncturing antibodies")
-        puncture_wells(pipette_300, antibody_wells, height_offset=18)
+        puncture_wells(pipette_300, antibody_wells[i], height_offset=18)
         protocol.comment("applying antibodies")
         washSamples(pipette_300, antibody_wells[i], sample_chambers[i], ab_volume,1)
     #INCUBATE
     if 'thermosheath' in omnistainer_type:
-        closeShutter(protocol, pipette_300, omnistainer)
+        closeShutter(protocol, pipette_300, omnistainer, keep_tip=True)
 
     if protocol_pause:
         protocol.pause(msg = "The protocol is paused for primary ab incubation")
@@ -180,18 +187,18 @@ def run(protocol: protocol_api.ProtocolContext):
         protocol.delay(minutes=ab_incubation_time_minutes, msg = "staining incubation")
 
     if 'thermosheath' in omnistainer_type:
-        openShutter(protocol, pipette_300, omnistainer)
+        openShutter(protocol, pipette_300, omnistainer, keep_tip=True)
     for i in range(2):
         #WASHING SAMPLES WITH Staining buffer
         protocol.comment("first washing with Staining buffer")
-        washSamples(pipette_300, buffers.Staining, sample_chambers, wash_volume,2)
+        washSamples(pipette_300, buffers.Staining, sample_chambers, wash_volume,2, keep_tip=True)
         #INCUBATE
         protocol.delay(minutes=5, msg = "first incubation in Staining Buffer")
 
 
     #POST STAINING FIXING SAMPLES WITH PFA
     protocol.comment("puncturing the second fix")
-    puncture_wells(pipette_300, buffers.Storage_PFA_4pct)
+    puncture_wells(pipette_300, buffers.Storage_PFA_4pct, height_offset=30)
     protocol.comment("second fix")
     washSamples(pipette_300, buffers.Storage_PFA_4pct, sample_chambers, wash_volume,1)
     #INCUBATE
@@ -201,35 +208,34 @@ def run(protocol: protocol_api.ProtocolContext):
     protocol.comment("puncture the PBS wash")
     puncture_wells(pipette_300, buffers.PBS)
     protocol.comment("the PBS wash")
-    washSamples(pipette_300, buffers.PBS, sample_chambers, wash_volume,2)
+    washSamples(pipette_300, buffers.PBS, sample_chambers, wash_volume,2, keep_tip=True)
 
     # FIXING SAMPLES WITH Methanol
     protocol.comment("puncturing the Methanol")
-    puncture_wells(pipette_300, buffers.MeOH)
+    puncture_wells(pipette_300, buffers.MeOH, height_offset=30)
     for i in range(2):
         protocol.comment("applying MeOH")
         washSamples(pipette_300, buffers.MeOH, sample_chambers, wash_volume,1)
         # INCUBATE
-        protocol.delay(minutes=2.5, msg="First MeOH incubation")
+        protocol.delay(minutes=2.5, msg="MeOH incubation")
 
     #WASHING SAMPLES WITH PBS
     protocol.comment("PBS wash")
-    washSamples(pipette_300, buffers.PBS, sample_chambers, wash_volume,2)
+    washSamples(pipette_300, buffers.PBS, sample_chambers, wash_volume,2, keep_tip=True)
 
     #PUNCTURING THE FIXATIVE
     protocol.comment("puncturing the fixative")
     puncture_wells(pipette_300, reagent_F_wells, height_offset=18)
-    pipette_300.drop_tip()
 
     #DILUTING AND APPLYING THE FIXATIVE
     protocol.comment("applying the fixative")
     for i in range (num_samples):
-        dilute_and_apply_fixative(pipette_300, reagent_F_wells[i], buffers.PBS, sample_chambers[i], wash_volume)
+        dilute_and_apply_fixative(pipette_300, reagent_F_wells[i], buffers.PBS, sample_chambers[i], wash_volume, keep_tip=True)
 
     protocol.comment("third fix incubation")
 
     if 'thermosheath' in omnistainer_type:
-        closeShutter(protocol, pipette_300, omnistainer)
+        closeShutter(protocol, pipette_300, omnistainer, keep_tip=True)
 
     protocol.delay(minutes=10, msg = "Reagent F incubation")
 
@@ -241,10 +247,12 @@ def run(protocol: protocol_api.ProtocolContext):
     washSamples(pipette_300, buffers.PBS, sample_chambers, wash_volume, 2)
 
     if Antibody_Screening:
+        protocol.comment("puncture the Codex Buffer")
+        puncture_wells(pipette_300, buffers.CODEX_buffer_1x, keep_tip=True)
+        protocol.comment("puncture the Screening Buffer")
+        puncture_wells(pipette_300, buffers.Screening_Buffer, keep_tip=True)
         protocol.comment("puncture the Stripping Buffer")
         puncture_wells(pipette_300, buffers.Stripping_buffer)
-        protocol.comment("puncture the Screening Buffer")
-        puncture_wells(pipette_300, buffers.Screening_Buffer)
         #PRE-CLEARING THE TISSUE
         for i in range (3):
             protocol.comment("tissue clearing round" + str(i+1))
@@ -280,5 +288,3 @@ def run(protocol: protocol_api.ProtocolContext):
     if 'thermosheath' in omnistainer_type:
         closeShutter(protocol, pipette_300, omnistainer)
 
-
-#protocol exported from Parhelia StainWorks

@@ -5,8 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3f1da4c3-d51e-4a23-9029-cafdead48ca7" name="Default Changelist" comment="Created H&amp;E protocol and layout">
+      <change afterPath="$PROJECT_DIR$/protocols/ACD RNA detection/3_probe_RNA_ACD_v2.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/global_functions.py" beforeDir="false" afterPath="$PROJECT_DIR$/global_functions.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/protocols/ACD RNA detection/RNA detection ACD v2.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/protocols/CODEX/CODEX.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/protocols/CODEX/CODEX_v0.11.py" beforeDir="false" afterPath="$PROJECT_DIR$/protocols/CODEX/CODEX_v0.11.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/protocols/H and E/HandE.py" beforeDir="false" afterPath="$PROJECT_DIR$/protocols/H and E/Hematoxylin and EOsin_v0.01.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/protocols/IHC/IHC.py" beforeDir="false" afterPath="$PROJECT_DIR$/protocols/IHC/IHC_with_Hematoxylin_v0.01.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -335,7 +340,14 @@
       <option name="project" value="LOCAL" />
       <updated>1672357031993</updated>
     </task>
-    <option name="localTasksCounter" value="35" />
+    <task id="LOCAL-00035" summary="Created H&amp;E protocol and layout">
+      <created>1672358699317</created>
+      <option name="number" value="00035" />
+      <option name="presentableId" value="LOCAL-00035" />
+      <option name="project" value="LOCAL" />
+      <updated>1672358699317</updated>
+    </task>
+    <option name="localTasksCounter" value="36" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
