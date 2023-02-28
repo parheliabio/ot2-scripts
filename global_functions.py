@@ -18,12 +18,10 @@ well_flow_rate = 5
 sample_flow_rate = 0.2
 extra_bottom_gap=0
 
-def washSamples(pipette, sourceSolutionWell, samples, volume, num_repeats=1, dispense_bottom_gap=None, keep_tip=False):
+def washSamples(pipette, sourceSolutionWell, samples, volume, num_repeats=1, height_offset=0, keep_tip=False):
     try:
         iter(samples)
-        print('samples are iterable')
     except TypeError:
-        print('samples arent iterable')
         samples = [samples]
 
     print('Samples are:')
@@ -32,44 +30,39 @@ def washSamples(pipette, sourceSolutionWell, samples, volume, num_repeats=1, dis
     if not pipette.has_tip:
         pipette.pick_up_tip()
 
-    if dispense_bottom_gap is None: dispense_bottom_gap=extra_bottom_gap
+    height_offset += extra_bottom_gap
 
     for i in range(0, num_repeats):
-        print("Iteration:" + str(i))
         for s in samples:
             print(s)
             print("Washing sample:" + str(s))
             pipette.aspirate(volume, sourceSolutionWell, rate=well_flow_rate)
-            pipette.dispense(volume, s.bottom(dispense_bottom_gap), rate=sample_flow_rate)
+            pipette.dispense(volume, s.bottom(height_offset), rate=sample_flow_rate)
             stats.volume += volume
-        print("Iteration:" + str(i))
 
     if not keep_tip: pipette.drop_tip()
 
-def dilute_and_apply_fixative(pipette, sourceSolutionWell, dilutant_buffer_well, samples, volume):
+def puncture_wells(pipette, wells, height_offset=0, keep_tip=False):
     try:
-        iter(samples)
+        iter(wells)
     except TypeError:
-        samples = [samples]
+        wells = [wells]
+    for well in wells:
+        washSamples(pipette, well, well, 1, 1, height_offset, keep_tip=True)
+    if not keep_tip: pipette.drop_tip()
+
+def dilute_and_apply_fixative(pipette, sourceSolutionWell, dilutant_buffer_well, samples, volume, height_offset=0, keep_tip=False):
 
     if not pipette.has_tip: pipette.pick_up_tip()
-
-    if (len(samples) == 0):
-        samples = [samples]
-
-    for s in samples:
-        # Diluting fixative:
-        pipette.aspirate(volume + 50, dilutant_buffer_well, rate=well_flow_rate)
-        pipette.dispense(volume + 50, sourceSolutionWell, rate=well_flow_rate)
-        for iterator in range(0, 3):
-            pipette.aspirate(volume, sourceSolutionWell, rate=well_flow_rate)
-            pipette.dispense(volume, sourceSolutionWell, rate=well_flow_rate)
-        # Applying fixative to sample:
+    # Diluting fixative:
+    pipette.aspirate(volume, dilutant_buffer_well, rate=well_flow_rate)
+    pipette.dispense(volume, sourceSolutionWell, rate=well_flow_rate)
+    for iterator in range(0, 3):
         pipette.aspirate(volume, sourceSolutionWell, rate=well_flow_rate)
-        pipette.dispense(volume, s, rate=sample_flow_rate).blow_out()
-        stats.volume += volume
+        pipette.dispense(volume, sourceSolutionWell, rate=well_flow_rate)
 
-    pipette.drop_tip()
+    washSamples(pipette, sourceSolutionWell, samples, volume, height_offset, keep_tip=keep_tip)
+
 
 def getOmnistainerWellsList(omnistainer, num_samples):
     sample_chambers = []
