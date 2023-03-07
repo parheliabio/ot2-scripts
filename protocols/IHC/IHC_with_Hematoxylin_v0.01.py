@@ -13,8 +13,8 @@ retrieval = False
 ### VERAO VAR NAME='shall the protocol PAUSE at the primary ab incubation step?' TYPE=BOOLEAN
 protocol_pause = False
 
-### VERAO VAR NAME='Perform Hematoxylin staining after the IHC' TYPE=BOOLEAN
-perform_hematoxylin_staining = False
+### VERAO VAR NAME='Type of protocol' TYPE=CHOICE OPTIONS=['IHC only','IHC with Hematoxylin','Hematoxylin only']
+type_of_protocol = 'IHC only'
 
 ### VERAO VAR NAME='Hematoxylin source' TYPE=CHOICE OPTIONS=['from reagent trough', 'from pcr strip']
 hematoxylin_source = 'from pcr strip'
@@ -163,115 +163,122 @@ def run(protocol: protocol_api.ProtocolContext):
         if 'thermosheath' in omnistainer_type:
             openShutter(protocol, pipette_300, omnistainer, keep_tip=True)
 
-    # WASHING SAMPLES WITH TBS
-    protocol.comment("washing in TBS")
-    puncture_wells(pipette_300, buffers.TBS_wash, height_offset=30)
-    washSamples(pipette_300, buffers.TBS_wash, sample_chambers, wash_volume, 2)
+    if type_of_protocol in ['IHC only','IHC with Hematoxylin']:
+        # WASHING SAMPLES WITH TBS
+        protocol.comment("washing in TBS")
+        puncture_wells(pipette_300, buffers.TBS_wash, height_offset=30)
+        washSamples(pipette_300, buffers.TBS_wash, sample_chambers, wash_volume, 2)
 
 
-    # APPLYING enzyme blocking
-    protocol.comment("puncturing enzyme blocking wells")
-    puncture_wells(pipette_300, enzymeblock_wells, height_offset=18)
+        # APPLYING enzyme blocking
+        protocol.comment("puncturing enzyme blocking wells")
+        for i in range(num_samples):
+            puncture_wells(pipette_300, enzymeblock_wells[i], height_offset=18, keep_tip=True)
+        pipette_300.drop_tip()
 
-    protocol.comment("applying enzyme blocking")
-    for i in range(num_samples):
-        washSamples(pipette_300, enzymeblock_wells[i], sample_chambers[i], ab_volume, 1)
-    # INCUBATE 10 MIN
-    protocol.comment("hrp blocking incubation: 10min")
-    protocol.delay(minutes=10)
+        protocol.comment("applying enzyme blocking")
+        for i in range(num_samples):
+            washSamples(pipette_300, enzymeblock_wells[i], sample_chambers[i], ab_volume, 1)
+        # INCUBATE 10 MIN
+        protocol.comment("hrp blocking incubation: 10min")
+        protocol.delay(minutes=10)
 
-    washSamples(pipette_300, buffers.TBS_wash, sample_chambers, wash_volume, 3)
-
-
-    # Preblocking
-    protocol.comment("preblocking")
-
-    protocol.comment("puncturing preblock wells")
-    puncture_wells(pipette_300, preblock_wells, height_offset=18)
-
-    protocol.comment("applying the preblock")
-    for i in range(num_samples):
-        protocol.comment(i)
-        washSamples(pipette_300, preblock_wells[i], sample_chambers[i], ab_volume, 1)
-    protocol.comment("preblocking incubation: 15 min")
-    protocol.delay(minutes=15)
-
-    # APPLYING ANTIBODY COCKTAILS TO SAMPLES
-
-    protocol.comment("puncturing and applying abs")
-    for i in range(num_samples):
-        protocol.comment(i)
-        puncture_wells(pipette_300, antibody_wells[i], height_offset=18)
-        washSamples(pipette_300, antibody_wells[i], sample_chambers[i], ab_volume, 1)
-
-    if 'thermosheath' in omnistainer_type:
-        closeShutter(protocol, pipette_300, omnistainer, keep_tip=True)
-
-    # INCUBATE FOR DESIRED TIME
-    protocol.comment("staining incubation: " + str(primary_ab_incubation_time_minutes) + "min")
-
-    if protocol_pause:
-        protocol.pause(msg = "The protocol is paused for primary antibody incubation")
-    if not protocol_pause:
-        protocol.delay(minutes=primary_ab_incubation_time_minutes, msg = "staining incubation")
-
-    if 'thermosheath' in omnistainer_type:
-        openShutter(protocol, pipette_300, omnistainer, keep_tip=True)
-
-    # WASHING SAMPLES WITH TBS
-    # three individual repeats below is because they need particular incubation time between them
-    protocol.comment("washing with TBS")
-    for i in range(5):
-        washSamples(pipette_300, buffers.TBS_wash, sample_chambers, wash_volume, 1, keep_tip=True)
-        protocol.delay(minutes=3)
-
-    # APPLYING HRP SECONDARY ANTIBODY COCKTAILS TO SAMPLES
-    protocol.comment("puncturing hrpsecondaryab wells")
-    puncture_wells(pipette_300, hrpsecondaryab_wells, height_offset=18)
-
-    protocol.comment("applying hrpsecondaryab")
-    for i in range(num_samples):
-        washSamples(pipette_300, hrpsecondaryab_wells[i], sample_chambers[i], ab_volume, 1)
-
-    if 'thermosheath' in omnistainer_type:
-        closeShutter(protocol, pipette_300, omnistainer, keep_tip=True)
-
-    # INCUBATE FOR DESIRED TIME
-    protocol.comment("staining incubation: " + str(secondary_ab_incubation_time_minutes) + "min")
-    protocol.delay(minutes=secondary_ab_incubation_time_minutes)
-
-    if 'thermosheath' in omnistainer_type:
-        openShutter(protocol, pipette_300, omnistainer, keep_tip=True)
-
-    # three individual repeats below is because they need particular incubation time between them
-    protocol.comment("washing with TBS")
-    for i in range(3):
-        washSamples(pipette_300, buffers.TBS_wash, sample_chambers, wash_volume, 1, keep_tip=True)
-        protocol.delay(minutes=3)
-    pipette_300.drop_tip()
-
-    # DILUTING AND APPLYING THE DAB
-    protocol.comment("puncturing the DAB wells")
-    puncture_wells(pipette_300, DAB_wells, height_offset=18, keep_tip=True)
-    protocol.comment("puncturing the substrate wells")
-    puncture_wells(pipette_300, substrate_wells, height_offset=18)
+        washSamples(pipette_300, buffers.TBS_wash, sample_chambers, wash_volume, 3)
 
 
-    protocol.comment("applying DAB")
-    for i in range(num_samples):
-        dilute_and_apply_fixative(pipette_300, DAB_wells[i], substrate_wells[i], sample_chambers[i], wash_volume, keep_tip=True)
-    pipette_300.drop_tip()
+        # Preblocking
+        protocol.comment("preblocking")
+
+        protocol.comment("puncturing preblock wells")
+        for i in range(num_samples):
+            puncture_wells(pipette_300, preblock_wells[i], height_offset=18, keep_tip=True)
+        pipette_300.drop_tip()
+
+        protocol.comment("applying the preblock")
+        for i in range(num_samples):
+            protocol.comment(i)
+            washSamples(pipette_300, preblock_wells[i], sample_chambers[i], ab_volume, 1)
+        protocol.comment("preblocking incubation: 15 min")
+        protocol.delay(minutes=15)
+
+        # APPLYING ANTIBODY COCKTAILS TO SAMPLES
+
+        protocol.comment("puncturing and applying abs")
+        for i in range(num_samples):
+            protocol.comment(i)
+            puncture_wells(pipette_300, antibody_wells[i], height_offset=18)
+            washSamples(pipette_300, antibody_wells[i], sample_chambers[i], ab_volume, 1)
+
+        if 'thermosheath' in omnistainer_type:
+            closeShutter(protocol, pipette_300, omnistainer, keep_tip=True)
+
+        # INCUBATE FOR DESIRED TIME
+        protocol.comment("staining incubation: " + str(primary_ab_incubation_time_minutes) + "min")
+
+        if protocol_pause:
+            protocol.pause(msg = "The protocol is paused for primary antibody incubation")
+        if not protocol_pause:
+            protocol.delay(minutes=primary_ab_incubation_time_minutes, msg = "staining incubation")
+
+        if 'thermosheath' in omnistainer_type:
+            openShutter(protocol, pipette_300, omnistainer, keep_tip=True)
+
+        # WASHING SAMPLES WITH TBS
+        # three individual repeats below is because they need particular incubation time between them
+        protocol.comment("washing with TBS")
+        for i in range(5):
+            washSamples(pipette_300, buffers.TBS_wash, sample_chambers, wash_volume, 1, keep_tip=True)
+            protocol.delay(minutes=3)
+
+        # APPLYING HRP SECONDARY ANTIBODY COCKTAILS TO SAMPLES
+        protocol.comment("puncturing hrpsecondaryab wells")
+        for i in range(num_samples):
+            puncture_wells(pipette_300, hrpsecondaryab_wells[i], height_offset=18, keep_tip=True)
+        pipette_300.drop_tip()
+
+        protocol.comment("applying hrpsecondaryab")
+        for i in range(num_samples):
+            washSamples(pipette_300, hrpsecondaryab_wells[i], sample_chambers[i], ab_volume, 1)
+
+        if 'thermosheath' in omnistainer_type:
+            closeShutter(protocol, pipette_300, omnistainer, keep_tip=True)
+
+        # INCUBATE FOR DESIRED TIME
+        protocol.comment("staining incubation: " + str(secondary_ab_incubation_time_minutes) + "min")
+        protocol.delay(minutes=secondary_ab_incubation_time_minutes)
+
+        if 'thermosheath' in omnistainer_type:
+            openShutter(protocol, pipette_300, omnistainer, keep_tip=True)
+
+        # three individual repeats below is because they need particular incubation time between them
+        protocol.comment("washing with TBS")
+        for i in range(3):
+            washSamples(pipette_300, buffers.TBS_wash, sample_chambers, wash_volume, 1, keep_tip=True)
+            protocol.delay(minutes=3)
+        pipette_300.drop_tip()
+
+        # DILUTING AND APPLYING THE DAB
+        protocol.comment("puncturing the DAB and substrate wells")
+        for i in range(num_samples):
+            puncture_wells(pipette_300, DAB_wells[i], height_offset=18, keep_tip=True)
+            puncture_wells(pipette_300, substrate_wells[i], height_offset=18, keep_tip=True)
+        pipette_300.drop_tip()
+
+        protocol.comment("applying DAB")
+        for i in range(num_samples):
+            dilute_and_apply_fixative(pipette_300, DAB_wells[i], substrate_wells[i], sample_chambers[i], wash_volume, keep_tip=True)
+        pipette_300.drop_tip()
 
 
-    protocol.comment("developing substrate")
-    protocol.delay(minutes=10)
+        protocol.comment("developing substrate")
+        protocol.delay(minutes=10)
 
-    protocol.comment("final washw with water")
-    puncture_wells(pipette_300, buffers.water,height_offset=18)
-    washSamples(pipette_300, buffers.water, sample_chambers, wash_volume, 5, keep_tip=True)
+        protocol.comment("final washw with water")
+        puncture_wells(pipette_300, buffers.water, height_offset=30)
+        washSamples(pipette_300, buffers.water, sample_chambers, wash_volume, 5, keep_tip=True)
 
     #HEMATOXYLIN STAINING
-    if perform_hematoxylin_staining:
+    if type_of_protocol in ['IHC with Hematoxylin','Hematoxylin only']:
         if 'thermosheath' in omnistainer_type:
             openShutter(protocol, pipette_300, omnistainer, keep_tip=True)
         if hematoxylin_source == 'from reagent trough':
@@ -280,9 +287,11 @@ def run(protocol: protocol_api.ProtocolContext):
             protocol.delay(minutes=hematoxylin_incubation_time_minutes)
         if hematoxylin_source == 'from pcr strip':
             protocol.comment("puncturing the hematoxylin wells")
-            puncture_wells(pipette_300, hematoxylin_wells, height_offset=18)
+            for i in range(num_samples):
+                puncture_wells(pipette_300, hematoxylin_wells[i], height_offset=18, keep_tip=True)
+            pipette_300.drop_tip()
             protocol.comment("applying hematoxylin")
-            for i in range(len(wellslist)):
+            for i in range(num_samples):
                 washSamples(pipette_300, hematoxylin_wells[i], sample_chambers[i], ab_volume, 1, keep_tip=True)
             pipette_300.drop_tip()
         protocol.delay(seconds=hematoxylin_incubation_time_seconds)

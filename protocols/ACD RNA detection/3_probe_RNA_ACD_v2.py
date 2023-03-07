@@ -20,7 +20,7 @@ type_of_96well_plate = 'parhelia_skirted_96_with_strips'
 FFPE = True
 
 ### VERAO VAR NAME='Temp lag for adjusting the temp' TYPE=NUMBER LBOUND=1 UBOUND=95 DECIMAL=FALS
-templa g =20
+templag =20
 """
 Antibody screening involves additional rendering step at the end, where the tissue is cleared and then
 fluorescent detection probes are applied to the tissue directly in the PAR2 device.

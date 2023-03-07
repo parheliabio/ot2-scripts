@@ -61,7 +61,7 @@ def dilute_and_apply_fixative(pipette, sourceSolutionWell, dilutant_buffer_well,
         pipette.aspirate(volume, sourceSolutionWell, rate=well_flow_rate)
         pipette.dispense(volume, sourceSolutionWell, rate=well_flow_rate)
 
-    washSamples(pipette, sourceSolutionWell, samples, volume, height_offset, keep_tip=keep_tip)
+    washSamples(pipette, sourceSolutionWell, samples, volume, 1, height_offset, keep_tip=keep_tip)
 
 
 def getOmnistainerWellsList(omnistainer, num_samples):
