@@ -226,7 +226,7 @@ def run(protocol: protocol_api.ProtocolContext):
     #DILUTING AND APPLYING THE FIXATIVE
     protocol.comment("applying the fixative")
     for i in range (num_samples):
-        dilute_and_apply_fixative(pipette_300, reagent_F_wells[i], buffers.PBS, sample_chambers[i], wash_volume)
+        dilute_and_apply_fixative(pipette_300, reagent_F_wells[i], buffers.PBS, sample_chambers[i], ab_volume)
 
     protocol.comment("third fix incubation")
 
