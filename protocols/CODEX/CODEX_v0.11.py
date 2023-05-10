@@ -35,8 +35,7 @@ Antibody_Screening = False
 ### VERAO VAR NAME='Number of Samples' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE
 num_samples = 12
 
-### VERAO VAR NAME='Tiprack starting position' TYPE=NUMBER LBOUND=1 UBOUND=95 DECIMAL=FALSE
-tiprack_300_starting_pos = 1
+
 
 ### VERAO VAR NAME='Antibody incubation time (minutes)' TYPE=NUMBER LBOUND=30 UBOUND=900 DECIMAL=FALSE
 ab_incubation_time_minutes = 480
@@ -58,7 +57,7 @@ sample_flow_rate = 0.2
 pipette_300_location = 'right'
 
 ### VERAO VAR NAME='P300 pipette model' TYPE=CHOICE OPTIONS=['GEN2', 'GEN1']
-pipette_300_GEN = 'GEN1'
+pipette_300_GEN = 'GEN2'
 
 
 if pipette_300_GEN == 'GEN2':
@@ -78,11 +77,14 @@ labwarePositions.omnistainer = 2
 ### VERAO VAR NAME='Deck position: Preblock/Antibody/F reagents plate' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE
 labwarePositions.codex_reagents_plate = 3
 
-### VERAO VAR NAME='Deck position: 300ul tip rack' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE
+### VERAO VAR NAME='Deck position: 300ul Tip rack #1' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE
 labwarePositions.tiprack_300_1 = 6
 
-### VERAO VAR NAME='Deck position: 300ul tip rack#2' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE
+### VERAO VAR NAME='Deck position: 300ul Tip rack#2' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE
 labwarePositions.tiprack_300_2 = 9
+
+### VERAO VAR NAME='Tip rack #1 starting tip position' TYPE=NUMBER LBOUND=1 UBOUND=95 DECIMAL=FALSE
+tiprack_300_starting_pos = 1
 
 
 # protocol run function. the part after the colon lets your editor know
