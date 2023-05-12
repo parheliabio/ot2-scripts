@@ -1,5 +1,5 @@
 ## VERAO GLOBAL
-
+## Copyright Parhelia Biosciences Corporation 2022-2023
 ### GLOBAL FUNCTIONS - AUTO-GENERATED - DO NOT MODIFY ###
 from opentrons import protocol_api
 import json
@@ -36,7 +36,7 @@ def washSamples(pipette, sourceSolutionWell, samples, volume, num_repeats=1, hei
         for s in samples:
             print(s)
             print("Washing sample:" + str(s))
-            pipette.aspirate(volume, sourceSolutionWell, rate=well_flow_rate)
+            pipette.aspirate(volume, sourceSolutionWell.bottom(height_offset), rate=well_flow_rate)
             pipette.dispense(volume, s.bottom(height_offset), rate=sample_flow_rate)
             stats.volume += volume
 
