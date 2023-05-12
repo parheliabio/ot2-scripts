@@ -4,12 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3f1da4c3-d51e-4a23-9029-cafdead48ca7" name="Default Changelist" comment="allowed to keep tip in dilute and apply">
-      <change afterPath="$PROJECT_DIR$/protocols/CODEX/labware layout_CODEX_v0.11.xlsx" afterDir="false" />
+    <list default="true" id="3f1da4c3-d51e-4a23-9029-cafdead48ca7" name="Default Changelist" comment="Created H&amp;E protocol and layout">
+      <change afterPath="$PROJECT_DIR$/labware/tube rack for panels.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/protocols/CODEX/CODEX.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/protocols/CODEX/CODEX_v0.11.py" beforeDir="false" afterPath="$PROJECT_DIR$/protocols/CODEX/CODEX_v0.11.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/protocols/CODEX/labware layout.xlsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/global_functions.py" beforeDir="false" afterPath="$PROJECT_DIR$/global_functions.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/protocols/ACD RNA detection/3_probe_RNA_ACD_v2.py" beforeDir="false" afterPath="$PROJECT_DIR$/protocols/ACD RNA detection/3_probe_RNA_ACD_v2.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/protocols/IHC/IHC_with_Hematoxylin_v0.01.py" beforeDir="false" afterPath="$PROJECT_DIR$/protocols/IHC/IHC_with_Hematoxylin_v0.01.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -48,23 +48,24 @@
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/Yury/PycharmProjects/ot2-scripts/labware&quot;
   }
 }</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/labware" />
+      <recent name="$PROJECT_DIR$/protocols/H and E" />
       <recent name="C:\Users\iovga\PycharmProjects\ot2-scripts\labware" />
       <recent name="C:\Users\iovga\PycharmProjects\ot2-scripts\protocols\CODEX" />
       <recent name="C:\Users\Dana\PycharmProjects\ot2-scripts\protocols" />
-      <recent name="$PROJECT_DIR$/protocols/CODEX multicycle" />
-      <recent name="$PROJECT_DIR$/protocols" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/protocols/CODEX" />
       <recent name="C:\Users\Dana\PycharmProjects\ot2-scripts\protocols\CODEX multicycle" />
       <recent name="$PROJECT_DIR$/protocols/CODEX multicycle" />
       <recent name="$PROJECT_DIR$/protocols/CODEX single stain" />
       <recent name="$PROJECT_DIR$/labware" />
+      <recent name="$PROJECT_DIR$/protocols/blue dye demo" />
     </key>
   </component>
   <component name="RunManager">
@@ -303,13 +304,55 @@
       <updated>1671593618413</updated>
     </task>
     <task id="LOCAL-00030" summary="allowed to keep tip in dilute and apply">
-      <created>1672212660389</created>
+      <created>1672033220336</created>
       <option name="number" value="00030" />
       <option name="presentableId" value="LOCAL-00030" />
       <option name="project" value="LOCAL" />
-      <updated>1672212660389</updated>
+      <updated>1672033220336</updated>
     </task>
-    <option name="localTasksCounter" value="31" />
+    <task id="LOCAL-00031" summary="IHC protocol switched for stainworks and layout updated">
+      <created>1672204062615</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1672204062615</updated>
+    </task>
+    <task id="LOCAL-00032" summary="Created H&amp;E protocol and layout">
+      <created>1672287998572</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1672287998572</updated>
+    </task>
+    <task id="LOCAL-00033" summary="Created H&amp;E protocol and layout">
+      <created>1672355923962</created>
+      <option name="number" value="00033" />
+      <option name="presentableId" value="LOCAL-00033" />
+      <option name="project" value="LOCAL" />
+      <updated>1672355923962</updated>
+    </task>
+    <task id="LOCAL-00034" summary="Created H&amp;E protocol and layout">
+      <created>1672357031993</created>
+      <option name="number" value="00034" />
+      <option name="presentableId" value="LOCAL-00034" />
+      <option name="project" value="LOCAL" />
+      <updated>1672357031993</updated>
+    </task>
+    <task id="LOCAL-00035" summary="Created H&amp;E protocol and layout">
+      <created>1672358699317</created>
+      <option name="number" value="00035" />
+      <option name="presentableId" value="LOCAL-00035" />
+      <option name="project" value="LOCAL" />
+      <updated>1672358699317</updated>
+    </task>
+    <task id="LOCAL-00036" summary="Created H&amp;E protocol and layout">
+      <created>1672376172495</created>
+      <option name="number" value="00036" />
+      <option name="presentableId" value="LOCAL-00036" />
+      <option name="project" value="LOCAL" />
+      <updated>1672376172495</updated>
+    </task>
+    <option name="localTasksCounter" value="37" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -332,6 +375,8 @@
     <MESSAGE value="Changed A1's to A0's in slide and cslp labwares" />
     <MESSAGE value="1.calibration position A1 is renamed to A0. This allows the first row of samples to start from A1&#10;2. New versions of slide labware tailored to 4.3. software update are introduced. Please download them and replace in the OT2 app (by deleting the existing files and adding new ones – using remove-add dialogue of the app)&#10;3. sample_z_correction_factor is introduced. Use it in case the adjustment to z-position of tip over the sample is needed." />
     <MESSAGE value="allowed to keep tip in dilute and apply" />
-    <option name="LAST_COMMIT_MESSAGE" value="allowed to keep tip in dilute and apply" />
+    <MESSAGE value="IHC protocol switched for stainworks and layout updated" />
+    <MESSAGE value="Created H&amp;E protocol and layout" />
+    <option name="LAST_COMMIT_MESSAGE" value="Created H&amp;E protocol and layout" />
   </component>
 </project>
