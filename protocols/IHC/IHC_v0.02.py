@@ -45,7 +45,7 @@ primary_ab_incubation_time_minutes = 480
 ### VERAO VAR NAME='Secondary antibody incubation time (minutes)' TYPE=NUMBER LBOUND=30 UBOUND=1440 DECIMAL=FALSE
 secondary_ab_incubation_time_minutes = 90
 
-### VERAO VAR NAME='Secondary antibody incubation time (minutes)' TYPE=NUMBER LBOUND=30 UBOUND=1440 DECIMAL=FALSE
+### VERAO VAR NAME='Hematoxylin incubation time (seconds)' TYPE=NUMBER LBOUND=30 UBOUND=1440 DECIMAL=FALSE
 hematoxylin_incubation_time_seconds = 60
 
 ### VERAO VAR NAME='Sample flow rate' TYPE=NUMBER LBOUND=0.05 UBOUND=1.0 DECIMAL=TRUE INCREMENT=0.05
