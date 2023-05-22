@@ -156,7 +156,7 @@ def run(protocol: protocol_api.ProtocolContext):
     #PUNCTURING THE PREBLOCK
     protocol.comment("puncturing the preblock")
     for i in range(num_samples):
-        puncture_wells(pipette_300, codex_preblock_wells[i], height_offset=12, keep_tip=True)
+        puncture_wells(pipette_300, codex_preblock_wells[i], height_offset=12)
     if pipette_300.has_tip: pipette_300.drop_tip()
 
     #WASHING SAMPLES WITH PREBLOCK
@@ -230,7 +230,7 @@ def run(protocol: protocol_api.ProtocolContext):
     #PUNCTURING THE FIXATIVE
     protocol.comment("puncturing the fixative")
     for i in range(num_samples):
-        puncture_wells(pipette_300, codex_reagent_F_wells[i], height_offset=12, keep_tip=True)
+        puncture_wells(pipette_300, codex_reagent_F_wells[i], height_offset=12)
     if pipette_300.has_tip: pipette_300.drop_tip()
 
     #DILUTING AND APPLYING THE FIXATIVE

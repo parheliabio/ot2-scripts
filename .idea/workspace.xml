@@ -5,13 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3f1da4c3-d51e-4a23-9029-cafdead48ca7" name="Default Changelist" comment="Created H&amp;E protocol and layout">
-      <change afterPath="$PROJECT_DIR$/protocols/ACD RNA detection/3_probe_RNA_ACD_v2.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/global_functions_v0.01.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/protocols/CODEX/CODEX-PCF_Hailin_v0.12.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/protocols/ACD RNA detection/RNA detection ACD v2.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/protocols/CODEX/CODEX.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/protocols/CODEX/CODEX_v0.11.py" beforeDir="false" afterPath="$PROJECT_DIR$/protocols/CODEX/CODEX_v0.11.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/protocols/H and E/HandE.py" beforeDir="false" afterPath="$PROJECT_DIR$/protocols/H and E/Hematoxylin and EOsin_v0.01.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/protocols/IHC/IHC.py" beforeDir="false" afterPath="$PROJECT_DIR$/protocols/IHC/IHC_with_Hematoxylin_v0.01.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/protocols/CODEX/CODEX-PCF_v0.12.py" beforeDir="false" afterPath="$PROJECT_DIR$/protocols/CODEX/CODEX-PCF_v0.12.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -51,16 +48,16 @@
   &quot;keyToString&quot;: {
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/Users/Yury/PycharmProjects/ot2-scripts/protocols/H and E&quot;
+    &quot;last_opened_file_path&quot;: &quot;/Users/Yury/PycharmProjects/ot2-scripts&quot;
   }
 }</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
+      <recent name="$PROJECT_DIR$/protocols/CODEX" />
+      <recent name="$PROJECT_DIR$/labware" />
       <recent name="$PROJECT_DIR$/protocols/H and E" />
       <recent name="C:\Users\iovga\PycharmProjects\ot2-scripts\labware" />
-      <recent name="C:\Users\iovga\PycharmProjects\ot2-scripts\protocols\CODEX" />
-      <recent name="C:\Users\Dana\PycharmProjects\ot2-scripts\protocols" />
-      <recent name="$PROJECT_DIR$/protocols/CODEX multicycle" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\Dana\PycharmProjects\ot2-scripts\protocols\CODEX multicycle" />
@@ -347,7 +344,28 @@
       <option name="project" value="LOCAL" />
       <updated>1672358699317</updated>
     </task>
-    <option name="localTasksCounter" value="36" />
+    <task id="LOCAL-00036" summary="Created H&amp;E protocol and layout">
+      <created>1672376172495</created>
+      <option name="number" value="00036" />
+      <option name="presentableId" value="LOCAL-00036" />
+      <option name="project" value="LOCAL" />
+      <updated>1672376172495</updated>
+    </task>
+    <task id="LOCAL-00037" summary="Created H&amp;E protocol and layout">
+      <created>1683876995426</created>
+      <option name="number" value="00037" />
+      <option name="presentableId" value="LOCAL-00037" />
+      <option name="project" value="LOCAL" />
+      <updated>1683876995426</updated>
+    </task>
+    <task id="LOCAL-00038" summary="Created H&amp;E protocol and layout">
+      <created>1683877015872</created>
+      <option name="number" value="00038" />
+      <option name="presentableId" value="LOCAL-00038" />
+      <option name="project" value="LOCAL" />
+      <updated>1683877015872</updated>
+    </task>
+    <option name="localTasksCounter" value="39" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
