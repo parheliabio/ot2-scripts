@@ -1,6 +1,6 @@
 
 metadata = {
-    'protocolName': 'Parhelia CODEX v11',
+    'protocolName': 'Parhelia CODEX v12',
     'author': 'Parhelia Bio <info@parheliabio.com>',
     'description': 'CODEX slide and coverslip staining protocol for Omni-Stainer instrument - from tissue rehydration to single-cycle rendering',
     'apiLevel': '2.7'
