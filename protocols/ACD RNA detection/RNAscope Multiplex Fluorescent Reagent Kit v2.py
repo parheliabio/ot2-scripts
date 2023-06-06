@@ -202,6 +202,9 @@ hybridization_time_minutes = 120
 ### VERAO VAR NAME='CODEX Antibody incubation time (minutes)' TYPE=NUMBER LBOUND=30 UBOUND=900 DECIMAL=FALSE
 ab_incubation_time_minutes = 120
 
+### VERAO VAR NAME='RNA protocol protease incubation time (minutes)' TYPE=NUMBER LBOUND=1 UBOUND=900 DECIMAL=FALSE
+protease_incubation_time = 30
+
 ### VERAO VAR NAME='Sample wash volume' TYPE=NUMBER LBOUND=50 UBOUND=350 DECIMAL=FALSE
 wash_volume = 100
 
@@ -338,7 +341,7 @@ def run(protocol: protocol_api.ProtocolContext):
         buffers.water = buffer_wells['A10']
         buffers.storage = buffer_wells['A12']
 
-        H2O2wash1_wells = RNA_reagents_96plate_1.rows()[0]
+        H2O2wash1_wells = RNA_reagents_96plate_1.rows()[0]  #could be used for the protease
         preblock_wells = RNA_reagents_96plate_1.rows()[1]
         avidinblock_wells = RNA_reagents_96plate_1.rows()[2]
         biotinblock_wells = RNA_reagents_96plate_1.rows()[3]
@@ -404,20 +407,22 @@ def run(protocol: protocol_api.ProtocolContext):
         protocol.comment("puncturing protease wells")
         puncture_wells(pipette_300, H2O2wash1_wells, height_offset=13)
 
-        protocol.comment("applying the preblock")
+        #PROTEASE TREATMENT
+        protocol.comment("applying the protease")
         openShutter(protocol, pipette_300, omnistainer, keep_tip=True)
         for i in range(len(sample_chambers)):
             protocol.comment(i)
             washSamples(pipette_300, H2O2wash1_wells[i], sample_chambers[i], ab_volume, 1, keep_tip=True)
         pipette_300.drop_tip()
-        protocol.comment("avidin block incubation: 15 min")
+        protocol.comment("protease incubation: 30 min")
         closeShutter(protocol, pipette_300, omnistainer)
-        protocol.delay(minutes=30)
+        protocol.delay(minutes=protease_incubation_time)
 
         openShutter(protocol, pipette_300, omnistainer)
         washSamples(pipette_300, buffers.water, sample_chambers, wash_volume, 4, keep_tip=True)
         closeShutter(protocol, pipette_300, omnistainer, keep_tip=True)
 
+        #BLOCKING THE BIOTIN
         if avidin_and_biotin_block:
 
             temp_mod.set_temperature(25)
@@ -490,7 +495,7 @@ def run(protocol: protocol_api.ProtocolContext):
 
         protocol.home()
 
-        # WASHING WITH 0.5 WASH BUFFER
+        # WASHING WITH Parhelia RNA WASH BUFFER
         protocol.comment("puncturing the ACD wash buffer")
         for i in range(len(sample_chambers)):
             puncture_wells(pipette_300, buffer_wells[list(buffer_wells.keys())[i]], height_offset=30, keep_tip=True)
@@ -522,7 +527,7 @@ def run(protocol: protocol_api.ProtocolContext):
         closeShutter(protocol, pipette_300, omnistainer)
         protocol.delay(minutes=30)
 
-        # WASHING WITH 0.5 WASH BUFFER
+        # WASHING WITH Parhelia RNA WASH BUFFER
 
         protocol.comment("washing in ACD wash buffer")
         for wash_counter in range(4):
@@ -549,7 +554,7 @@ def run(protocol: protocol_api.ProtocolContext):
         closeShutter(protocol, pipette_300, omnistainer)
         protocol.delay(minutes=30)
 
-        # WASHING WITH 0.5 WASH BUFFER
+        # WASHING WITH Parhelia RNA WASH BUFFER
         protocol.comment("washing in ACD wash buffer")
         for wash_counter in range(4):
             openShutter(protocol, pipette_300, omnistainer, keep_tip=True)
@@ -575,7 +580,7 @@ def run(protocol: protocol_api.ProtocolContext):
         closeShutter(protocol, pipette_300, omnistainer)
         protocol.delay(minutes=15)
 
-        # WASHING WITH 0.5 WASH BUFFER
+        # WASHING WITH Parhelia RNA WASH BUFFER
         protocol.comment("washing in ACD wash buffer")
         for wash_counter in range(4):
             openShutter(protocol, pipette_300, omnistainer, keep_tip=True)
@@ -601,7 +606,7 @@ def run(protocol: protocol_api.ProtocolContext):
         closeShutter(protocol, pipette_300, omnistainer)
         protocol.delay(minutes=15)
 
-        # WASHING WITH 0.5 WASH BUFFER
+        # WASHING WITH Parhelia RNA WASH BUFFER
         protocol.comment("washing in ACD wash buffer")
         for wash_counter in range(4):
             openShutter(protocol, pipette_300, omnistainer, keep_tip=True)
@@ -633,6 +638,8 @@ def run(protocol: protocol_api.ProtocolContext):
         closeShutter(protocol, pipette_300, omnistainer)
         protocol.delay(minutes=30)
 
+
+        # WASHING WITH Parhelia RNA WASH BUFFER
         protocol.comment("washing in ACD wash buffer")
         for wash_counter in range(3):
             openShutter(protocol, pipette_300, omnistainer, keep_tip=True)
