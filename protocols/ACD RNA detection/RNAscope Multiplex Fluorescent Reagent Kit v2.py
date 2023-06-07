@@ -291,7 +291,7 @@ def run(protocol: protocol_api.ProtocolContext):
         buffers.water = buffer_wells['A10']
         buffers.storage = buffer_wells['A12']
 
-        H2O2wash1_wells = RNA_reagents_96plate_1.rows()[0]
+        H2O2wash1_wells = RNA_reagents_96plate_1.rows()[0]  #could be used for the protease
         preblock_wells = RNA_reagents_96plate_1.rows()[1]
         avidinblock_wells = RNA_reagents_96plate_1.rows()[2]
         biotinblock_wells = RNA_reagents_96plate_1.rows()[3]
