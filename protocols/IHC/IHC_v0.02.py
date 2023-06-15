@@ -299,7 +299,7 @@ def run(protocol: protocol_api.ProtocolContext):
 
         protocol.comment("applying DAB")
         for i in range(num_samples):
-            dilute_and_apply_fixative(pipette_300, DAB_wells[i], substrate_wells[i], sample_chambers[i], wash_volume,
+            dilute_and_apply_fixative(pipette_300, DAB_wells[i], substrate_wells[i], sample_chambers[i], ab_volume,
                                       keep_tip=True)
         pipette_300.drop_tip()
 
