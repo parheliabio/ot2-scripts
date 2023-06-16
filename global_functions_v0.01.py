@@ -16,7 +16,8 @@ debug = False
 default_flow_rate = 50
 well_flow_rate = 5
 sample_flow_rate = 0.2
-
+aspiration_gap=0
+dispensing_gap=0
 
 def washSamples(pipette, sourceSolutionWell, samples, volume, num_repeats=1, height_offset=0, aspiration_offset=0, dispensing_offset=0, keep_tip=False):
     try:
