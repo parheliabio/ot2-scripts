@@ -5,10 +5,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3f1da4c3-d51e-4a23-9029-cafdead48ca7" name="Default Changelist" comment="Created H&amp;E protocol and layout">
-      <change afterPath="$PROJECT_DIR$/protocols/testzone/baking test.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/protocols/ACD RNA detection/RNAscope Multiplex Fluorescent Reagent Kit v2 for 4 RNAs.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/global_functions.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/global_functions_v0.01.py" beforeDir="false" afterPath="$PROJECT_DIR$/global_functions_v0.01.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/global_functions_v0.02.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/protocols/ACD RNA detection/RNAscope Multiplex Fluorescent Reagent Kit v2.py" beforeDir="false" afterPath="$PROJECT_DIR$/protocols/ACD RNA detection/RNAscope Multiplex Fluorescent Reagent Kit v2 for 2 RNAs and CODEX.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/protocols/IHC/~$labware layout IHC.xlsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/protocols/testzone/baking test.py" beforeDir="false" afterPath="$PROJECT_DIR$/protocols/testzone/baking test.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -64,17 +68,17 @@
   "keyToString": {
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "last_opened_file_path": "/Users/Yury/PycharmProjects/ot2-scripts/protocols/testzone",
+    "last_opened_file_path": "/Users/Yury/PycharmProjects/ot2-scripts/protocols/ACD RNA detection",
     "run.code.analysis.last.selected.profile": "aDefault"
   }
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/protocols/ACD RNA detection" />
       <recent name="$PROJECT_DIR$/protocols/testzone" />
       <recent name="$PROJECT_DIR$" />
       <recent name="$PROJECT_DIR$/protocols/CODEX" />
       <recent name="$PROJECT_DIR$/labware" />
-      <recent name="$PROJECT_DIR$/protocols/H and E" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\Dana\PycharmProjects\ot2-scripts\protocols\CODEX multicycle" />
@@ -115,20 +119,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1618804622983</updated>
-    </task>
-    <task id="LOCAL-00001" summary="renaming labwares">
-      <created>1618807867615</created>
-      <option name="number" value="00001" />
-      <option name="presentableId" value="LOCAL-00001" />
-      <option name="project" value="LOCAL" />
-      <updated>1618807867615</updated>
-    </task>
-    <task id="LOCAL-00002" summary="renaming labwares">
-      <created>1618807889739</created>
-      <option name="number" value="00002" />
-      <option name="presentableId" value="LOCAL-00002" />
-      <option name="project" value="LOCAL" />
-      <updated>1618807889739</updated>
     </task>
     <task id="LOCAL-00003" summary="renaming labwares">
       <created>1618813359558</created>
@@ -459,7 +449,21 @@
       <option name="project" value="LOCAL" />
       <updated>1686874785074</updated>
     </task>
-    <option name="localTasksCounter" value="50" />
+    <task id="LOCAL-00050" summary="Created H&amp;E protocol and layout">
+      <created>1686961563565</created>
+      <option name="number" value="00050" />
+      <option name="presentableId" value="LOCAL-00050" />
+      <option name="project" value="LOCAL" />
+      <updated>1686961563566</updated>
+    </task>
+    <task id="LOCAL-00051" summary="Created H&amp;E protocol and layout">
+      <created>1686961578403</created>
+      <option name="number" value="00051" />
+      <option name="presentableId" value="LOCAL-00051" />
+      <option name="project" value="LOCAL" />
+      <updated>1686961578403</updated>
+    </task>
+    <option name="localTasksCounter" value="52" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">

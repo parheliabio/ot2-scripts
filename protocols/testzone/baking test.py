@@ -467,11 +467,11 @@ def run(protocol: protocol_api.ProtocolContext):
             protocol.delay(minutes=hematoxylin_incubation_time_seconds)
         if hematoxylin_source == 'from pcr strip':
             protocol.comment("puncturing the hematoxylin wells")
-            for i in range(num_samples):
+            for i in range(num_samples+1):
                 puncture_wells(pipette_300, hematoxylin_wells[i], height_offset=-5, keep_tip=True)
             pipette_300.drop_tip()
             protocol.comment("applying hematoxylin")
-            for i in range(num_samples):
+            for i in range(num_samples+1):
                 washSamples(pipette_300, hematoxylin_wells[i], sample_chambers[i], ab_volume, 1, keep_tip=True)
             pipette_300.drop_tip()
         protocol.delay(seconds=hematoxylin_incubation_time_seconds)
