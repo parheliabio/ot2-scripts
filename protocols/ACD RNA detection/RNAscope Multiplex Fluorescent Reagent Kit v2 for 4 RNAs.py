@@ -1,5 +1,4 @@
 
-
 metadata = {
     'protocolName': '3 probes RNA ACD v2',
     'author': 'Parhelia Bio <info@parheliabio.com>',
@@ -39,8 +38,11 @@ If this option is enabled, make sure that
 ### VERAO VAR NAME='labwarePositions.heatmodule_position' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE
 heatmodule_position = 7
 
-### VERAO VAR NAME='labwarePositions.buffers_plate' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE
-buffers_plate_position = 4
+### VERAO VAR NAME='labwarePositions.wash_buffers_plate' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE
+wash_buffers_plate_position = 4
+
+### VERAO VAR NAME='labwarePositions.additional_buffers_plate' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE
+additional_buffers_plate_position = 5
 
 ### VERAO VAR NAME='labwarePositions.rna_reagents_plate_1 ' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE
 rna_reagents_plate_1_position = 1
@@ -99,7 +101,8 @@ else:
     pipette_type = 'p300_single'
 
 labwarePositions = Object()
-labwarePositions.buffers_plate = buffers_plate_position
+labwarePositions.wash_buffers_plate = wash_buffers_plate_position
+labwarePositions.additional_buffers_plate = additional_buffers_plate_position
 labwarePositions.rna_reagents_plate_1 = rna_reagents_plate_1_position
 labwarePositions.rna_reagents_plate_2 = rna_reagents_plate_2_position
 labwarePositions.rna_reagents_plate_3 = rna_reagents_plate_3_position
@@ -137,9 +140,13 @@ def run(protocol: protocol_api.ProtocolContext):
 
     omnistainer = temp_mod.load_labware(omnistainer_type)
 
-    rna_trough12 = protocol.load_labware('parhelia_12trough', labwarePositions.buffers_plate,
+    rna_trough12 = protocol.load_labware('parhelia_12trough', labwarePositions.wash_buffers_plate,
                                          '12-trough buffers reservoir')
+    rna_trough12_addon = protocol.load_labware('parhelia_12trough', labwarePositions.additional_buffers_plate,
+                                         '12-trough buffers reservoir')
+
     buffer_wells = rna_trough12.wells_by_name()
+    additional_buffer_wells = rna_trough12_addon.wells_by_name()
 
     RNA_reagents_96plate_1 = protocol.load_labware(type_of_96well_plate, labwarePositions.rna_reagents_plate_1,
                                                    '96-well-plate')
@@ -153,9 +160,9 @@ def run(protocol: protocol_api.ProtocolContext):
     Tyramide_wells=list(range(4))
     Substrate_wells=list(range(4))
     HRPblocker_wells=list(range(4))
-    buffers.parhelia_rnawash_buffer = buffer_wells['A8']
-    buffers.water = buffer_wells['A10']
-    buffers.storage = buffer_wells['A12']
+#    buffers.parhelia_rnawash_buffer = buffer_wells['A8']
+    buffers.water = additional_buffer_wells['A10']
+    buffers.storage = additional_buffer_wells['A12']
 
 
 
@@ -512,5 +519,6 @@ def run(protocol: protocol_api.ProtocolContext):
             closeShutter(protocol, pipette_300, omnistainer, keep_tip=True)
             protocol.delay(minutes=1, msg="incubation in ACD wash buffer")
         pipette_300.drop_tip()
+
 
 
