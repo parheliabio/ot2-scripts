@@ -370,9 +370,6 @@ def run(protocol: protocol_api.ProtocolContext):
             washSamples(pipette_300, buffers.storage, sample_chambers, wash_volume, 2, keep_tip=True)
             closeShutter(protocol, pipette_300, omnistainer)
 
-            temp_mod.set_temperature(42)
-            protocol.delay(minutes=templag)
-
             # Blocking the channel 1 HRP
             # First HRP block
             protocol.comment("puncturing HRP_block "+str(z))
@@ -435,9 +432,6 @@ def run(protocol: protocol_api.ProtocolContext):
             protocol.delay(minutes=4, msg="incubation in ACD wash buffer")
         pipette_300.drop_tip()
 
-        temp_mod.set_temperature(25)
-        protocol.delay(minutes=templag)
-
         # DILUTING AND APPLYING THE Ch1 tyramide
         protocol.comment("puncturing the Ch"+str(channel)+" tyramide")
         puncture_wells(pipette_300, Tyramide_wells[z], height_offset=13, keep_tip=True)
@@ -453,7 +447,7 @@ def run(protocol: protocol_api.ProtocolContext):
 
         protocol.comment("developing Ch"+str(z)+" tyramide")
         closeShutter(protocol, pipette_300, omnistainer)
-        protocol.delay(minutes=15)
+        protocol.delay(minutes=30)
 
         protocol.comment("washing in ACD wash buffer")
         for wash_counter in range(3):
@@ -465,6 +459,8 @@ def run(protocol: protocol_api.ProtocolContext):
             closeShutter(protocol, pipette_300, omnistainer, keep_tip=True)
             protocol.delay(minutes=1, msg="incubation in ACD wash buffer")
         pipette_300.drop_tip()
+
+    temp_mod.set_temperature(25)
 
 
 
