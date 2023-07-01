@@ -22,6 +22,9 @@ FFPE = True
 # The initial 1.6% PFA fixation is skipped for FFPE tissues
 ### VERAO VAR NAME='Avidin and Biotin block' TYPE=BOOLEAN
 avidin_and_biotin_block = False
+### VERAO VAR NAME='preblock_incubation' TYPE=BOOLEAN
+preblock_incubation = False
+
 
 
 ### VERAO VAR NAME='Temp lag for adjusting the temp' TYPE=NUMBER LBOUND=1 UBOUND=95 DECIMAL=FALS
@@ -61,10 +64,10 @@ tiprack_300_1_position = 6
 tiprack_300_2_position = 9
 
 ### VERAO VAR NAME='Number of Samples' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE
-num_samples = 4
+num_samples = 2
 
 ### VERAO VAR NAME='Number of RNAs for codetection' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE
-num_RNAs = 4
+num_RNAs = 2
 
 ### VERAO VAR NAME='Tiprack starting position' TYPE=NUMBER LBOUND=1 UBOUND=95 DECIMAL=FALSE
 tiprack_300_starting_pos = 1
@@ -77,16 +80,16 @@ hybridization_time_minutes = 120
 protease_incubation_time = 30
 
 ### VERAO VAR NAME='Sample wash volume' TYPE=NUMBER LBOUND=50 UBOUND=350 DECIMAL=FALSE
-wash_volume = 100
+wash_volume = 200
 
 ### VERAO VAR NAME='Antibody mix volume' TYPE=NUMBER LBOUND=50 UBOUND=350 DECIMAL=FALSE
-ab_volume = 60
+ab_volume = 110
 
 ### VERAO VAR NAME='Extra bottom gap (um, for calibration debugging)' TYPE=NUMBER LBOUND=0 UBOUND=100 DECIMAL=FALSE
 extra_bottom_gap = 0
 
 ### VERAO VAR NAME='Sample flow rate' TYPE=NUMBER LBOUND=0.05 UBOUND=1 DECIMAL=TRUE INCREMENT=0.05
-sample_flow_rate = 0.15
+sample_flow_rate = 0.1
 
 ####################LABWARE LAYOUT ON DECK#########################
 ### VERAO VAR NAME='P300 mounting' TYPE=CHOICE OPTIONS=['right', 'left']
@@ -156,10 +159,14 @@ def run(protocol: protocol_api.ProtocolContext):
                                                    '96-well-plate')
 
     buffers = Object()
+
+    probes_and_amps_wells = list(range(4))
+
     HRP_wells = list(range(4))
     Tyramide_wells=list(range(4))
     Substrate_wells=list(range(4))
     HRPblocker_wells=list(range(4))
+
 #    buffers.parhelia_rnawash_buffer = buffer_wells['A8']
     buffers.water = additional_buffer_wells['A10']
     buffers.storage = additional_buffer_wells['A12']
@@ -174,6 +181,19 @@ def run(protocol: protocol_api.ProtocolContext):
     amp1_wells = RNA_reagents_96plate_1.rows()[5]
     amp2_wells = RNA_reagents_96plate_1.rows()[6]
     amp3_wells = RNA_reagents_96plate_1.rows()[7]
+
+    probes_and_amps_wells[0] = probe_wells
+    probes_and_amps_wells[1] = amp1_wells
+    probes_and_amps_wells[2] = amp2_wells
+    probes_and_amps_wells[3] = amp3_wells
+
+    probes_and_amps_incubation_times = [hybridization_time_minutes,30,30,15]
+
+    keeping_the_tips=[False,True,True,True]
+
+    comments=["probes hyb","amp1","amp2","amp3"]
+
+
 
     HRP_wells[0] = RNA_reagents_96plate_2.rows()[0]
     Substrate_wells[0] = RNA_reagents_96plate_2.rows()[1]
@@ -220,22 +240,22 @@ def run(protocol: protocol_api.ProtocolContext):
     protocol.delay(minutes=templag)
 
     protocol.comment("puncturing protease wells")
-    puncture_wells(pipette_300, H2O2wash1_wells, height_offset=13)
+    for i in range(len(sample_chambers)):
+        puncture_wells(pipette_300, H2O2wash1_wells[i], height_offset=13, keep_tip=True) # cycle is needed to puncture only the columns in use
 
     #PROTEASE TREATMENT
     protocol.comment("applying the protease")
-    openShutter(protocol, pipette_300, omnistainer, keep_tip=True)
+    openShutter(protocol, pipette_300, omnistainer)
     for i in range(len(sample_chambers)):
         protocol.comment(i)
         washSamples(pipette_300, H2O2wash1_wells[i], sample_chambers[i], ab_volume, 1, keep_tip=True)
-    pipette_300.drop_tip()
     protocol.comment("protease incubation: 30 min")
     closeShutter(protocol, pipette_300, omnistainer)
     protocol.delay(minutes=protease_incubation_time)
 
-    openShutter(protocol, pipette_300, omnistainer)
+    openShutter(protocol, pipette_300, omnistainer, keep_tip=True)
     washSamples(pipette_300, buffers.water, sample_chambers, wash_volume, 4, keep_tip=True)
-    closeShutter(protocol, pipette_300, omnistainer, keep_tip=True)
+    closeShutter(protocol, pipette_300, omnistainer)
 
     #BLOCKING THE BIOTIN
     if avidin_and_biotin_block:
@@ -264,7 +284,7 @@ def run(protocol: protocol_api.ProtocolContext):
         protocol.comment("puncturing biotin-block wells")
         puncture_wells(pipette_300, biotinblock_wells, height_offset=13)
 
-        protocol.comment("applying the preblock")
+        protocol.comment("applying the biotin")
         for i in range(len(sample_chambers)):
             protocol.comment(i)
             washSamples(pipette_300, biotinblock_wells[i], sample_chambers[i], ab_volume, 1, keep_tip=True)
@@ -281,34 +301,21 @@ def run(protocol: protocol_api.ProtocolContext):
         protocol.delay(minutes=templag)
 
     # WASHING SAMPLES WITH PROBE DILUENT
-    protocol.comment("puncturing the preblock")
-    puncture_wells(pipette_300, preblock_wells, height_offset=13, keep_tip=True)
+    if preblock_incubation:
+        protocol.comment("puncturing the preblock")
+        for i in range(len(sample_chambers)):
+            puncture_wells(pipette_300, preblock_wells, height_offset=13, keep_tip=True)
 
-    openShutter(protocol, pipette_300, omnistainer)
+        openShutter(protocol, pipette_300, omnistainer)
 
-    protocol.comment("applying the probe diluent")
-    for i in range(len(sample_chambers)):
-        protocol.comment(i)
-        washSamples(pipette_300, preblock_wells[i], sample_chambers[i], ab_volume, 1, keep_tip=True)
-    #    pipette_300.drop_tip()
-    protocol.comment("preblockblock incubation: 1 h")
-    closeShutter(protocol, pipette_300, omnistainer, keep_tip=True)
-    protocol.delay(minutes=60)
-
-    # APPLYING probe COCKTAILS TO SAMPLES
-    openShutter(protocol, pipette_300, omnistainer, keep_tip=True)
-    protocol.comment("puncturing and applying abs")
-    for i in range(len(sample_chambers)):
-        protocol.comment(i)
-        washSamples(pipette_300, probe_wells[i], probe_wells[i], 2, 1, height_offset=13)
-        washSamples(pipette_300, probe_wells[i], sample_chambers[i], ab_volume, 1)
-
-    protocol.comment("staining incubation: " + str(hybridization_time_minutes) + "min")
-    closeShutter(protocol, pipette_300, omnistainer)
-
-    protocol.delay(minutes=hybridization_time_minutes)
-
-    protocol.home()
+        protocol.comment("applying the probe diluent")
+        for i in range(len(sample_chambers)):
+            protocol.comment(i)
+            washSamples(pipette_300, preblock_wells[i], sample_chambers[i], ab_volume, 1, keep_tip=True)
+        #    pipette_300.drop_tip()
+        protocol.comment("preblockblock incubation: 1 h")
+        closeShutter(protocol, pipette_300, omnistainer, keep_tip=True)
+        protocol.delay(minutes=60)
 
     # WASHING WITH Parhelia RNA WASH BUFFER
     protocol.comment("puncturing the ACD wash buffer")
@@ -316,96 +323,35 @@ def run(protocol: protocol_api.ProtocolContext):
         puncture_wells(pipette_300, buffer_wells[list(buffer_wells.keys())[i]], height_offset=30, keep_tip=True)
     pipette_300.drop_tip()
 
-    protocol.comment("washing in ACD wash buffer")
-    for wash_counter in range(4):
-        openShutter(protocol, pipette_300, omnistainer, keep_tip=True)
+#applying probes and amps
+
+    for z in range(4):
+
+        protocol.home()
+
+        protocol.comment(comments[z])
         for i in range(len(sample_chambers)):
-            washSamples(pipette_300, buffer_wells[list(buffer_wells.keys())[i]], sample_chambers[i], wash_volume, 2,
-                        keep_tip=True)
-        #            washSamples(pipette_300,  buffer_wells[list(buffer_wells.keys())[i]], sample_chambers[i], wash_volume, 1)
-        closeShutter(protocol, pipette_300, omnistainer, keep_tip=True)
-        protocol.delay(minutes=4, msg="incubation in ACD wash buffer")
-    pipette_300.drop_tip()
+            puncture_wells(pipette_300, probes_and_amps_wells[z][i], height_offset=13, keep_tip=keeping_the_tips[z])
 
-    # AMP 1
-    protocol.comment("puncturing amp1 wells")
-    puncture_wells(pipette_300, amp1_wells, height_offset=13, keep_tip=True)
-    #    pipette_300.drop_tip()
+        openShutter(protocol, pipette_300, omnistainer)
 
-    openShutter(protocol, pipette_300, omnistainer)
-    protocol.comment("applying the AMP1")
-    for i in range(len(sample_chambers)):
-        protocol.comment(i)
-        washSamples(pipette_300, amp1_wells[i], sample_chambers[i], ab_volume, 1, keep_tip=True)
-    #    pipette_300.drop_tip()
-    protocol.comment("AMP1 incubation: 15 min")
-    closeShutter(protocol, pipette_300, omnistainer)
-    protocol.delay(minutes=30)
-
-    # WASHING WITH Parhelia RNA WASH BUFFER
-
-    protocol.comment("washing in ACD wash buffer")
-    for wash_counter in range(4):
-        openShutter(protocol, pipette_300, omnistainer, keep_tip=True)
         for i in range(len(sample_chambers)):
-            washSamples(pipette_300, buffer_wells[list(buffer_wells.keys())[i]], sample_chambers[i], wash_volume, 2,
-                        keep_tip=True)
-        #            washSamples(pipette_300,  buffer_wells[list(buffer_wells.keys())[i]], sample_chambers[i], wash_volume, 1)
-        closeShutter(protocol, pipette_300, omnistainer, keep_tip=True)
-        protocol.delay(minutes=4, msg="incubation in ACD wash buffer")
-    pipette_300.drop_tip()
+            washSamples(pipette_300, probes_and_amps_wells[z][i], sample_chambers[i], ab_volume, 1, keep_tip=keeping_the_tips[z])
 
-    # AMP 2
-    protocol.comment("puncturing amp2 wells")
-    puncture_wells(pipette_300, amp2_wells, height_offset=13, keep_tip=True)
-    #    pipette_300.drop_tip()
-    openShutter(protocol, pipette_300, omnistainer)
-    protocol.comment("applying the AMP2")
-    for i in range(len(sample_chambers)):
-        protocol.comment(i)
-        washSamples(pipette_300, amp2_wells[i], sample_chambers[i], ab_volume, 1, keep_tip=True)
-    #    pipette_300.drop_tip()
-    protocol.comment("AMP2 incubation: 15 min")
-    closeShutter(protocol, pipette_300, omnistainer)
-    protocol.delay(minutes=30)
+        protocol.comment("incubation: " + str(probes_and_amps_incubation_times[z]) + "min")
+        closeShutter(protocol, pipette_300, omnistainer)
 
-    # WASHING WITH Parhelia RNA WASH BUFFER
-    protocol.comment("washing in ACD wash buffer")
-    for wash_counter in range(4):
-        openShutter(protocol, pipette_300, omnistainer, keep_tip=True)
-        for i in range(len(sample_chambers)):
-            washSamples(pipette_300, buffer_wells[list(buffer_wells.keys())[i]], sample_chambers[i], wash_volume, 2,
-                        keep_tip=True)
-        #            washSamples(pipette_300,  buffer_wells[list(buffer_wells.keys())[i]], sample_chambers[i], wash_volume, 1)
-        closeShutter(protocol, pipette_300, omnistainer, keep_tip=True)
-        protocol.delay(minutes=4, msg="incubation in ACD wash buffer")
-    pipette_300.drop_tip()
+        protocol.delay(minutes=probes_and_amps_incubation_times[z])
 
-    # AMP 3
-    protocol.comment("puncturing amp3 wells")
-    puncture_wells(pipette_300, amp3_wells, height_offset=13, keep_tip=True)
+        protocol.comment("washing in ACD wash buffer")
+        for wash_counter in range(4):
+            openShutter(protocol, pipette_300, omnistainer, keep_tip=True)
+            for i in range(len(sample_chambers)):
+                washSamples(pipette_300, buffer_wells[list(buffer_wells.keys())[i]], sample_chambers[i], wash_volume, 2, keep_tip=True)
+            closeShutter(protocol, pipette_300, omnistainer, keep_tip=True)
+            protocol.delay(minutes=4, msg="incubation in ACD wash buffer")
+        pipette_300.drop_tip()
 
-    protocol.comment("applying the AMP3")
-    openShutter(protocol, pipette_300, omnistainer)
-    for i in range(len(sample_chambers)):
-        protocol.comment(i)
-        washSamples(pipette_300, amp3_wells[i], sample_chambers[i], ab_volume, 1, keep_tip=True)
-    #    pipette_300.drop_tip()
-    protocol.comment("AMP3 incubation: 15 min")
-    closeShutter(protocol, pipette_300, omnistainer)
-    protocol.delay(minutes=15)
-
-    # WASHING WITH Parhelia RNA WASH BUFFER
-    protocol.comment("washing in ACD wash buffer")
-    for wash_counter in range(4):
-        openShutter(protocol, pipette_300, omnistainer, keep_tip=True)
-        for i in range(len(sample_chambers)):
-            washSamples(pipette_300, buffer_wells[list(buffer_wells.keys())[i]], sample_chambers[i], wash_volume, 2,
-                        keep_tip=True)
-        #            washSamples(pipette_300,  buffer_wells[list(buffer_wells.keys())[i]], sample_chambers[i], wash_volume, 1)
-        closeShutter(protocol, pipette_300, omnistainer, keep_tip=True)
-        protocol.delay(minutes=4, msg="incubation in ACD wash buffer")
-    pipette_300.drop_tip()
 # HERE the final iterative branch detection starts
 
     protocol.comment("puncturing the storage well")
