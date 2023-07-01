@@ -5,7 +5,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3f1da4c3-d51e-4a23-9029-cafdead48ca7" name="Default Changelist" comment="Created H&amp;E protocol and layout">
-      <change afterPath="$PROJECT_DIR$/protocols/ACD RNA detection/RNAscope HiPlex v2 for 2 rounds.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/protocols/ACD RNA detection/RNAscope Multiplex Fluorescent Reagent Kit v2 for 4 RNAs.py" beforeDir="false" afterPath="$PROJECT_DIR$/protocols/ACD RNA detection/RNAscope Multiplex Fluorescent Reagent Kit v2 for 4 RNAs.py" afterDir="false" />
     </list>
@@ -114,13 +113,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1618804622983</updated>
-    </task>
-    <task id="LOCAL-00005" summary="conforming to Akoya nomenclature">
-      <created>1618816801485</created>
-      <option name="number" value="00005" />
-      <option name="presentableId" value="LOCAL-00005" />
-      <option name="project" value="LOCAL" />
-      <updated>1618816801485</updated>
     </task>
     <task id="LOCAL-00006" summary="conforming to Akoya nomenclature">
       <created>1619049619745</created>
@@ -458,7 +450,14 @@
       <option name="project" value="LOCAL" />
       <updated>1687996968466</updated>
     </task>
-    <option name="localTasksCounter" value="54" />
+    <task id="LOCAL-00054" summary="Created H&amp;E protocol and layout">
+      <created>1688171865968</created>
+      <option name="number" value="00054" />
+      <option name="presentableId" value="LOCAL-00054" />
+      <option name="project" value="LOCAL" />
+      <updated>1688171865968</updated>
+    </task>
+    <option name="localTasksCounter" value="55" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">

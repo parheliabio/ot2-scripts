@@ -1,8 +1,8 @@
 
 metadata = {
-    'protocolName': '3 probes RNA ACD v2',
+    'protocolName': 'ACD multiplexed v2',
     'author': 'Parhelia Bio <info@parheliabio.com>',
-    'description': '3 probes RNA ACD v2',
+    'description': 'ACD multiplexed v2',
     'apiLevel': '2.7'
 }
 
