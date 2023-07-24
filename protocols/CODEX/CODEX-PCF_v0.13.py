@@ -244,79 +244,48 @@ def loadLabwareFromDict(labwareName, protocol_or_tempmodule, position=-1, z_offs
 
 
 # End of jupyter notebook labware stuff
-def washSamples(pipette, sourceLiquid, samples, volume, num_repeats=1, height_offset=0, aspiration_offset=0,
-                dispensing_offset=0, keep_tip=False):
+# Below is washSamples puncture_wells and dilute_and_appply_fixation for well based methods, not ParLiquid Class
+def washSamples(pipette, sourceSolutionWell, samples, volume, num_repeats=1, height_offset=0, aspiration_offset=0, dispensing_offset=0, keep_tip=False):
+    try:
+        iter(samples)
+    except TypeError:
+        samples = [samples]
+
+    print('Samples are:')
+    print(samples)
+
     if not pipette.has_tip:
         pipette.pick_up_tip()
 
-    aspiration_offset += aspiration_gap
-    dispensing_offset += dispensing_gap
-
-    if isinstance(sourceLiquid, ParLiquid):
-        sourceWell = sourceLiquid.wells[sourceLiquid.current_well]
-    else:
-        sourceWell = sourceLiquid
-
     for i in range(0, num_repeats):
-        for sample in samples:  # iterate over samples
-            if isinstance(sourceLiquid, ParLiquid):
-                if sourceLiquid.volume - sourceLiquid.volume_used < volume:
-                    sourceLiquid.next_well()  # update to the next well
-                    sourceWell = sourceLiquid.wells[sourceLiquid.current_well]  # update the current well
-                    if sourceLiquid.volume - sourceLiquid.volume_used < volume:
-                        raise Exception(f"Liquid depleted: {sourceLiquid}")
-                sourceLiquid.volume_used += volume
-            pipette.aspirate(volume, sourceWell.bottom(height_offset + aspiration_offset), rate=well_flow_rate)
-            pipette.dispense(volume, sample.bottom(height_offset + dispensing_offset), rate=sample_flow_rate)
-            volume_counter[sourceLiquid] += volume
+        for s in samples:
+            print(s)
+            print("Washing sample:" + str(s))
+            pipette.aspirate(volume, sourceSolutionWell.bottom(height_offset+aspiration_offset), rate=well_flow_rate)
+            pipette.dispense(volume, s.bottom(height_offset+dispensing_offset), rate=sample_flow_rate)
 
     if not keep_tip: pipette.drop_tip()
 
-
-def puncture_wells(pipette, wells, top_offset=-5, height_offset=0, keep_tip=False):
+def puncture_wells(pipette, wells, height_offset=0, keep_tip=False):
     try:
         iter(wells)
     except TypeError:
         wells = [wells]
-    if not pipette.has_tip: pipette.pick_up_tip()
-
     for well in wells:
-        if isinstance(well, ParLiquid):
-            well = well.wells[well.current_well]  # access the current well in use by the ParLiquid
-        else:
-            print(
-                "warning: please don't pass the well directly, instead pass ParLiquid as an argument. \n this way we can track the liquid types and the volumes used")
-        pipette.aspirate(1, well.top(top_offset), rate=well_flow_rate)
-        pipette.dispense(1, well.top(top_offset), rate=well_flow_rate)
+        washSamples(pipette, well, well, 1, 1, height_offset, keep_tip=True)
     if not keep_tip: pipette.drop_tip()
 
+def dilute_and_apply_fixative(pipette, sourceSolutionWell, dilutant_buffer_well, samples, volume, height_offset=0, keep_tip=False):
 
-def dilute_and_apply_fixative(pipette, sourceSolution, dilutant_buffer, samples, volume, height_offset=0,
-                              keep_tip=False):
     if not pipette.has_tip: pipette.pick_up_tip()
     # Diluting fixative:
-    sourceSolutionWell = sourceSolution.wells[
-        sourceSolution.current_well]  # access the current well in use by the ParLiquid
-    dilutant_buffer_well = dilutant_buffer.wells[
-        dilutant_buffer.current_well]  # access the current well in use by the ParLiquid
-
-    if sourceSolution.volume - sourceSolution.volume_used < volume:
-        sourceSolution.next_well()  # update to the next well
-        sourceSolutionWell = sourceSolution.wells[sourceSolution.current_well]  # update the current well
-        if sourceSolution.volume - sourceSolution.volume_used < volume:
-            raise Exception(f"Liquid depleted: {sourceSolution}")
-    sourceSolution.volume_used += volume
-
     pipette.aspirate(volume, dilutant_buffer_well, rate=well_flow_rate)
     pipette.dispense(volume, sourceSolutionWell, rate=well_flow_rate)
-
     for iterator in range(0, 3):
         pipette.aspirate(volume, sourceSolutionWell, rate=well_flow_rate)
         pipette.dispense(volume, sourceSolutionWell, rate=well_flow_rate)
 
-    washSamples(pipette, sourceSolutionWell, [samples.wells[samples.current_well]], volume, 1, height_offset,
-                keep_tip=keep_tip)
-
+    washSamples(pipette, sourceSolutionWell, samples, volume, 1, height_offset, keep_tip=keep_tip)
 
 def getOmnistainerWellsList(omnistainer, num_samples):
     sample_chambers = []
