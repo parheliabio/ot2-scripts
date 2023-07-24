@@ -9,7 +9,6 @@ import serial
 import opentrons.protocol_api
 
 ####################GENERAL SETUP################################
-volume_counter = defaultdict(int)
 debug = False
 
 ####################FIXED RUN PARAMETERS#########################
@@ -129,50 +128,49 @@ class ColdPlateSlimDriver():
         self._send_command("tempOn")
         return
 
-    def set_temp_andWait(self, target_temp, timeout_min=30, tolerance=0.5, msg=None):
-        if msg is not None:
-            print(msg)
+    def set_temp_andWait(self, target_temp, timeout_min=30, tolerance=0.5):
 
         interval_sec = 10
         SEC_IN_MIN = 60
 
         curr_temp = self.get_temp()
-        self.protocol.comment(f"Current temp: {curr_temp}\nTarget temp: {target_temp}")
+        self.protocol.comment(f"Setting temperature. Current temp: {curr_temp}\nTarget temp: {target_temp}")
 
         temp_diff = target_temp - curr_temp
         temp_lag = self.max_temp_lag * (abs(temp_diff) / 100.0)
 
         if temp_diff > 0:
             temp_step = self.heating_rate_deg_per_min * (interval_sec / SEC_IN_MIN)
-            print(f"Heating rate: {temp_step}")
+            self.protocol.comment(f"Heating rate: {temp_step}")
         else:
             temp_step = -self.cooling_rate_deg_per_min * (interval_sec / SEC_IN_MIN)
-            print(f"Cooling rate: {temp_step}")
+            self.protocol.comment(f"Cooling rate: {temp_step}")
 
         while (abs(target_temp - curr_temp) > abs(temp_step)):
             curr_temp += temp_step
             self.set_temp(curr_temp)
-            print(f"Ramping the temp to: {curr_temp}")
+            self.protocol.comment(f"Ramping the temp to: {curr_temp}")
             self.protocol.delay(seconds=interval_sec)
             curr_temp = self.get_temp()
-            print(f"Actual temp: {curr_temp}")
+            self.protocol.comment(f"Actual temp: {curr_temp}")
 
         self.set_temp(target_temp)
 
         time_elapsed = 0
 
         while (abs(self.get_temp() - target_temp) > tolerance):
-            print(f"Waiting for temp to reach target: {target_temp}, actual temp: {self.get_temp()}, {msg}")
+            self.protocol.comment(f"Waiting for temp to reach target: {target_temp}, actual temp: {self.get_temp()}, {msg}")
             if not self.protocol.is_simulating():  # Skip delay during simulation
                 self.protocol.delay(seconds=interval_sec)
             time_elapsed += interval_sec
             if (time_elapsed > timeout_min * 60):
                 raise Exception("Temperature timeout")
 
-        print(f"Target reached, equilibrating for {ab_incubation_time_minutes} minutes, {msg}")
+        self.protocol.comment(f"Target reached, equilibrating for {ab_incubation_time_minutes} minutes, {msg}")
         if not self.protocol.is_simulating():  # Skip delay during simulation
             self.protocol.delay(seconds=temp_lag * SEC_IN_MIN)
         return target_temp
+
     def temp_off(self):
         if self.serial_object is None:
             self.temp = 25
@@ -322,13 +320,12 @@ def openShutter(protocol, pipette, covered_lbwr, use_tip=False):
             pipette.pick_up_tip()
         pipette.move_to(covered_lbwr.wells()[len(covered_lbwr.wells()) - 2].bottom(0))
         pipette.move_to(covered_lbwr.wells()[len(covered_lbwr.wells()) - 1].bottom(0), force_direct=True)
-        protocol.delay(seconds=1)
     else:
         if pipette.has_tip:
             pipette.drop_tip()
         pipette.move_to(covered_lbwr.wells()[len(covered_lbwr.wells()) - 2].top(-5))
         pipette.move_to(covered_lbwr.wells()[len(covered_lbwr.wells()) - 1].top(-5), force_direct=True)
-        protocol.delay(seconds=1)
+    protocol.delay(seconds=1)
 
 
 def closeShutter(protocol, pipette, covered_lbwr, keep_tip=False, use_tip=False):
@@ -337,7 +334,6 @@ def closeShutter(protocol, pipette, covered_lbwr, keep_tip=False, use_tip=False)
             pipette.pick_up_tip()
         pipette.move_to(covered_lbwr.wells()[len(covered_lbwr.wells()) - 2].bottom(0))
         pipette.move_to(covered_lbwr.wells()[len(covered_lbwr.wells()) - 3].bottom(0), force_direct=True)
-        protocol.delay(seconds=1)
         if not keep_tip:
             pipette.drop_tip()
     else:
@@ -345,7 +341,7 @@ def closeShutter(protocol, pipette, covered_lbwr, keep_tip=False, use_tip=False)
             pipette.drop_tip()
         pipette.move_to(covered_lbwr.wells()[len(covered_lbwr.wells()) - 2].top(-10))
         pipette.move_to(covered_lbwr.wells()[len(covered_lbwr.wells()) - 3].top(-10), force_direct=True)
-        protocol.delay(seconds=1)
+    protocol.home()
 
 
 metadata = {
@@ -392,13 +388,16 @@ num_samples = 3
 tiprack_300_starting_pos = 1
 
 ### VERAO VAR NAME='Antibody incubation time (minutes)' TYPE=NUMBER LBOUND=30 UBOUND=900 DECIMAL=FALSE
-ab_incubation_time_minutes = 480
+ab_incubation_time_minutes = 1
 
 ### VERAO VAR NAME='Sample wash volume (150ul for slides/100ul for coverslips)' TYPE=NUMBER LBOUND=50 UBOUND=350 DECIMAL=FALSE
 wash_volume = 150
 
 ### VERAO VAR NAME='Antibody mix volume (110ul for slides/60ul for coverslips)' TYPE=NUMBER LBOUND=50 UBOUND=350 DECIMAL=FALSE
 ab_volume = 110
+
+### VERAO VAR NAME='Room Temp Set: the non-cold temp for all steps besides methanol and antibody incubation, in celsius' TYPE=NUMBER LBOUND=1 UBOUND=95 DECIMAL=FALSE
+room_temp = 25
 
 ### VERAO VAR NAME='Aspiration height offset(mm, for calibration debugging)'  TYPE=NUMBER LBOUND=0 UBOUND=100 DECIMAL=TRUE INCREMENT=0.1
 aspiration_gap = 0
@@ -445,28 +444,29 @@ tiprack_300_2_position = 9
 # where to look for autocomplete suggestions
 def run(protocol: protocol_api.ProtocolContext):
     ###########################LABWARE SETUP#################################
-    labwarePositions = {
+    labwarePositions = dict2obj({
         "codex_buffers_plate": codex_buffers_plate_position,
         "omnistainer": omnistainer_position,
         "codex_reagents_plate": codex_reagents_plate_position,
         "tiprack_300_1": tiprack_300_1_position,
         "tiprack_300_2": tiprack_300_2_position,
         "heatmodule": heatmodule_position,
-    }
+    })
     protocol.home()
 
+    if "_on_coldplate" in omnistainer_type:
+        temp_mod = ColdPlateSlimDriver(protocol, max_temp_lag=15, heating_rate_deg_per_min=10, cooling_rate_deg_per_min=2)
 
-    temp_mod = ColdPlateSlimDriver(protocol, "/dev/ttyUSB0", max_temp_lag=15,
-                 heating_rate_deg_per_min=10, cooling_rate_deg_per_min=2)
+    has_sheath = 'thermosheath' in omnistainer_type
 
-    if labwarePositions['heatmodule'] >= 10:
+    if labwarePositions.heatmodule >= 10:
         raise Exception("heat module cannot be in positions 10 or 11")
 
-    omnistainer = protocol.load_labware(omnistainer_type, labwarePositions['heatmodule'], 'omni-stainer')
+    omnistainer = protocol.load_labware(omnistainer_type, labwarePositions.heatmodule, 'omni-stainer')
 
-    tiprack_300_1 = protocol.load_labware('opentrons_96_tiprack_300ul', labwarePositions['tiprack_300_1'],
+    tiprack_300_1 = protocol.load_labware('opentrons_96_tiprack_300ul', labwarePositions.tiprack_300_1,
                                           'tiprack 300ul 1')
-    tiprack_300_2 = protocol.load_labware('opentrons_96_tiprack_300ul', labwarePositions['tiprack_300_2'],
+    tiprack_300_2 = protocol.load_labware('opentrons_96_tiprack_300ul', labwarePositions.tiprack_300_2,
                                           'tiprack 300ul 2')
 
     pipette_300 = protocol.load_instrument(pipette_type, pipette_300_location, tip_racks=[tiprack_300_1, tiprack_300_2])
@@ -474,9 +474,9 @@ def run(protocol: protocol_api.ProtocolContext):
     pipette_300.flow_rate.aspirate = default_flow_rate
     pipette_300.starting_tip = tiprack_300_1.wells()[tiprack_300_starting_pos - 1]
 
-    codex_trough12 = protocol.load_labware('parhelia_12trough', labwarePositions['codex_buffers_plate'],
+    codex_trough12 = protocol.load_labware('parhelia_12trough', labwarePositions.codex_buffers_plate,
                                            'codex_12-trough buffers reservoir')
-    CODEX_reagents_96plate = protocol.load_labware(type_of_96well_plate, labwarePositions['codex_reagents_plate'],
+    CODEX_reagents_96plate = protocol.load_labware(type_of_96well_plate, labwarePositions.codex_reagents_plate,
                                                    '96-well-plate')
 
     codex_buffer_wells = codex_trough12.wells_by_name()
@@ -502,12 +502,13 @@ def run(protocol: protocol_api.ProtocolContext):
     #################PROTOCOL####################
     protocol.comment("Starting the CODEX staining protocol for samples:" + str(sample_chambers))
 
-    if 'thermosheath' in omnistainer_type:
-        openShutter(protocol, pipette_300, omnistainer, use_tip=False)
+    if has_sheath:
+        openShutter(protocol, pipette_300, omnistainer)
+
     if not FFPE:
         # WASHING SAMPLES WITH PFA
         protocol.comment("puncturing first fix")
-        puncture_wells(pipette_300, codex_buffers.Hydration_PFA_1pt6pct, height_offset=30)
+        puncture_wells(pipette_300, codex_buffers.Hydration_PFA_1pt6pct)
         protocol.comment("first fix")
         washSamples(pipette_300, codex_buffers.Hydration_PFA_1pt6pct, sample_chambers, wash_volume, 1)
         # INCUBATE
@@ -515,14 +516,14 @@ def run(protocol: protocol_api.ProtocolContext):
 
     # WASHING SAMPLES WITH S2
     protocol.comment("puncture S2")
-    puncture_wells(pipette_300, codex_buffers.Staining, height_offset=30)
+    puncture_wells(pipette_300, codex_buffers.Staining)
     protocol.comment("wash in S2")
     washSamples(pipette_300, codex_buffers.Staining, sample_chambers, wash_volume, 2, keep_tip=True)
 
     # PUNCTURING THE PREBLOCK
     protocol.comment("puncturing the preblock")
     for i in range(num_samples):
-        puncture_wells(pipette_300, codex_preblock_wells[i], height_offset=12, keep_tip=True)
+        puncture_wells(pipette_300, codex_preblock_wells[i])
     if pipette_300.has_tip: pipette_300.drop_tip()
 
     # WASHING SAMPLES WITH PREBLOCK
@@ -531,45 +532,41 @@ def run(protocol: protocol_api.ProtocolContext):
         washSamples(pipette_300, codex_preblock_wells[i], sample_chambers[i], wash_volume, 1, keep_tip=True)
     # INCUBATE
 
-    if 'thermosheath' in omnistainer_type:
+    if has_sheath:
         closeShutter(protocol, pipette_300, omnistainer)
 
     protocol.delay(minutes=15, msg="preblocking incubation")
 
     # APPLYING ANTIBODY COCKTAILS TO SAMPLES
 
-    if 'thermosheath' in omnistainer_type:
-        openShutter(protocol, pipette_300, omnistainer, use_tip=False)
+    if has_sheath:
+        openShutter(protocol, pipette_300, omnistainer)
 
     protocol.comment("applying antibodies")
     for i in range(num_samples):
         protocol.comment("puncturing antibodies")
-        puncture_wells(pipette_300, codex_antibody_wells[i], height_offset=12)
+        puncture_wells(pipette_300, codex_antibody_wells[i])
         protocol.comment("applying antibodies")
         washSamples(pipette_300, codex_antibody_wells[i], sample_chambers[i], ab_volume, 1)
     # INCUBATE
     if 'thermosheath' in omnistainer_type:
-        closeShutter(protocol, pipette_300, omnistainer, keep_tip=True)
+        closeShutter(protocol, pipette_300, omnistainer)
+
+    if not (temp_mod is None):
+        # Default incubation temp is 4C
+        temp_mod.set_temp_andWait(antibody_incubation_temp, msg="staining incubation on coldplate")
+        protocol.comment(f"staining incubation on coldplate: {ab_incubation_time_minutes} temp: {antibody_incubation_temp}")
 
     if protocol_pause:
         protocol.pause(msg="The protocol is paused for manual primary ab incubation")
-
-    if coldplate_incubation and omnistainer_type == "omni_stainer_s12_slides_with_thermosheath_on_coldplate":
-        # Default incubation temp is 4C
-        temp_mod.set_temp_andWait(antibody_incubation_temp, timeout_min=ab_incubation_time_minutes,
-                                  msg="staining incubation on coldplate")
-        print(f"staining incubation on coldplate: {ab_incubation_time_minutes} temp: {antibody_incubation_temp}")
-
-        temp_mod.temp_off()
-        # If we wanted to leave at 4C this temp_off would be deleted
-
-        print(f"cooling stopped")
-        # If we wanted to do room temp between the cold steps that would go here
-
     else:
         protocol.delay(minutes=ab_incubation_time_minutes, msg="staining incubation")
 
-    if 'thermosheath' in omnistainer_type:
+    if not (temp_mod is None):
+        temp_mod.temp_off()
+        protocol.comment(f"temp off")
+
+    if has_sheath:
         openShutter(protocol, pipette_300, omnistainer, use_tip=False)
     for i in range(2):
         # WASHING SAMPLES WITH Staining buffer
@@ -580,7 +577,7 @@ def run(protocol: protocol_api.ProtocolContext):
 
     # POST STAINING FIXING SAMPLES WITH PFA
     protocol.comment("puncturing the second fix")
-    puncture_wells(pipette_300, codex_buffers.Storage_PFA_4pct, height_offset=30)
+    puncture_wells(pipette_300, codex_buffers.Storage_PFA_4pct)
     protocol.comment("second fix")
     washSamples(pipette_300, codex_buffers.Storage_PFA_4pct, sample_chambers, wash_volume, 1)
     # INCUBATE
@@ -592,46 +589,23 @@ def run(protocol: protocol_api.ProtocolContext):
     protocol.comment("the PBS wash")
     washSamples(pipette_300, codex_buffers.PBS, sample_chambers, wash_volume, 2, keep_tip=True)
 
+    # set the temperature of the ColdPlate to 4°C before applying the cold methanol
+    if not (temp_mod is None):
+        methanol_fixation_temp = 4  # Temperature for methanol fixation in Celsius
+        protocol.comment(f"Setting ColdPlate to {methanol_fixation_temp}°C for cold methanol fixation")
+        temp_mod.set_temp_andWait(methanol_fixation_temp)
+
     # FIXING SAMPLES WITH Methanol
     protocol.comment("puncturing the Methanol")
-    puncture_wells(pipette_300, codex_buffers.MeOH, height_offset=30)
+    puncture_wells(pipette_300, codex_buffers.MeOH)
     for i in range(2):
         protocol.comment("applying MeOH")
         washSamples(pipette_300, codex_buffers.MeOH, sample_chambers, wash_volume, 1)
         # INCUBATE
         protocol.delay(minutes=2.5, msg="MeOH incubation")
 
-    # FIXING SAMPLES WITH Methanol
-    protocol.comment("puncturing the Methanol")
-    puncture_wells(pipette_300, codex_buffers.MeOH, height_offset=30)
-
-    # If the omnistainer_type is "omni_stainer_s12_slides_with_thermosheath_on_coldplate",
-    # set the temperature of the ColdPlate to 4°C before applying the cold methanol
-    if omnistainer_type == "omni_stainer_s12_slides_with_thermosheath_on_coldplate":
-        methanol_fixation_temp = 4  # Temperature for methanol fixation in Celsius
-        temp_mod.set_temp_andWait(methanol_fixation_temp, timeout_min=10,
-                                  msg="Cooling staining chamber for cold methanol fixation")
-        print(f"Setting ColdPlate to {methanol_fixation_temp}°C for cold methanol fixation")
-
-    # Slow down the dispensing rate for the cold methanol fixation
-    pipette_300.flow_rate.dispense = 0.05
-
-    # Apply the methanol
-    for i in range(2):
-        protocol.comment("applying MeOH")
-        washSamples(pipette_300, codex_buffers.MeOH, sample_chambers, wash_volume, 1)
-
-    # Reset the dispensing rate back to its original value
-    pipette_300.flow_rate.dispense = sample_flow_rate
-
-    # INCUBATE
-    if omnistainer_type == "omni_stainer_s12_slides_with_thermosheath_on_coldplate":
-        temp_mod.set_temp_andWait(methanol_fixation_temp, timeout_min=2.5, msg="MeOH incubation at 4°C on ColdPlate")
-        print(f"Methanol incubation at 4°C on ColdPlate: 2.5 minutes")
-
+    if not (temp_mod is None):
         temp_mod.temp_off()
-    else:
-        protocol.delay(minutes=2.5, msg="MeOH incubation at room temperature")
 
     # WASHING SAMPLES WITH PBS
     protocol.comment("PBS wash")
