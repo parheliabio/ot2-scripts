@@ -159,14 +159,14 @@ class ColdPlateSlimDriver():
         time_elapsed = 0
 
         while (abs(self.get_temp() - target_temp) > tolerance):
-            self.protocol.comment(f"Waiting for temp to reach target: {target_temp}, actual temp: {self.get_temp()}, {msg}")
+            self.protocol.comment(f"Waiting for temp to reach target: {target_temp}, actual temp: {self.get_temp()}")
             if not self.protocol.is_simulating():  # Skip delay during simulation
                 self.protocol.delay(seconds=interval_sec)
             time_elapsed += interval_sec
             if (time_elapsed > timeout_min * 60):
                 raise Exception("Temperature timeout")
 
-        self.protocol.comment(f"Target reached, equilibrating for {ab_incubation_time_minutes} minutes, {msg}")
+        self.protocol.comment(f"Target reached, equilibrating for {ab_incubation_time_minutes} minutes")
         if not self.protocol.is_simulating():  # Skip delay during simulation
             self.protocol.delay(seconds=temp_lag * SEC_IN_MIN)
         return target_temp
@@ -345,9 +345,9 @@ def closeShutter(protocol, pipette, covered_lbwr, keep_tip=False, use_tip=False)
 
 
 metadata = {
-    'protocolName': 'Parhelia CODEX v13',
+    'protocolName': 'Parhelia CODEX v13.31',
     'author': 'Parhelia Bio <info@parheliabio.com>',
-    'description': 'CODEX/PhenoCycler Sample Prep/Antibody Screening w/ ColdPlateSlimDriver',
+    'description': 'CODEX/PhenoCycler Sample Prep/Antibody Screening w/ ColdPlateSlimDriver v13.31',
     'apiLevel': '2.13'
 }
 
@@ -363,11 +363,8 @@ type_of_96well_plate = 'parhelia_skirted_96_with_strips'
 ### VERAO VAR NAME='FFPE mode (skip initial 1.6% PFA fixation)' TYPE=BOOLEAN
 FFPE = True
 
-### VERAO VAR NAME='Manual Overnight incubation: enable manual pausing at the antibody incubation step?' TYPE=BOOLEAN
-protocol_pause = False
-
-### VERAO VAR NAME='Automated antibody incubation: use ColdPlate at 4C for the antibody incubation step?' TYPE=BOOLEAN
-coldplate_incubation = True
+### VERAO VAR NAME='Manual Overnight incubation: enable manual pause at the antibody incubation step?' TYPE=BOOLEAN
+overnight_incubation = False
 
 """
 Antibody screening involves additional rendering step at the end, where the tissue is cleared and then
@@ -396,9 +393,6 @@ wash_volume = 150
 ### VERAO VAR NAME='Antibody mix volume (110ul for slides/60ul for coverslips)' TYPE=NUMBER LBOUND=50 UBOUND=350 DECIMAL=FALSE
 ab_volume = 110
 
-### VERAO VAR NAME='Room Temp Set: the non-cold temp for all steps besides methanol and antibody incubation, in celsius' TYPE=NUMBER LBOUND=1 UBOUND=95 DECIMAL=FALSE
-room_temp = 25
-
 ### VERAO VAR NAME='Aspiration height offset(mm, for calibration debugging)'  TYPE=NUMBER LBOUND=0 UBOUND=100 DECIMAL=TRUE INCREMENT=0.1
 aspiration_gap = 0
 
@@ -419,16 +413,36 @@ if pipette_300_GEN == 'GEN2':
     pipette_type = 'p300_single_gen2'
 else:
     pipette_type = 'p300_single'
+
+"""Methanol step is allways cold if temp mod initialized right now"""
+
+### VERAO VAR NAME='Room Temp Set: the set temp for all steps besides methanol and antibody incubation, in celsius' TYPE=NUMBER LBOUND=1 UBOUND=95 DECIMAL=FALSE
+room_temp = 25
+
 ### VERAO VAR NAME='Antibody cocktail incubation temperature' TYPE=NUMBER LBOUND=1 UBOUND=95 DECIMAL=FALSE
 antibody_incubation_temp = 4
 
-### VERAO VAR NAME='Temperature Module Position' TYPE=NUMBER LBOUND=1 UBOUND=9 DECIMAL=FALSE
+### VERAO VAR NAME='Methanol fixation temperature, set to room temp if not doing cold fix' TYPE=NUMBER LBOUND=1 UBOUND=30 DECIMAL=FALSE
+methanol_fixation_temp = 4
+
+### VERAO VAR NAME='Storage temperature' TYPE=NUMBER LBOUND=1 UBOUND=95 DECIMAL=FALSE
+storage_temp = 4
+
+### VERAO VAR NAME='Automated Storage Temperature Hold time (minutes)' TYPE=NUMBER LBOUND=0 UBOUND=900 DECIMAL=FALSE
+storage_hold_set_time_minutes = 15
+
+### VERAO VAR NAME='Manual Storage Hold: continue to hold at storage temp until manually stopped' TYPE=BOOLEAN
+manual_storage_hold = False
+
+### VERAO VAR NAME='Temperature Module Position, 7 highly recommended, ignore if not using temp mod' TYPE=NUMBER LBOUND=1 UBOUND=7 DECIMAL=FALSE
 heatmodule_position = 7
 
-### VERAO VAR NAME='Deck position: 12-trough buffers reservoir' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE
-codex_buffers_plate_position = 1
+"""If there is an S12 with thermosheath on a ColdPlate Slim, the pippette tip may impact the S12 module if it intersects the direct paths between the remaining labware and the trash"""
 
-### VERAO VAR NAME='Deck position: Parhelia Omni-stainer w/ Thermosheath w/ ColdPlate' TYPE=NUMBER LBOUND=1 UBOUND=9 DECIMAL=FALSE
+### VERAO VAR NAME='Deck position: 12-trough buffers reservoir' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE
+codex_buffers_plate_position = 2
+
+### VERAO VAR NAME='Deck position: Parhelia Omni-stainer / Thermosheath / ColdPlate' TYPE=NUMBER LBOUND=1 UBOUND=9 DECIMAL=FALSE
 omnistainer_position = 7
 
 ### VERAO VAR NAME='Deck position: Preblock/Antibody/F reagents plate' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE
@@ -501,23 +515,30 @@ def run(protocol: protocol_api.ProtocolContext):
 
     #################PROTOCOL####################
     protocol.comment("Starting the CODEX staining protocol for samples:" + str(sample_chambers))
-
-    if has_sheath:
-        openShutter(protocol, pipette_300, omnistainer)
+    if temp_mod is not None:
+        temp_mod.set_temp_andWait(room_temp)
+        protocol.comment(f"bringing samples to room temp: {room_temp} C")
 
     if not FFPE:
         # WASHING SAMPLES WITH PFA
         protocol.comment("puncturing first fix")
         puncture_wells(pipette_300, codex_buffers.Hydration_PFA_1pt6pct)
         protocol.comment("first fix")
+        if has_sheath:
+            openShutter(protocol, pipette_300, omnistainer)
         washSamples(pipette_300, codex_buffers.Hydration_PFA_1pt6pct, sample_chambers, wash_volume, 1)
+        if has_sheath:
+            closeShutter(protocol, pipette_300, omnistainer)
         # INCUBATE
         protocol.delay(minutes=10, msg="first fix incubation")
+
 
     # WASHING SAMPLES WITH S2
     protocol.comment("puncture S2")
     puncture_wells(pipette_300, codex_buffers.Staining)
     protocol.comment("wash in S2")
+    if has_sheath:
+        openShutter(protocol, pipette_300, omnistainer)
     washSamples(pipette_300, codex_buffers.Staining, sample_chambers, wash_volume, 2, keep_tip=True)
 
     # PUNCTURING THE PREBLOCK
@@ -529,7 +550,7 @@ def run(protocol: protocol_api.ProtocolContext):
     # WASHING SAMPLES WITH PREBLOCK
     protocol.comment("preblocking")
     for i in range(num_samples):
-        washSamples(pipette_300, codex_preblock_wells[i], sample_chambers[i], wash_volume, 1, keep_tip=True)
+        washSamples(pipette_300, codex_preblock_wells[i], sample_chambers[i], ab_volume, 1, keep_tip=True)
     # INCUBATE
 
     if has_sheath:
@@ -549,29 +570,32 @@ def run(protocol: protocol_api.ProtocolContext):
         protocol.comment("applying antibodies")
         washSamples(pipette_300, codex_antibody_wells[i], sample_chambers[i], ab_volume, 1)
     # INCUBATE
-    if 'thermosheath' in omnistainer_type:
+    if has_sheath:
         closeShutter(protocol, pipette_300, omnistainer)
 
-    if not (temp_mod is None):
+    if temp_mod is not None:
         # Default incubation temp is 4C
-        temp_mod.set_temp_andWait(antibody_incubation_temp, msg="staining incubation on coldplate")
+        temp_mod.set_temp_andWait(antibody_incubation_temp)
         protocol.comment(f"staining incubation on coldplate: {ab_incubation_time_minutes} temp: {antibody_incubation_temp}")
 
-    if protocol_pause:
+    if overnight_incubation:
         protocol.pause(msg="The protocol is paused for manual primary ab incubation")
     else:
         protocol.delay(minutes=ab_incubation_time_minutes, msg="staining incubation")
 
-    if not (temp_mod is None):
-        temp_mod.temp_off()
-        protocol.comment(f"temp off")
+    if temp_mod is not None:
+        temp_mod.set_temp_andWait(room_temp)
+        protocol.comment(f"returning to room temp: {room_temp} C")
 
-    if has_sheath:
-        openShutter(protocol, pipette_300, omnistainer, use_tip=False)
     for i in range(2):
         # WASHING SAMPLES WITH Staining buffer
         protocol.comment("first washing with Staining buffer")
+        if has_sheath:
+            openShutter(protocol, pipette_300, omnistainer)
         washSamples(pipette_300, codex_buffers.Staining, sample_chambers, wash_volume, 2, keep_tip=True)
+        pipette_300.drop_tip()
+        if has_sheath:
+            closeShutter(protocol, pipette_300, omnistainer)
         # INCUBATE
         protocol.delay(minutes=5, msg="first incubation in Staining Buffer")
 
@@ -579,36 +603,50 @@ def run(protocol: protocol_api.ProtocolContext):
     protocol.comment("puncturing the second fix")
     puncture_wells(pipette_300, codex_buffers.Storage_PFA_4pct)
     protocol.comment("second fix")
+    if has_sheath:
+        openShutter(protocol, pipette_300, omnistainer)
     washSamples(pipette_300, codex_buffers.Storage_PFA_4pct, sample_chambers, wash_volume, 1)
     # INCUBATE
+    if has_sheath:
+        closeShutter(protocol, pipette_300, omnistainer)
     protocol.delay(minutes=5, msg="incubation with fixative")
 
     # WASHING SAMPLES WITH PBS
     protocol.comment("puncture the PBS wash")
     puncture_wells(pipette_300, codex_buffers.PBS)
+    if has_sheath:
+        openShutter(protocol, pipette_300, omnistainer)
     protocol.comment("the PBS wash")
-    washSamples(pipette_300, codex_buffers.PBS, sample_chambers, wash_volume, 2, keep_tip=True)
-
+    washSamples(pipette_300, codex_buffers.PBS, sample_chambers, wash_volume, 2)
+    if has_sheath:
+        closeShutter(protocol, pipette_300, omnistainer)
     # set the temperature of the ColdPlate to 4°C before applying the cold methanol
-    if not (temp_mod is None):
-        methanol_fixation_temp = 4  # Temperature for methanol fixation in Celsius
+    if temp_mod is not None:
         protocol.comment(f"Setting ColdPlate to {methanol_fixation_temp}°C for cold methanol fixation")
         temp_mod.set_temp_andWait(methanol_fixation_temp)
 
     # FIXING SAMPLES WITH Methanol
     protocol.comment("puncturing the Methanol")
     puncture_wells(pipette_300, codex_buffers.MeOH)
+
     for i in range(2):
+        if has_sheath:
+            openShutter(protocol, pipette_300, omnistainer)
         protocol.comment("applying MeOH")
         washSamples(pipette_300, codex_buffers.MeOH, sample_chambers, wash_volume, 1)
+        if has_sheath:
+            closeShutter(protocol, pipette_300, omnistainer)
         # INCUBATE
         protocol.delay(minutes=2.5, msg="MeOH incubation")
 
-    if not (temp_mod is None):
-        temp_mod.temp_off()
+    if temp_mod is not None:
+        temp_mod.set_temp_andWait(room_temp)
+        protocol.comment(f"returning to room temp: {room_temp} C")
 
     # WASHING SAMPLES WITH PBS
     protocol.comment("PBS wash")
+    if has_sheath:
+        openShutter(protocol, pipette_300, omnistainer)
     washSamples(pipette_300, codex_buffers.PBS, sample_chambers, wash_volume, 2, keep_tip=True)
 
     # PUNCTURING THE FIXATIVE
@@ -625,17 +663,20 @@ def run(protocol: protocol_api.ProtocolContext):
 
     protocol.comment("third fix incubation")
 
-    if 'thermosheath' in omnistainer_type:
-        closeShutter(protocol, pipette_300, omnistainer, keep_tip=True)
+    if has_sheath:
+        closeShutter(protocol, pipette_300, omnistainer)
 
+        # keep_tip error was here
     protocol.delay(minutes=10, msg="Reagent F incubation")
 
-    if 'thermosheath' in omnistainer_type:
-        openShutter(protocol, pipette_300, omnistainer, use_tip=False)
+    if has_sheath:
+        openShutter(protocol, pipette_300, omnistainer)
 
     # WASHING SAMPLES WITH PBS
     protocol.comment("PBS wash")
     washSamples(pipette_300, codex_buffers.PBS, sample_chambers, wash_volume, 2)
+    if has_sheath:
+        closeShutter(protocol, pipette_300, omnistainer)
 
     if Antibody_Screening:
         protocol.comment("puncture the Codex Buffer")
@@ -644,6 +685,8 @@ def run(protocol: protocol_api.ProtocolContext):
         puncture_wells(pipette_300, codex_buffers.Screening_Buffer, keep_tip=True)
         protocol.comment("puncture the Stripping Buffer")
         puncture_wells(pipette_300, codex_buffers.Stripping_buffer)
+        if has_sheath:
+            openShutter(protocol, pipette_300, omnistainer)
         # PRE-CLEARING THE TISSUE
         for i in range(3):
             protocol.comment("tissue clearing round" + str(i + 1))
@@ -662,19 +705,39 @@ def run(protocol: protocol_api.ProtocolContext):
             protocol.comment("puncturing the rendering solution")
             puncture_wells(pipette_300, codex_rendering_wells[i], height_offset=12)
             protocol.comment("Applying the rendering solution to the wells")
-            washSamples(pipette_300, codex_rendering_wells[i], sample_chambers[i], wash_volume, 1)
+            washSamples(pipette_300, codex_rendering_wells[i], sample_chambers[i], ab_volume, 1)
         # INCUBATE
+        if has_sheath:
+            closeShutter(protocol, pipette_300, omnistainer)
         protocol.delay(minutes=10, msg="rendering hybridization")
 
         # WASH SAMPLES IN 1x CODEX buffer
+        if has_sheath:
+            openShutter(protocol, pipette_300, omnistainer)
         protocol.comment("Washing with rendering buffer")
         washSamples(pipette_300, codex_buffers.Screening_Buffer, sample_chambers, wash_volume, 2)
+        if has_sheath:
+            closeShutter(protocol, pipette_300, omnistainer)
 
-    # STORAGE, washing samples every hour for 100 hours
+    # STORAGE
+    if temp_mod is not None:
+        temp_mod.set_temp_andWait(storage_temp)
+        protocol.comment(f"storage temp: {storage_temp} C")
     protocol.comment("puncturing the storage buffer")
     puncture_wells(pipette_300, codex_buffers.storage)
     protocol.comment("applying the storage buffer")
+    if has_sheath:
+        openShutter(protocol, pipette_300, omnistainer)
     washSamples(pipette_300, codex_buffers.storage, sample_chambers, wash_volume, 2)
 
-    if 'thermosheath' in omnistainer_type:
+    if has_sheath:
         closeShutter(protocol, pipette_300, omnistainer)
+
+    if temp_mod is not None:
+        protocol.comment(f"Holding at storage temp: {storage_temp} C for {storage_hold_set_time_minutes} min")
+        protocol.delay(minutes=storage_hold_set_time_minutes, msg="preset automated storage mode")
+        if manual_storage_hold:
+            protocol.pause(msg=f"The protocol is paused in storage mode: {storage_temp} C")
+
+        temp_mod.temp_off()
+        protocol.comment(f"temp off - protocol complete")
