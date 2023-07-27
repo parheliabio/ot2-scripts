@@ -21,7 +21,6 @@ sample_flow_rate = 0.2
 extra_bottom_gap=0
 
 
-
 class Object:
     # constructor
     def __init__(self, dict1=None):
