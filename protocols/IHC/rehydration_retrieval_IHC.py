@@ -143,13 +143,13 @@ type_of_protocol = 'IHC only'
 hematoxylin_source = 'from pcr strip'
 
 ### VERAO VAR NAME='Device type' TYPE=CHOICE OPTIONS=['omni_stainer_s12_slides', 'omni_stainer_s12_slides_with_thermosheath', 'omni_stainer_c12_cslps', 'omni_stainer_c12_cslps_with_thermosheath', 'par2s_9slides_blue_v3', 'PAR2c_12coverslips']
-omnistainer_type = 'omni_stainer_s12_slides'
+omnistainer_type = 'omni_stainer_s12_slides_with_thermosheath'
 
 ### VERAO VAR NAME='Well plate type' TYPE=CHOICE OPTIONS=['parhelia_skirted_96', 'parhelia_skirted_96_with_strips', 'parhelia_black_96']
 type_of_96well_plate = 'parhelia_skirted_96_with_strips'
 
 ### VERAO VAR NAME='Number of Samples' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE
-num_samples = 12
+num_samples = 1
 
 ### VERAO VAR NAME='Tiprack starting position' TYPE=NUMBER LBOUND=1 UBOUND=95 DECIMAL=FALSE
 tiprack_300_starting_pos = 1
@@ -196,7 +196,7 @@ else:
 buffers_plate_position = 2
 
 ### VERAO VAR NAME='labwarePositions.omnistainer' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE
-omnistainer_position = 7
+omnistainer_position = 4
 
 ### VERAO VAR NAME='labwarePositions.ihc_reagents_plate' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE
 ihc_reagents_plate_position = 3
@@ -243,7 +243,7 @@ def run(protocol: protocol_api.ProtocolContext):
     buffers.TBS_wash = buffer_wells['A2']
     buffers.water = buffer_wells['A3']
     buffers.storage = buffer_wells['A4']
-    buffers.eth_70perc_ = buffer_wells['A5']
+    buffers.eth_70perc = buffer_wells['A5']
     buffers.eth_80perc = buffer_wells['A6']
     buffers.eth_95perc = buffer_wells['A7']
     buffers.eth_100perc = buffer_wells['A8']
@@ -273,13 +273,13 @@ def run(protocol: protocol_api.ProtocolContext):
         if 'thermosheath' in omnistainer_type:
             openShutter(protocol, pipette_300, omnistainer, keep_tip=True)
 
-        washSamples(pipette_300, buffers.eth_100perc, sample_chambers, wash_volume, 3, keep_tip=True)
+        washSamples(pipette_300, buffers.eth_100perc, sample_chambers, wash_volume, 2, keep_tip=True)
         protocol.delay(minutes=1)
-        washSamples(pipette_300, buffers.eth_95perc, sample_chambers, wash_volume, 3, keep_tip=True)
+        washSamples(pipette_300, buffers.eth_95perc, sample_chambers, wash_volume, 2, keep_tip=True)
         protocol.delay(minutes=1)
-        washSamples(pipette_300, buffers.eth_80perc, sample_chambers, wash_volume, 3, keep_tip=True)
+        washSamples(pipette_300, buffers.eth_80perc, sample_chambers, wash_volume, 2, keep_tip=True)
         protocol.delay(minutes=1)
-        washSamples(pipette_300, buffers.eth_70perc, sample_chambers, wash_volume, 3, keep_tip=True)
+        washSamples(pipette_300, buffers.eth_70perc, sample_chambers, wash_volume, 2, keep_tip=True)
         pipette_300.drop_tip()
         protocol.delay(minutes=1)
         for i in range(3):
@@ -312,7 +312,7 @@ def run(protocol: protocol_api.ProtocolContext):
 
         protocol.delay(1200)
 
-        if type_of_protocol in ['IHC only', 'IHC with Hematoxylin']:
+    if type_of_protocol in ['IHC only', 'IHC with Hematoxylin']:
         # WASHING SAMPLES WITH TBS
         protocol.comment("washing in TBS")
         puncture_wells(pipette_300, buffers.TBS_wash, height_offset=30)
