@@ -16,8 +16,8 @@ debug = False
 
 ####################FIXED RUN PARAMETERS#########################
 default_flow_rate = 50
-well_flow_rate = 5
-sample_flow_rate = 0.2
+trough_flow_rate_multiplier = 1
+sample_flow_rate_multiplier = 0.2
 extra_bottom_gap=0
 
 testmode = False
@@ -29,7 +29,6 @@ class Object:
             self.__dict__.update(dict1)
         else:
             pass
-
 
 class ColdPlateSlimDriver():
     def __init__(self, protocol_context,
@@ -472,8 +471,8 @@ def run(protocol: protocol_api.ProtocolContext):
     
     pipette = protocol.load_instrument(pipette_type, pipette_300_location, tip_racks = [tiprack_300_1,tiprack_300_2])
 
-    pipette.flow_rate.aspirate = default_flow_rate*well_flow_rate
-    pipette.flow_rate.dispense = default_flow_rate*sample_flow_rate
+    pipette.flow_rate.aspirate = default_flow_rate
+    pipette.flow_rate.dispense = default_flow_rate*sample_flow_rate_multiplier
     
     pipette.starting_tip = tiprack_300_1.wells()[tiprack_300_starting_pos-1]
 
