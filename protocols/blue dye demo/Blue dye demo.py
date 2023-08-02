@@ -481,4 +481,4 @@ def run(protocol: protocol_api.ProtocolContext):
 
         protocol.comment("Washing with clear buffer")
         washSamples(pipette_300, buffers.clear, sample_chambers, wash_volume, num_repeats=2)
-# protocol exported from Parhelia StainWorks
+# protocol exported from Parhelia StainWorks Aug 2 2023 4pm PST
