@@ -5,17 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3f1da4c3-d51e-4a23-9029-cafdead48ca7" name="Default Changelist" comment="Added support for ColdPlate, &#10;enabled loading labware from JSON (only works with Jupyter, not with OT2 app)&#10;added dict2obj function for labware position conversion&#10;enabled openShutter, closeShutter working without a tip&#10;added a check to labware positions making sure the heatmodule is not placed into positions 10 or 11 as it would cause a tip crash    def set_temp_andWait(self, target_temp, timeout_min=30, tolerance=0.5, msg=None):&#10;        if msg is not None:&#10;            print(msg)&#10;&#10;        interval_sec = 10&#10;        SEC_IN_MIN = 60&#10;&#10;        curr_temp = self.get_temp()&#10;        self.protocol.comment(f&quot;Current temp: {curr_temp}\nTarget temp: {target_temp}&quot;)&#10;&#10;        temp_diff = target_temp - curr_temp&#10;        temp_lag = self.max_temp_lag * (abs(temp_diff) / 100.0)&#10;&#10;        if temp_diff &gt; 0:&#10;            temp_step = self.heating_rate_deg_per_min * (interval_sec / SEC_IN_MIN)&#10;            print(f&quot;Heating rate: {temp_step}&quot;)&#10;        else:&#10;            temp_step = -self.cooling_rate_deg_per_min * (interval_sec / SEC_IN_MIN)&#10;            print(f&quot;Cooling rate: {temp_step}&quot;)&#10;&#10;        while (abs(target_temp - curr_temp) &gt; abs(temp_step)):&#10;            curr_temp += temp_step&#10;            self.set_temp(curr_temp)&#10;            print(f&quot;Ramping the temp to: {curr_temp}&quot;)&#10;            self.protocol.delay(seconds=interval_sec)&#10;            curr_temp = self.get_temp()&#10;            print(f&quot;Actual temp: {curr_temp}&quot;)&#10;&#10;        self.set_temp(target_temp)&#10;&#10;        time_elapsed = 0&#10;&#10;        while (abs(self.get_temp() - target_temp) &gt; tolerance):&#10;            print(f&quot;Waiting for temp to reach target: {target_temp}, actual temp: {self.get_temp()}, {msg}&quot;)&#10;            if not self.protocol.is_simulating():  # Skip delay during simulation&#10;                self.protocol.delay(seconds=interval_sec)&#10;            time_elapsed += interval_sec&#10;            if (time_elapsed &gt; timeout_min * 60):&#10;                raise Exception(&quot;Temperature timeout&quot;)&#10;&#10;        print(f&quot;Target reached, equilibrating for {ab_incubation_time_minutes} minutes, {msg}&quot;)&#10;        if not self.protocol.is_simulating():  # Skip delay during simulation&#10;            self.protocol.delay(seconds=temp_lag * SEC_IN_MIN)&#10;        return target_temp&#10;&#10;ColdPlate antibody incubation and methanol fixation at 4C (but can set temp)&#10;switched back to old washSamples and puncture_wells defs for well based code&#10;Lots of nice things ^_^&#10;Monday morning update 1&#10;Monday evening update">
-      <change afterPath="$PROJECT_DIR$/protocols/ACD RNA detection/ACD multiplexed v2 ColdPlate ParLiquid Integration v1.5.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/protocols/ACD RNA detection/ACD multiplexed v2 ColdPlate ParLiquid Integration v1.51.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/protocols/ACD RNA detection/ACD multiplexed v2 ColdPlate ParLiquid Integration v1.51jupyter_Minusdilute.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/protocols/ACD RNA detection/ACD multiplexed v2 ColdPlate ParLiquid Integration v1.51jupyteronly.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/protocols/ACD RNA detection/ACD multiplexed v2 ColdPlate ParLiquid Integration v1.51jupyterwithoutshuttersafe.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/protocols/ACD RNA detection/ACD multiplexed v2 ColdPlate ParLiquid Integration v1.53.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/protocols/H and E/H&amp;E in PCF Flowchamber v1.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/protocols/IHC/rehydration_retrieval_IHC_HEIR.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/global_functions.py" beforeDir="false" afterPath="$PROJECT_DIR$/global_functions.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/protocols/CODEX/CODEX-PCF_v0.13.py" beforeDir="false" afterPath="$PROJECT_DIR$/protocols/CODEX/CODEX-PCF_v0.13.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -48,7 +38,7 @@
   <component name="GithubPullRequestsUISettings">
     <option name="selectedUrlAndAccountId">
       <UrlAndAccount>
-        <option name="accountId" value="49a64af6-f0b9-486e-9bf7-313fd14dcd42" />
+        <option name="accountId" value="a7d21fcc-03a2-44a8-9fcf-b6ca89cd3533" />
         <option name="url" value="https://github.com/parheliabio/ot2-scripts.git" />
       </UrlAndAccount>
     </option>
@@ -59,6 +49,10 @@
   <component name="ProblemsViewState">
     <option name="selectedTabId" value="CurrentFile" />
   </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "customColor": "",
+  "associatedIndex": -1
+}]]></component>
   <component name="ProjectId" id="1rN7JSxWgv8qkWwmU5cQ7ve19kg" />
   <component name="ProjectLevelVcsManager">
     <ConfirmationsSetting value="2" id="Add" />
@@ -78,6 +72,7 @@
   },
   "keyToStringList": {
     "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
+      "Python",
       "GitIgnore"
     ]
   }
