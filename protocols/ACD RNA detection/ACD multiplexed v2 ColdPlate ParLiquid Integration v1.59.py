@@ -623,7 +623,7 @@ def run(protocol: protocol_api.ProtocolContext):
 
     sample_chambers = getOmnistainerWellsList(omnistainer, num_samples)
 
-########################PROTOCOL#################
+#######################PROTOCOL#################
 
     protocol.comment("Starting the RNAscope Multiplex V2 staining protocol for samples:" + str(sample_chambers))
     protocol.home()
