@@ -444,7 +444,7 @@ metadata = {
 
 # The type of Parhelia Omni-Stainer
 ### VERAO VAR NAME='Device type' TYPE=CHOICE OPTIONS=['omni_stainer_s12_slides', 'omni_stainer_s12_slides_with_thermosheath', 'omni_stainer_s12_slides_with_thermosheath_on_coldplate', 'omni_stainer_c12_cslps', 'omni_stainer_c12_cslps_with_thermosheath']
-omnistainer_type = 'omni_stainer_s12_slides_with_thermosheath_on_coldplate'
+omnistainer_type = 'omni_stainer_s12_slides_with_thermosheath'
 
 ### VERAO VAR NAME='Well plate type' TYPE=CHOICE OPTIONS=['black_96', 'parhelia_skirted_96', 'parhelia_skirted_96_with_strips']
 type_of_96well_plate = 'parhelia_skirted_96'
