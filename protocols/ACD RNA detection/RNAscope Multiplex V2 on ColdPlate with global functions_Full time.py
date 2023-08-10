@@ -986,14 +986,14 @@ def run(protocol: protocol_api.ProtocolContext):
                 closeShutter(protocol, pipette_300, omnistainer)
                 protocol.delay(minutes=1, msg="incubation in ACD wash buffer")
 
-            if not (temp_mod is None):
-                temp_mod.set_temp(room_temp)
-                protocol.comment(f"Staining Complete: bringing samples to room temp: {room_temp} C")
-                protocol.delay(minutes=templag_time_minutes)
-            # Storage
-            if temp_mod is not None:
-                protocol.comment(f"Holding at storage temp: {storage_temp} C for {storage_hold_set_time_minutes} min")
-                protocol.delay(minutes=storage_hold_set_time_minutes, msg="preset automated storage mode")
+    if not (temp_mod is None):
+        temp_mod.set_temp(room_temp)
+        protocol.comment(f"Staining Complete: bringing samples to room temp: {room_temp} C")
+        protocol.delay(minutes=templag_time_minutes)
+    # Storage
+    if temp_mod is not None:
+        protocol.comment(f"Holding at storage temp: {storage_temp} C for {storage_hold_set_time_minutes} min")
+        protocol.delay(minutes=storage_hold_set_time_minutes, msg="preset automated storage mode")
 
-                temp_mod.temp_off()
-            protocol.comment(f"temp off - protocol complete")
+        temp_mod.temp_off()
+    protocol.comment(f"temp off - protocol complete")
