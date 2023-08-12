@@ -962,7 +962,8 @@ def run(protocol: protocol_api.ProtocolContext):
             # Blocking the channel 1 HRP
             # First HRP block
             protocol.comment("puncturing HRP_block " + str(z))
-            puncture_wells(pipette_300, HRPblocker_wells[z - 1], keep_tip=True)
+            or i in range(len(sample_chambers)):
+                puncture_wells(pipette_300, HRPblocker_wells[z - 1][i], keep_tip=True)
 
             openShutter(protocol, pipette_300, omnistainer)
             protocol.comment("applying the HRP_block " + str(z))
