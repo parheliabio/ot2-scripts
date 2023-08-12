@@ -22,7 +22,7 @@ aspiration_gap = 0
 dispensing_gap = 0
 extra_bottom_gap = 0
 
-testmode = False
+testmode = True
 
 
 class Object:
@@ -558,7 +558,7 @@ def distribute_between_samples(
 ### END VERAO GLOBAL
 
 metadata = {
-    'protocolName': 'ACD multiplexed v2 simple ColdPlate - testmode = False',
+    'protocolName': 'ACD multiplexed v2 simple ColdPlate - testmode = True',
     'author': 'Parhelia Bio <info@parheliabio.com>',
     'description': 'ACD multiplexed v2',
     'apiLevel': '2.14'
@@ -962,7 +962,7 @@ def run(protocol: protocol_api.ProtocolContext):
             # Blocking the channel 1 HRP
             # First HRP block
             protocol.comment("puncturing HRP_block " + str(z))
-            or i in range(len(sample_chambers)):
+            for i in range(len(sample_chambers)):
                 puncture_wells(pipette_300, HRPblocker_wells[z - 1][i], keep_tip=True)
 
             openShutter(protocol, pipette_300, omnistainer)
@@ -1073,8 +1073,6 @@ def run(protocol: protocol_api.ProtocolContext):
 
         temp_mod.temp_off()
     protocol.comment(f"temp off - protocol complete")
-
-
 
 
 
