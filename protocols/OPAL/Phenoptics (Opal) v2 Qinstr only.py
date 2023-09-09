@@ -21,6 +21,9 @@ delayed_start = False
 ### VERAO VAR NAME='Protocol start delay time (minutes)' TYPE=NUMBER LBOUND=30 UBOUND=360 DECIMAL=FALSE
 protocol_delay_minutes = 30
 
+### VERAO VAR NAME='Preblock time (minutes)' TYPE=NUMBER LBOUND=1 UBOUND=90 DECIMAL=FALSE
+preblock_time_minutes = 10
+
 ### VERAO VAR NAME='Primary ab hyb time (minutes)' TYPE=NUMBER LBOUND=30 UBOUND=360 DECIMAL=FALSE
 primary_ab_time_minutes = 90
 

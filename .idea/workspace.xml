@@ -6,6 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="3f1da4c3-d51e-4a23-9029-cafdead48ca7" name="Default Changelist" comment="Created H&amp;E protocol and layout">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/protocols/OPAL/Phenoptics (Opal) v2 Qinstr only.py" beforeDir="false" afterPath="$PROJECT_DIR$/protocols/OPAL/Phenoptics (Opal) v2 Qinstr only.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/protocols/OPAL/Phenoptics (Opal) v2 YG.py" beforeDir="false" afterPath="$PROJECT_DIR$/protocols/OPAL/Phenoptics (Opal) v2 YG.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -114,13 +115,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1618804622983</updated>
-    </task>
-    <task id="LOCAL-00008" summary="Edits as per Derek Oldridge's suggestions">
-      <created>1623275917833</created>
-      <option name="number" value="00008" />
-      <option name="presentableId" value="LOCAL-00008" />
-      <option name="project" value="LOCAL" />
-      <updated>1623275917833</updated>
     </task>
     <task id="LOCAL-00009" summary="Updated the IMC protocol to introduce an option of a manual pause and a 4C overnight incubation. &#10;Merged the CODEX_single_stain and CODEX_multicycle protocols into one protocol and added the options for FFPE and Antibody_Screening modes in the *MODIFIABLE RUN PARAMETER* section. Setting Antibody_Screening to False makes this protocol run like CODEX_multicycle, setting it to true makes it run like CODEX_single_stain">
       <created>1623276093585</created>
@@ -458,7 +452,14 @@
       <option name="project" value="LOCAL" />
       <updated>1694243286329</updated>
     </task>
-    <option name="localTasksCounter" value="57" />
+    <task id="LOCAL-00057" summary="Created H&amp;E protocol and layout">
+      <created>1694244992824</created>
+      <option name="number" value="00057" />
+      <option name="presentableId" value="LOCAL-00057" />
+      <option name="project" value="LOCAL" />
+      <updated>1694244992824</updated>
+    </task>
+    <option name="localTasksCounter" value="58" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
