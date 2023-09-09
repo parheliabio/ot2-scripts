@@ -637,9 +637,9 @@ def run(protocol: protocol_api.ProtocolContext):
 
     if not (temp_mod is None):
         temp_mod.set_temp(room_temp)
-        protocol.comment(f"Temperature going to {room_temp} C, 10 min")
+        protocol.comment(f"Temperature going to {room_temp} C, 1 min")
         #protocol.delay(minutes=templag_time_minutes)
-        protocol.delay(minutes=10)
+        protocol.delay(minutes=1)
         protocol.comment(f"Temperature going to {hyb_temp + overshot_temp} C, for {templag_time_minutes * overshot_time_factor} min")
         temp_mod.set_temp(hyb_temp + overshot_temp)
         protocol.delay(minutes=templag_time_minutes * overshot_time_factor)
