@@ -14,6 +14,10 @@ omnistainer_type = 'omni_stainer_s12_slides_with_thermosheath'
 ### VERAO VAR NAME='Well plate type' TYPE=CHOICE OPTIONS=['parhelia_skirted_96', 'parhelia_skirted_96_with_strips']
 type_of_96well_plate = 'parhelia_skirted_96_with_strips'
 
+primary_times=[90,90,90,90,90,90]
+secondary_times=[30,30,30,30,30,30]
+retrieval=['A2','A2','A2','A2','A1','A1']
+
 
 ### VERAO VAR NAME='Delayed start' TYPE=BOOLEAN
 delayed_start = False
@@ -22,10 +26,10 @@ delayed_start = False
 protocol_delay_minutes = 30
 
 ### VERAO VAR NAME='Primary ab hyb time (minutes)' TYPE=NUMBER LBOUND=30 UBOUND=360 DECIMAL=FALSE
-primary_ab_time_minutes = 90
+primary_ab_time_minutes = 60
 
 ### VERAO VAR NAME='Secondary ab hyb time (minutes)' TYPE=NUMBER LBOUND=30 UBOUND=360 DECIMAL=FALSE
-secondary_ab_time_minutes = 90
+secondary_ab_time_minutes = 10
 
 ### VERAO VAR NAME='TSA time (minutes)' TYPE=NUMBER LBOUND=30 UBOUND=360 DECIMAL=FALSE
 tsa_time_minutes = 30
@@ -158,9 +162,9 @@ def run(protocol: protocol_api.ProtocolContext):
     buffer_wells = buffer_trough12.wells_by_name()
 
     buffers = Object()
-    buffers.water = buffer_wells['A1']
-    buffers.AR6 =  buffer_wells['A2']
-    buffers.AR9 =  buffer_wells['A3']
+    buffers.AR6 =  buffer_wells['A1']
+    buffers.AR9 =  buffer_wells['A2']
+    buffers.water = buffer_wells['A3']
 
     puncture_wells(pipette_300, list(buffers.vars().values()), keep_tip=True)
 
@@ -196,6 +200,78 @@ def run(protocol: protocol_api.ProtocolContext):
         opal_fluorophore_wells = all_reag_rows[i * 5 + 4]
 
 
+
+
+
+        openShutter(protocol, pipette, omnistainer)
+
+        # WASHING SAMPLES WITH TBS
+        protocol.comment("washing in TBS")
+
+        for i in range(len(sample_chambers)):
+            washSamples(pipette_300, TBS_wells[list(TBS_wells.keys())[i]], sample_chambers[i], wash_volume, 2,
+                        keep_tip=True)
+
+        #    protocol.delay(minutes=5)
+
+        puncture_wells(pipette_300, antibody_wells, keep_tip=True)
+        puncture_wells(pipette_300, opal_polymer_wells, keep_tip=True)
+        puncture_wells(pipette_300, opal_fluorophore_wells, keep_tip=True)
+
+        protocol.comment("preblocking")
+        washSamples(pipette_300,  buffers.blocking, sample_chambers, ab_volume)
+        # INCUBATE
+        safe_delay(minutes=preblock_time_minutes, msg = "preblocking incubation: " + str(preblock_time_minutes)  +" min")
+
+        # APPLYING ANTIBODY COCKTAILS TO SAMPLES
+        protocol.comment("applying primary antibodies")
+        for i in range(len(wellslist)):
+            washSamples(pipette_300, antibody_wells[i], sample_chambers[i], wash_volume)
+
+        # INCUBATE
+        safe_delay(minutes=primary_times[i], msg = "primary antibody incubation: " + str(primary_ab_time_minutes)  +" min")
+
+        # WASHING SAMPLES WITH TBS
+        # three individual repeats below is because they need particular incubation time between them
+        print("washing with TBS")
+        for i in range(3):
+            for i in range(len(sample_chambers)):
+                washSamples(pipette_300, TBS_wells[list(TBS_wells.keys())[i]], sample_chambers[i], wash_volume, 2,
+                            keep_tip=True)
+            safe_delay(minutes=3, msg="TBS wash incubation")
+
+        # APPLYING OPAL polymer HRP
+        print("applying opal secondary")
+        for i in range(len(wellslist)):
+            washSamples(pipette_300, opal_polymer_wells[i], sample_chambers[i], ab_volume)
+
+        # INCUBATE
+        safe_delay(minutes=secondary_times[i], msg = "Opal secondary incubation for " +  str(secondary_ab_time_minutes)+  " min")
+
+        # WASHING SAMPLES WITH TBS
+        protocol.comment("washing with TBS")
+        for i in range(3):
+            for i in range(len(sample_chambers)):
+                washSamples(pipette_300, TBS_wells[list(TBS_wells.keys())[i]], sample_chambers[i], wash_volume, 2,
+                            keep_tip=True)
+            safe_delay(minutes=3, msg="TBS wash incubation")
+
+        # Opal Signal generation
+        protocol.comment("Applying the Opal TSA reagent")
+        for i in range(num_samples):
+            dilute_and_apply_fixative(pipette_300, opal_fluorophore_wells[i], buffers.amplification, sample_chambers[i], ab_volume)
+
+        # INCUBATE
+        safe_delay(minutes=tsa_time_minutes, msg = "Opal TSA incubation for " +  str(tsa_time_minutes)+  " min")
+
+        # WASHING SAMPLES WITH TBS
+        # three individual repeats below is because they need particular incubation time between them
+        print("washing with TBS")
+        for i in range(3):
+            for i in range(len(sample_chambers)):
+                washSamples(pipette_300, TBS_wells[list(TBS_wells.keys())[i]], sample_chambers[i], wash_volume, 2,
+                            keep_tip=True)
+            safe_delay(minutes=3, msg="TBS wash incubation")
 
         #ER/Stripping
         washSamples(pipette, buffers.water, sample_chambers, wash_volume, 2, keep_tip=True)
@@ -254,76 +330,6 @@ def run(protocol: protocol_api.ProtocolContext):
                 closeShutter(protocol, pipette_300, omnistainer, keep_tip=True)
             protocol.delay(600)
 
-
-        openShutter(protocol, pipette, omnistainer)
-
-        # WASHING SAMPLES WITH TBS
-        protocol.comment("washing in TBS")
-
-        for i in range(len(sample_chambers)):
-            washSamples(pipette_300, TBS_wells[list(TBS_wells.keys())[i]], sample_chambers[i], wash_volume, 2,
-                        keep_tip=True)
-
-        #    protocol.delay(minutes=5)
-
-        puncture_wells(pipette_300, antibody_wells, keep_tip=True)
-        puncture_wells(pipette_300, opal_polymer_wells, keep_tip=True)
-        puncture_wells(pipette_300, opal_fluorophore_wells, keep_tip=True)
-
-        protocol.comment("preblocking")
-        washSamples(pipette_300,  buffers.blocking, sample_chambers, ab_volume)
-        # INCUBATE
-        safe_delay(minutes=preblock_time_minutes, msg = "preblocking incubation: " + str(preblock_time_minutes)  +" min")
-
-        # APPLYING ANTIBODY COCKTAILS TO SAMPLES
-        protocol.comment("applying primary antibodies")
-        for i in range(len(wellslist)):
-            washSamples(pipette_300, antibody_wells[i], sample_chambers[i], wash_volume)
-
-        # INCUBATE
-        safe_delay(minutes=primary_ab_time_minutes, msg = "primary antibody incubation: " + str(primary_ab_time_minutes)  +" min")
-
-        # WASHING SAMPLES WITH TBS
-        # three individual repeats below is because they need particular incubation time between them
-        print("washing with TBS")
-        for i in range(3):
-            for i in range(len(sample_chambers)):
-                washSamples(pipette_300, TBS_wells[list(TBS_wells.keys())[i]], sample_chambers[i], wash_volume, 2,
-                            keep_tip=True)
-            safe_delay(minutes=3, msg="TBS wash incubation")
-
-        # APPLYING OPAL polymer HRP
-        print("applying opal secondary")
-        for i in range(len(wellslist)):
-            washSamples(pipette_300, opal_polymer_wells[i], sample_chambers[i], ab_volume)
-
-        # INCUBATE
-        safe_delay(minutes=secondary_ab_time_minutes, msg = "Opal secondary incubation for " +  str(secondary_ab_time_minutes)+  " min")
-
-        # WASHING SAMPLES WITH TBS
-        protocol.comment("washing with TBS")
-        for i in range(3):
-            for i in range(len(sample_chambers)):
-                washSamples(pipette_300, TBS_wells[list(TBS_wells.keys())[i]], sample_chambers[i], wash_volume, 2,
-                            keep_tip=True)
-            safe_delay(minutes=3, msg="TBS wash incubation")
-
-        # Opal Signal generation
-        protocol.comment("Applying the Opal TSA reagent")
-        for i in range(num_samples):
-            dilute_and_apply_fixative(pipette_300, opal_fluorophore_wells[i], buffers.amplification, sample_chambers[i], ab_volume)
-
-        # INCUBATE
-        safe_delay(minutes=tsa_time_minutes, msg = "Opal TSA incubation for " +  str(tsa_time_minutes)+  " min")
-
-        # WASHING SAMPLES WITH TBS
-        # three individual repeats below is because they need particular incubation time between them
-        print("washing with TBS")
-        for i in range(3):
-            for i in range(len(sample_chambers)):
-                washSamples(pipette_300, TBS_wells[list(TBS_wells.keys())[i]], sample_chambers[i], wash_volume, 2,
-                            keep_tip=True)
-            safe_delay(minutes=3, msg="TBS wash incubation")
 
 
     ### ANTI-TAG STAINING
