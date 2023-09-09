@@ -557,7 +557,7 @@ def distribute_between_samples(
 ### END VERAO GLOBAL
 
 metadata = {
-    'protocolName': 'temp test coldplate V4 , 7.2 hr, overshoot 5T at 0.15t templag 60 min',
+    'protocolName': 'temp test coldplate V4 , 7.2 hr, overshoot 5T at 0.15t templag 2 min',
     'author': 'Parhelia Bio <info@parheliabio.com>',
     'description': 'Temp test coldplate',
     'apiLevel': '2.14'
@@ -571,7 +571,7 @@ omnistainer_type = 'omni_stainer_s12_slides_with_thermosheath_on_coldplate'
 
 
 ### VERAO VAR NAME='Temp lag for adjusting the temp (in minutes) 30 recommended' TYPE=NUMBER LBOUND=1 UBOUND=95 DECIMAL=FALS
-templag_time_minutes = 60
+templag_time_minutes = 2
 
 ### VERAO VAR NAME='Hybridization temperature' TYPE=NUMBER LBOUND=1 UBOUND=95 DECIMAL=FALSE
 hyb_temp = 42
