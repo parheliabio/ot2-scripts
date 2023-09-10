@@ -33,14 +33,15 @@ class Object:
         else:
             pass
 
+
 class ColdPlateSlimDriver:
     def __init__(
-        self,
-        protocol_context,
-        my_device_name="/dev/ttyUSB0",
-        max_temp_lag=0,
-        heating_rate_deg_per_min=100,
-        cooling_rate_deg_per_min=100,
+            self,
+            protocol_context,
+            my_device_name="/dev/ttyUSB0",
+            max_temp_lag=0,
+            heating_rate_deg_per_min=100,
+            cooling_rate_deg_per_min=100,
     ):
         self.serial_number = "29517"
         self.device_name = my_device_name
@@ -143,7 +144,6 @@ class ColdPlateSlimDriver:
     def set_temperature(self, target_temp):
         self.set_temp_andWait(target_temp)
 
-
     def set_temp_andWait(self, target_temp, timeout_min=30, tolerance=0.5):
         interval_sec = 10
         SEC_IN_MIN = 60
@@ -186,7 +186,7 @@ class ColdPlateSlimDriver:
                 raise Exception("Temperature timeout")
 
         self.protocol.comment(
-            f"Target reached, equilibrating for {ab_incubation_time_minutes} minutes"
+            f"Target reached, equilibrating for {temp_lag} minutes"
         )
         if not self.protocol.is_simulating():  # Skip delay during simulation
             time.sleep(temp_lag * SEC_IN_MIN)
@@ -200,6 +200,7 @@ class ColdPlateSlimDriver:
 
     def deactivate(self):
         self.temp_off()
+
 
 class ParLiquid:
     def __init__(self, name, color, well_list, volume):
@@ -252,7 +253,7 @@ def loadLabwareFromDict(labwareName, protocol_or_tempmodule, position=-1, z_offs
 
     # Check if the passed context is a TemperatureModuleContext or ColdPlateSlimDriver
     if isinstance(
-        protocol_or_tempmodule, opentrons.protocol_api.TemperatureModuleContext
+            protocol_or_tempmodule, opentrons.protocol_api.TemperatureModuleContext
     ) or isinstance(protocol_or_tempmodule, ColdPlateSlimDriver):
         labware = protocol_or_tempmodule.load_labware_from_definition(
             LABWARE_DEF, LABWARE_DEF.get("metadata", {}).get("displayName")
@@ -268,15 +269,15 @@ def loadLabwareFromDict(labwareName, protocol_or_tempmodule, position=-1, z_offs
 
 
 def washSamples(
-    pipette,
-    sourceLiquid,
-    samples,
-    volume,
-    num_repeats=1,
-    height_offset=0,
-    aspiration_offset=0,
-    dispensing_offset=0,
-    keep_tip=False,
+        pipette,
+        sourceLiquid,
+        samples,
+        volume,
+        num_repeats=1,
+        height_offset=0,
+        aspiration_offset=0,
+        dispensing_offset=0,
+        keep_tip=False,
 ):
     try:
         iter(samples)
@@ -324,9 +325,7 @@ def washSamples(
         pipette.drop_tip()
 
 
-def puncture_wells(
-    pipette, wells, height_offset=0, top_height_offset=-5, keep_tip=False
-):
+def puncture_wells(pipette, wells, height_offset=0, top_height_offset=-5, keep_tip=False):
     try:
         iter(wells)
     except TypeError:
@@ -335,18 +334,17 @@ def puncture_wells(
         pipette.pick_up_tip()
     for well in wells:
         pipette.move_to(well.top(top_height_offset))
-    if not keep_tip:
-        pipette.drop_tip()
+    if not keep_tip: pipette.drop_tip()
 
 
 def dilute_and_apply_fixative(
-    pipette,
-    sourceSolutionWell,
-    dilutant_buffer_well,
-    samples,
-    volume,
-    height_offset=0,
-    keep_tip=False,
+        pipette,
+        sourceSolutionWell,
+        dilutant_buffer_well,
+        samples,
+        volume,
+        height_offset=0,
+        keep_tip=False,
 ):
     if not pipette.has_tip:
         pipette.pick_up_tip()
@@ -375,7 +373,7 @@ def getOmnistainerWellsList(omnistainer, num_samples):
         raise Exception("number of wells in the Omni-Stainer less than num_samples")
 
     wellslist = list(omnistainer.wells_by_name().keys())
-    wellslist = wellslist[1 : num_samples + 1]
+    wellslist = wellslist[1: num_samples + 1]
 
     for well in wellslist:
         sample_chambers.append(omnistainer.wells_by_name()[well])
@@ -396,6 +394,7 @@ def mix(pipette, sourceSolutionWell, volume, num_repeats):
         pipette.dispense(volume, sourceSolutionWell, rate=2)
 
     pipette.drop_tip()
+
 
 def openShutter(protocol, pipette, covered_lbwr, keep_tip=False, use_tip=False):
     if use_tip:
@@ -442,16 +441,16 @@ def closeShutter(protocol, pipette, covered_lbwr, keep_tip=False, use_tip=False)
 
 
 def apply_and_incubate(
-    protocol,
-    pipette,
-    source,
-    reagent_name,
-    target_wells,
-    volume,
-    dispense_repeats,
-    incubation_time,
-    puncture=True,
-    step_repeats=1
+        protocol,
+        pipette,
+        source,
+        reagent_name,
+        target_wells,
+        volume,
+        dispense_repeats,
+        incubation_time,
+        puncture=True,
+        step_repeats=1
 ):
     if puncture:
         puncture_wells(pipette, source)
@@ -480,7 +479,7 @@ def apply_and_incubate(
 
         if one_to_many:
             for i in range(dispense_repeats):
-                if(i>0) and not testmode: protocol.delay(minutes=1, msg = "1 min delay before repeat applications")
+                if (i > 0) and not testmode: protocol.delay(minutes=1, msg="1 min delay before repeat applications")
                 pipette.distribute(
                     volume,
                     source,
@@ -491,7 +490,7 @@ def apply_and_incubate(
                 )
         else:
             for i in range(dispense_repeats):
-                if(i>0) and not testmode: protocol.delay(minutes=1, msg = "1 min delay before repeat applications")
+                if (i > 0) and not testmode: protocol.delay(minutes=1, msg="1 min delay before repeat applications")
                 pipette.transfer(
                     volume,
                     source,
@@ -505,6 +504,7 @@ def apply_and_incubate(
         else:
             protocol.delay(minutes=incubation_time, msg=reagent_name + " incubation")
 
+
 def safe_delay(protocol, *args, **kwargs):
     if testmode:
         protocol.delay(minutes=0.5)
@@ -512,16 +512,17 @@ def safe_delay(protocol, *args, **kwargs):
     else:
         protocol.delay(*args, **kwargs)
 
+
 def distribute_between_samples(
-    pipette,
-    sourceSolutionWell,
-    samples,
-    volume,
-    num_repeats=1,
-    height_offset=0,
-    aspiration_offset=0,
-    dispensing_offset=0,
-    keep_tip=False,
+        pipette,
+        sourceSolutionWell,
+        samples,
+        volume,
+        num_repeats=1,
+        height_offset=0,
+        aspiration_offset=0,
+        dispensing_offset=0,
+        keep_tip=False,
 ):
     try:
         iter(samples)
@@ -554,5 +555,6 @@ def distribute_between_samples(
 
     if not keep_tip:
         pipette.drop_tip()
+
 
 ### END VERAO GLOBAL

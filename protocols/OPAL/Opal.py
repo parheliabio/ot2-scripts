@@ -186,7 +186,7 @@ class ColdPlateSlimDriver:
                 raise Exception("Temperature timeout")
 
         self.protocol.comment(
-            f"Target reached, equilibrating for {ab_incubation_time_minutes} minutes"
+            f"Target reached, equilibrating for {temp_lag} minutes"
         )
         if not self.protocol.is_simulating():  # Skip delay during simulation
             time.sleep(temp_lag * SEC_IN_MIN)
@@ -571,7 +571,7 @@ metadata = {
 
 # The type of Parhelia Omni-Stainer
 ### VERAO VAR NAME='Device type' TYPE=CHOICE OPTIONS=['omni_stainer_s12_slides_with_thermosheath_on_coldplate']
-omnistainer_type = 'omni_stainer_s12_slides_with_thermosheath'
+omnistainer_type = 'omni_stainer_s12_slides_with_thermosheath_on_coldplate'
 
 ### VERAO VAR NAME='Well plate type' TYPE=CHOICE OPTIONS=['parhelia_skirted_96', 'parhelia_skirted_96_with_strips']
 type_of_96well_plate = 'parhelia_skirted_96'
@@ -863,15 +863,15 @@ def run(protocol: protocol_api.ProtocolContext):
 
         closeShutter(protocol, pipette_300, omnistainer, use_tip=True)
         if "coldplate" in omnistainer_type:
-            temp_mod.set_temperature(retrieval_temp)
+            temp_mod.set_temperature(ar_temp)
 
             protocol.delay(minutes=templag, msg="Equilibrating")
 
-            protocol.delay(minutes=retrieval_time, msg="ER in progress")
+            protocol.delay(minutes=ar_time, msg="ER in progress")
             temp_mod.set_temp(room_temp)
 
             prevTemp = temp_mod.temperature
-            while (temp_mod.get_temp() > pbs_wash_temp + 1):
+            while (temp_mod.get_temp() > room_temp + 1):
                 currTemp = temp_mod.temperature
                 protocol.delay(seconds=60, msg="cooling down, temp: " + str(currTemp))
                 if (prevTemp - currTemp > 10):
