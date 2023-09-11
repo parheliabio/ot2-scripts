@@ -599,7 +599,7 @@ secondary_ab_time_minutes = 10
 tsa_time_minutes = 30
 
 ### VERAO VAR NAME='Sample wash volume' TYPE=NUMBER LBOUND=50 UBOUND=200 DECIMAL=FALSE
-wash_volume = 150
+wash_volume = 130
 
 ### VERAO VAR NAME='Antibody mix volume' TYPE=NUMBER LBOUND=50 UBOUND=200 DECIMAL=FALSE
 ab_volume = 110
