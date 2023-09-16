@@ -558,10 +558,8 @@ def distribute_between_samples(
 
 
 ### END VERAO GLOBAL
-
-
 metadata = {
-    'protocolName': 'Parhelia Phenoptics/Opal protocol',
+    'protocolName': 'Parhelia Phenoptics/Opal protocol for Mayo',
     'author': 'Parhelia Bio <info@parheliabio.com>',
     'description': 'Multicycle fluorescent TSA protocol compatible with Akoya Phenoptics/Opal platform',
     'apiLevel': '2.13'
@@ -574,7 +572,7 @@ metadata = {
 omnistainer_type = 'omni_stainer_s12_slides_with_thermosheath_on_coldplate'
 
 ### VERAO VAR NAME='Well plate type' TYPE=CHOICE OPTIONS=['parhelia_skirted_96', 'parhelia_skirted_96_with_strips']
-type_of_96well_plate = 'parhelia_skirted_96'
+type_of_96well_plate = 'parhelia_skirted_96_with_strips'
 
 primary_times = [90, 90, 90, 90, 90, 90]
 secondary_times = [30, 30, 30, 30, 30, 30]
@@ -582,6 +580,9 @@ retrieval = ['A2', 'A2', 'A2', 'A2', 'A1', 'A1']
 
 ### VERAO VAR NAME='Delayed start' TYPE=BOOLEAN
 delayed_start = False
+
+### VERAO VAR NAME='DAPI: enable manual pausing before the DAPI staining?' TYPE=BOOLEAN
+preDAPI_pause = True
 
 ### VERAO VAR NAME='Protocol start delay time (minutes)' TYPE=NUMBER LBOUND=30 UBOUND=360 DECIMAL=FALSE
 protocol_delay_minutes = 30
@@ -632,7 +633,7 @@ storage_mode = True
 storage_temp = 4
 
 ### VERAO VAR NAME='Deck position: Parhelia Omni-stainer / Thermosheath / ColdPlate' TYPE=NUMBER LBOUND=1 UBOUND=9 DECIMAL=FALSE
-omnistainer_position = 4
+omnistainer_position = 1
 
 ### VERAO VAR NAME='labwarePositions.wash_buffers_plate' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE
 wash_buffers_plate_position = 3
@@ -641,16 +642,16 @@ wash_buffers_plate_position = 3
 retrieval_buffers_plate_position = 6
 
 ### VERAO VAR NAME='labwarePositions.rna_reagents_plate_1 ' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE
-ab_reagents_plate_1_position = 2
+ab_reagents_plate_1_position = 7
 
 ### VERAO VAR NAME='labwarePositions.rna_reagents_plate_2 ' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE
-ab_reagents_plate_2_position = 5
+ab_reagents_plate_2_position = 8
 
 ### VERAO VAR NAME='labwarePositions.rna_reagents_plate_3 ' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE
-ab_reagents_plate_3_position = 8
+ab_reagents_plate_3_position = 9
 
 ### VERAO VAR NAME='labwarePositions.rna_reagents_plate_4 ' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE
-ab_reagents_plate_4_position = 9
+ab_reagents_plate_4_position = 5
 
 ### VERAO VAR NAME='labwarePositions.tiprack_300_1' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE
 tiprack_300_1_position = 10
@@ -666,10 +667,10 @@ tip_type = 'opentrons_96_tiprack_300ul'
 
 ####################LABWARE LAYOUT ON DECK#########################
 ### VERAO VAR NAME='P300 mounting' TYPE=CHOICE OPTIONS=['right', 'left']
-pipette_300_location = 'right'
+pipette_300_location = 'left'
 
 ### VERAO VAR NAME='P300 model' TYPE=CHOICE OPTIONS=['GEN2', 'GEN1']
-pipette_300_GEN = 'GEN1'
+pipette_300_GEN = 'GEN2'
 
 if pipette_300_GEN == 'GEN2':
     pipette_type = 'p300_single_gen2'
@@ -720,7 +721,7 @@ def run(protocol: protocol_api.ProtocolContext):
         omnistainer = temp_mod.load_labware(omnistainer_type)
 
     TBS_trough12 = protocol.load_labware('parhelia_12trough', labwarePositions.wash_buffers_plate,
-                                         '12-trough TBS servoir')
+                                         '12-trough TBS reservoir')
     TBS_wells = TBS_trough12.wells_by_name()
 
     buffer_trough12 = protocol.load_labware('parhelia_12trough', labwarePositions.retrieval_buffers_plate,
@@ -747,7 +748,7 @@ def run(protocol: protocol_api.ProtocolContext):
         if labwarePositions.omnistainer > 9:
             raise Exception(
                 "Omni-Stainer module with current thermal sheath on cannot be placed in the last row of the deck because the shutter ear will be unreachable by the pipette due to the gantry travel limits")
-        # Remove Exception for new Thermal Sheath Shutters
+        # Remove Exception for new Thermal Sheath Shutters, or if flipping lid on labware definitions
     sample_chambers = getOmnistainerWellsList(omnistainer, num_samples)
     protocol.home()
 
@@ -771,6 +772,7 @@ def run(protocol: protocol_api.ProtocolContext):
         ampl_buffer_wells = all_reag_rows[z * 5 + 3]
         opal_fluorophore_wells = all_reag_rows[z * 5 + 4]
 
+
         openShutter(protocol, pipette_300, omnistainer, use_tip=True)
 
         # WASHING SAMPLES WITH TBS
@@ -781,8 +783,8 @@ def run(protocol: protocol_api.ProtocolContext):
                         keep_tip=True)
 
         #    protocol.delay(minutes=5)
-        puncture_wells(pipette_300, preblock_wells, keep_tip=True)
-        puncture_wells(pipette_300, antibody_wells)
+        puncture_wells(pipette_300, preblock_wells[:num_samples], keep_tip=True)
+        puncture_wells(pipette_300, antibody_wells[:num_samples])
 
         protocol.comment("preblocking")
         for i in range(num_samples):
@@ -810,7 +812,7 @@ def run(protocol: protocol_api.ProtocolContext):
             safe_delay(protocol, minutes=3, msg="TBS wash incubation")
         pipette_300.drop_tip()
 
-        puncture_wells(pipette_300, opal_polymer_wells, keep_tip=True)
+        puncture_wells(pipette_300, opal_polymer_wells[:num_samples], keep_tip=True)
         pipette_300.drop_tip()
 
         # APPLYING OPAL polymer HRP
@@ -831,8 +833,8 @@ def run(protocol: protocol_api.ProtocolContext):
                             keep_tip=True)
             safe_delay(protocol, minutes=3, msg="TBS wash incubation")
 
-        puncture_wells(pipette_300, opal_fluorophore_wells, keep_tip=True)
-        puncture_wells(pipette_300, ampl_buffer_wells, keep_tip=True)
+        puncture_wells(pipette_300, opal_fluorophore_wells[:num_samples], keep_tip=True)
+        puncture_wells(pipette_300, ampl_buffer_wells[:num_samples], keep_tip=True)
         pipette_300.drop_tip()
 
         # Opal Signal generation
@@ -922,8 +924,11 @@ def run(protocol: protocol_api.ProtocolContext):
     if num_abs == 6:
         anti_tsa_wells = all_reag_rows[-2]
         protocol.comment("puncturing anti-TSA wells")
-        puncture_wells(pipette_300, anti_tsa_wells)
-        pipette_300.transfer(ab_volume, anti_tsa_wells, sample_chambers, new_tip='once', disposal_vol=0)
+        puncture_wells(pipette_300, anti_tsa_wells[:num_samples], keep_tip=True)
+        pipette_300.drop_tip()
+        for i in range(num_samples):
+            washSamples(pipette_300, anti_tsa_wells[i], sample_chambers[i], ab_volume, keep_tip=True)
+        pipette_300.drop_tip()
         safe_delay(protocol, minutes=60, msg="incubation in anti-TSA fluorescent antibody")
 
         for k in range(3):
@@ -931,13 +936,17 @@ def run(protocol: protocol_api.ProtocolContext):
                 washSamples(pipette_300, TBS_wells[list(TBS_wells.keys())[i]], sample_chambers[i], wash_volume, 2,
                             keep_tip=True)
             safe_delay(protocol, minutes=3, msg="TBS wash incubation")
-
+    if preDAPI_pause:
+        protocol.pause(msg="The protocol is paused before the DAPI staining. Hit resume in OT2 app")
     ### DAPI STAINING
     DAPI_wells = all_reag_rows[-1]
     protocol.comment("puncturing DAPI wells")
-    puncture_wells(pipette_300, DAPI_wells)
+    puncture_wells(pipette_300, DAPI_wells[:num_samples], keep_tip=True)
+    pipette_300.drop_tip()
     # Washing with DAPI
-    pipette_300.transfer(ab_volume, DAPI_wells, sample_chambers, new_tip='once', disposal_vol=0)
+    for i in range(num_samples):
+        washSamples(pipette_300, DAPI_wells[i], sample_chambers[i], ab_volume, keep_tip=True)
+    pipette_300.drop_tip()
     safe_delay(protocol, minutes=4, msg="incubation in DAPI")
 
     for i in range(len(sample_chambers)):
@@ -956,5 +965,4 @@ def run(protocol: protocol_api.ProtocolContext):
     if "coldplate" in omnistainer_type:
         temp_mod.temp_off()
     protocol.comment(f"Protocol done - temperature module has been turned off")
-
 
