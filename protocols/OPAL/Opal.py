@@ -639,7 +639,7 @@ omnistainer_position = 1
 wash_buffers_plate_position = 3
 
 ### VERAO VAR NAME='labwarePositions.wash_buffers_plate' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE
-retrieval_buffers_plate_position = 6
+retrieval_buffers_plate_position = 5
 
 ### VERAO VAR NAME='labwarePositions.rna_reagents_plate_1 ' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE
 ab_reagents_plate_1_position = 7
@@ -651,7 +651,7 @@ ab_reagents_plate_2_position = 8
 ab_reagents_plate_3_position = 9
 
 ### VERAO VAR NAME='labwarePositions.rna_reagents_plate_4 ' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE
-ab_reagents_plate_4_position = 5
+ab_reagents_plate_4_position = 6
 
 ### VERAO VAR NAME='labwarePositions.tiprack_300_1' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE
 tiprack_300_1_position = 10
