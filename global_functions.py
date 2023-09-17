@@ -144,53 +144,30 @@ class ColdPlateSlimDriver:
     def set_temperature(self, target_temp):
         self.set_temp_andWait(target_temp)
 
-    def set_temp_andWait(self, target_temp, timeout_min=30, tolerance=0.5):
-        interval_sec = 10
-        SEC_IN_MIN = 60
+def set_temp_andWait(self, target_temp, timeout_min=30, tolerance=0.5):
+    interval_sec = 10
+    SEC_IN_MIN = 60
 
-        curr_temp = self.get_temp()
+    curr_temp = self.get_temp()
+    self.protocol.comment(
+        f"Setting temperature. Current temp: {curr_temp}\nTarget temp: {target_temp}"
+    )
+
+    self.set_temp(target_temp)
+
+    time_elapsed = 0
+
+    while abs(self.get_temp() - target_temp) > tolerance:
         self.protocol.comment(
-            f"Setting temperature. Current temp: {curr_temp}\nTarget temp: {target_temp}"
-        )
-
-        temp_diff = target_temp - curr_temp
-        temp_lag = self.max_temp_lag * (abs(temp_diff) / 100.0)
-
-        if temp_diff > 0:
-            temp_step = self.heating_rate_deg_per_min * (interval_sec / SEC_IN_MIN)
-            self.protocol.comment(f"Heating rate: {temp_step}")
-        else:
-            temp_step = -self.cooling_rate_deg_per_min * (interval_sec / SEC_IN_MIN)
-            self.protocol.comment(f"Cooling rate: {temp_step}")
-
-        while abs(target_temp - curr_temp) > abs(temp_step):
-            curr_temp += temp_step
-            self.set_temp(curr_temp)
-            self.protocol.comment(f"Ramping the temp to: {curr_temp}")
-            time.sleep(interval_sec)
-            curr_temp = self.get_temp()
-            self.protocol.comment(f"Actual temp: {curr_temp}")
-
-        self.set_temp(target_temp)
-
-        time_elapsed = 0
-
-        while abs(self.get_temp() - target_temp) > tolerance:
-            self.protocol.comment(
-                f"Waiting for temp to reach target: {target_temp}, actual temp: {self.get_temp()}"
-            )
-            if not self.protocol.is_simulating():  # Skip delay during simulation
-                time.sleep(interval_sec)
-            time_elapsed += interval_sec
-            if time_elapsed > timeout_min * SEC_IN_MIN:
-                raise Exception("Temperature timeout")
-
-        self.protocol.comment(
-            f"Target reached, equilibrating for {temp_lag} minutes"
+            f"Waiting for temp to reach target: {target_temp}, actual temp: {self.get_temp()}"
         )
         if not self.protocol.is_simulating():  # Skip delay during simulation
-            time.sleep(temp_lag * SEC_IN_MIN)
-        return target_temp
+            time.sleep(interval_sec)
+        time_elapsed += interval_sec
+        if time_elapsed > timeout_min * SEC_IN_MIN:
+            raise Exception("Temperature timeout")
+
+    return target_temp
 
     def temp_off(self):
         if self.serial_object is None:
@@ -201,6 +178,9 @@ class ColdPlateSlimDriver:
     def deactivate(self):
         self.temp_off()
 
+    def __del__(self):
+        self.temp_off()
+        self.serial_object.close()
 
 class ParLiquid:
     def __init__(self, name, color, well_list, volume):
