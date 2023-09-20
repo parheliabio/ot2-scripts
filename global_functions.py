@@ -144,30 +144,30 @@ class ColdPlateSlimDriver:
     def set_temperature(self, target_temp):
         self.set_temp_andWait(target_temp)
 
-def set_temp_andWait(self, target_temp, timeout_min=30, tolerance=0.5):
-    interval_sec = 10
-    SEC_IN_MIN = 60
+    def set_temp_andWait(self, target_temp, timeout_min=30, tolerance=0.5):
+        interval_sec = 10
+        SEC_IN_MIN = 60
 
-    curr_temp = self.get_temp()
-    self.protocol.comment(
-        f"Setting temperature. Current temp: {curr_temp}\nTarget temp: {target_temp}"
-    )
-
-    self.set_temp(target_temp)
-
-    time_elapsed = 0
-
-    while abs(self.get_temp() - target_temp) > tolerance:
+        curr_temp = self.get_temp()
         self.protocol.comment(
-            f"Waiting for temp to reach target: {target_temp}, actual temp: {self.get_temp()}"
+            f"Setting temperature. Current temp: {curr_temp}\nTarget temp: {target_temp}"
         )
-        if not self.protocol.is_simulating():  # Skip delay during simulation
-            time.sleep(interval_sec)
-        time_elapsed += interval_sec
-        if time_elapsed > timeout_min * SEC_IN_MIN:
-            raise Exception("Temperature timeout")
 
-    return target_temp
+        self.set_temp(target_temp)
+
+        time_elapsed = 0
+
+        while abs(self.get_temp() - target_temp) > tolerance:
+            self.protocol.comment(
+                f"Waiting for temp to reach target: {target_temp}, actual temp: {self.get_temp()}"
+            )
+            if not self.protocol.is_simulating():  # Skip delay during simulation
+                time.sleep(interval_sec)
+            time_elapsed += interval_sec
+            if time_elapsed > timeout_min * SEC_IN_MIN:
+                raise Exception("Temperature timeout")
+
+        return target_temp
 
     def temp_off(self):
         if self.serial_object is None:
