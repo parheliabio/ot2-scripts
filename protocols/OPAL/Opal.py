@@ -577,6 +577,10 @@ type_of_96well_plate = 'parhelia_skirted_96_with_strips'
 primary_times = [90, 90, 90, 90, 90, 90]
 secondary_times = [30, 30, 30, 30, 30, 30]
 retrieval = ['A2', 'A2', 'A2', 'A2', 'A1', 'A1']
+tyramide_times = [30, 30, 30, 30, 30, 30]
+
+### VERAO VAR NAME='Double application of key solutions' TYPE=BOOLEAN
+double_add = False
 
 ### VERAO VAR NAME='Delayed start' TYPE=BOOLEAN
 delayed_start = False
@@ -788,15 +792,19 @@ def run(protocol: protocol_api.ProtocolContext):
 
         protocol.comment("preblocking")
         for i in range(num_samples):
-            washSamples(pipette_300, preblock_wells[i], sample_chambers[i], wash_volume, keep_tip=True)
+            washSamples(pipette_300, preblock_wells[i], sample_chambers[i], ab_volume, keep_tip=True)
         # INCUBATE
         safe_delay(protocol, minutes=preblock_time_minutes,
                    msg="preblocking incubation: " + str(preblock_time_minutes) + " min")
 
         # APPLYING ANTIBODY COCKTAILS TO SAMPLES
         protocol.comment("applying primary antibodies")
+        if double_add:
+            for i in range(num_samples):
+                washSamples(pipette_300, antibody_wells[i], sample_chambers[i], ab_volume)
+            safe_delay(protocol, minutes=1)
         for i in range(num_samples):
-            washSamples(pipette_300, antibody_wells[i], sample_chambers[i], wash_volume)
+            washSamples(pipette_300, antibody_wells[i], sample_chambers[i], ab_volume)
 
         # INCUBATE
         safe_delay(protocol, minutes=primary_times[z],
@@ -817,8 +825,14 @@ def run(protocol: protocol_api.ProtocolContext):
 
         # APPLYING OPAL polymer HRP
         protocol.comment("applying opal secondary")
+
+        if double_add:
+            for i in range(num_samples):
+                washSamples(pipette_300, opal_polymer_wells[i], sample_chambers[i], ab_volume, keep_tip=True)
+            safe_delay(protocol, minutes=1)
         for i in range(num_samples):
             washSamples(pipette_300, opal_polymer_wells[i], sample_chambers[i], ab_volume, keep_tip=True)
+
         pipette_300.drop_tip()
 
         # INCUBATE
@@ -843,8 +857,23 @@ def run(protocol: protocol_api.ProtocolContext):
             dilute_and_apply_fixative(pipette_300, opal_fluorophore_wells[i], ampl_buffer_wells[i], sample_chambers[i],
                                       ab_volume)
 
+        if double_add:
+            for i in range(num_samples):
+                pipette_300.transfer(ab_volume, ampl_buffer_wells[i], opal_fluorophore_wells[i], new_tip='once',
+                                     mix_after=(3, ab_volume))
+        for i in range(num_samples):
+            pipette_300.transfer(ab_volume, ampl_buffer_wells[i], opal_fluorophore_wells[i], new_tip='once',
+                                 mix_after=(3, ab_volume))
+
+        if double_add:
+            for i in range(num_samples):
+                washSamples(pipette_300, opal_fluorophore_wells[i], sample_chambers[i], ab_volume, 1, keep_tip=True)
+            safe_delay(protocol, minutes=1)
+        for i in range(num_samples):
+            washSamples(pipette_300, opal_fluorophore_wells[i], sample_chambers[i], ab_volume, 1, keep_tip=True)
+
         # INCUBATE
-        safe_delay(protocol, minutes=tsa_time_minutes, msg="Opal TSA incubation for " + str(tsa_time_minutes) + " min")
+        safe_delay(protocol, minutes=tyramide_times[z], msg="Opal TSA incubation for " + str(tsa_time_minutes) + " min")
 
         # WASHING SAMPLES WITH TBS
         # three individual repeats below is because they need particular incubation time between them
