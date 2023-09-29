@@ -115,13 +115,6 @@
       <option name="presentableId" value="Default" />
       <updated>1618804622983</updated>
     </task>
-    <task id="LOCAL-00017" summary="1.calibration position A1 is renamed to A0. This allows the first row of samples to start from A1&#10;2. New versions of slide labware tailored to 4.3. software update are introduced. Please download them and replace in the OT2 app (by deleting the existing files and adding new ones – using remove-add dialogue of the app)&#10;3. sample_z_correction_factor is introduced. Use it in case the adjustment to z-position of tip over the sample is needed.">
-      <created>1637808170941</created>
-      <option name="number" value="00017" />
-      <option name="presentableId" value="LOCAL-00017" />
-      <option name="project" value="LOCAL" />
-      <updated>1637808170941</updated>
-    </task>
     <task id="LOCAL-00018" summary="1.calibration position A1 is renamed to A0. This allows the first row of samples to start from A1&#10;2. New versions of slide labware tailored to 4.3. software update are introduced. Please download them and replace in the OT2 app (by deleting the existing files and adding new ones – using remove-add dialogue of the app)&#10;3. sample_z_correction_factor is introduced. Use it in case the adjustment to z-position of tip over the sample is needed.">
       <created>1640840007001</created>
       <option name="number" value="00018" />
@@ -458,7 +451,14 @@
       <option name="project" value="LOCAL" />
       <updated>1694828972102</updated>
     </task>
-    <option name="localTasksCounter" value="66" />
+    <task id="LOCAL-00066" summary="Created H&amp;E protocol and layout">
+      <created>1695935891594</created>
+      <option name="number" value="00066" />
+      <option name="presentableId" value="LOCAL-00066" />
+      <option name="project" value="LOCAL" />
+      <updated>1695935891595</updated>
+    </task>
+    <option name="localTasksCounter" value="67" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
