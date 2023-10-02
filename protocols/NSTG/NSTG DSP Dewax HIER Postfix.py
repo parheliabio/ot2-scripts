@@ -1,5 +1,3 @@
-from global_functions import *
-
 metadata = {
     'protocolName': 'Parhelia Dewax HIER Postfix for NSTG DSP v4',
     'author': 'Parhelia Bio <info@parheliabio.com>',
