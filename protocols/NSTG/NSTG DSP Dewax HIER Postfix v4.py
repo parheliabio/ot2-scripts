@@ -207,7 +207,7 @@ def run(protocol: protocol_api.ProtocolContext):
     cooldown_delay_min = 15
     topoff_every_min = 5
 
-    for i in range(cooldown_delay_min/topoff_every_min):
+    for i in range(int(cooldown_delay_min/topoff_every_min)):
         safe_delay(protocol, minutes=topoff_every_min, msg = "adjusting temp to " + str(target_temp) + ", topping off ER buffer to prevent evap")
         openShutter(protocol, pipette, omnistainer)
         distribute_between_samples(pipette, er_buff_well, sample_chambers, wash_volume/2, 1, keep_tip=True)
