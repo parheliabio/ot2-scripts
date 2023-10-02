@@ -257,21 +257,22 @@ def run(protocol: protocol_api.ProtocolContext):
         protocol.delay(minutes=2.5, msg="MeOH incubation")
 
 
-    overshot = 10
+    # WASHING SAMPLES WITH PBS
+    protocol.comment("PBS wash")
+    washSamples(pipette_300, codex_buffers.PBS, sample_chambers, wash_volume, 2, keep_tip=True)
+`
     if not (temp_mod is None) and cold_MeOH:
-        protocol.comment("warming up after the MeOH step")
-        temp_mod.set_temp(room_temp+ overshot)
+        temp_mod.set_temp(room_temp + overshot)
+        protocol.delay(minutes=3, msg="waiting for temperature equilibration")
+        temp_mod.set_temp(room_temp)
+        protocol.delay(minutes=12, msg="waiting for temperature equilibration")
+
+    #added in v13 to avoid overflowing at cold temp during alcohol-water exchange
+    pipette_300.flow_rate.dispense = default_flow_rate
 
     # WASHING SAMPLES WITH PBS
     protocol.comment("PBS wash")
     washSamples(pipette_300, codex_buffers.PBS, sample_chambers, wash_volume, 2, keep_tip=True)
-
-    if not (temp_mod is None) and cold_MeOH:
-        temp_mod.set_temp(room_temp)
-        protocol.delay(minutes=10, msg="waiting for temperature equilibration")
-
-    #added in v13 to avoid overflowing at cold temp during alcohol-water exchange
-    pipette_300.flow_rate.dispense = default_flow_rate
 
     # PUNCTURING THE FIXATIVE
     protocol.comment("puncturing the fixative")
