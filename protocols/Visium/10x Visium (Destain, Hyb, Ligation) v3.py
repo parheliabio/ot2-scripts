@@ -86,12 +86,18 @@ omnistainer_position = 1
 ### VERAO VAR NAME='labwarePositions.tiprack_300' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE
 tiprack_300_position = 6
 
+### VERAO VAR NAME='labwarePositions.tiprack_300_2' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE
+tiprack_300_position_2 = 9
+
+### VERAO VAR NAME='Test mode (all delays reduced to 30sec)' TYPE=BOOLEAN
+testmode = False
+
 labwarePositions = Object()
 labwarePositions.buffers_plate = buffers_plate_position
 labwarePositions.probes_plate = probes_plate_position
 labwarePositions.omnistainer = omnistainer_position
 labwarePositions.tiprack_300 = tiprack_300_position
-
+labwarePositions.tiprack_300_2 = tiprack_300_position_2
 
 ###########################LABWARE SETUP#################################
 
