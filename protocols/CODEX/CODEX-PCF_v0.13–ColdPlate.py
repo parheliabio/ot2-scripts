@@ -4,6 +4,7 @@
 # Default Ab incubation temp changed to 8C
 # Ab incubation time in hours, not minutes
 # Incubation notification shows hours elapsed and remaining
+# protocol.delay replaced with safe_delay
 
 metadata = {
     'protocolName': 'Parhelia CODEX-PCF v13_ColdPlate',
@@ -164,7 +165,7 @@ def run(protocol: protocol_api.ProtocolContext):
     protocol.comment("first fix")
     washSamples(pipette_300, codex_buffers.Hydration_PFA_1pt6pct, sample_chambers, wash_volume, 1)
     # INCUBATE
-    protocol.delay(minutes=10, msg="first fix incubation")
+    safe_delay(minutes=10, msg="first fix incubation")
 
     # WASHING SAMPLES WITH S2
     protocol.comment("puncture S2")
@@ -187,7 +188,7 @@ def run(protocol: protocol_api.ProtocolContext):
     if 'thermosheath' in omnistainer_type:
         closeShutter(protocol, pipette_300, omnistainer)
 
-    protocol.delay(minutes=15, msg="preblocking incubation")
+    safe_delay(minutes=15, msg="preblocking incubation")
 
     # APPLYING ANTIBODY COCKTAILS TO SAMPLES
 
@@ -211,7 +212,7 @@ def run(protocol: protocol_api.ProtocolContext):
         protocol.pause(msg="The protocol is paused for primary ab incubation")
     else:
         for i in range(ab_incubation_time_hours):
-            protocol.delay(minutes=60, msg="staining incubation, hour #" + str(i+1) + " out of " + str(ab_incubation_time_hours))
+            safe_delay(minutes=60, msg="staining incubation, hour #" + str(i+1) + " out of " + str(ab_incubation_time_hours))
             temp_mod.set_temp(room_temp)
 
     if 'thermosheath' in omnistainer_type:
@@ -221,7 +222,7 @@ def run(protocol: protocol_api.ProtocolContext):
         protocol.comment("washing with Staining buffer #" + str(i))
         washSamples(pipette_300, codex_buffers.Staining, sample_chambers, wash_volume, 2, keep_tip=True)
         # INCUBATE
-        protocol.delay(minutes=5, msg="incubation in Staining Buffer" + str(i))
+        safe_delay(minutes=5, msg="incubation in Staining Buffer" + str(i))
 
     # POST STAINING FIXING SAMPLES WITH PFA
     protocol.comment("puncturing the second fix")
@@ -229,7 +230,7 @@ def run(protocol: protocol_api.ProtocolContext):
     protocol.comment("second fix")
     washSamples(pipette_300, codex_buffers.Storage_PFA_4pct, sample_chambers, wash_volume, 1)
     # INCUBATE
-    protocol.delay(minutes=5, msg="incubation with fixative")
+    safe_delay(minutes=5, msg="incubation with fixative")
 
     # WASHING SAMPLES WITH PBS
     protocol.comment("puncture the PBS wash")
@@ -245,7 +246,7 @@ def run(protocol: protocol_api.ProtocolContext):
     if not (temp_mod is None) and cold_MeOH:
         protocol.comment("cooling down for the MeOH step")
         temp_mod.set_temp(4)
-        protocol.delay(minutes=15, msg="waiting for temperature equilibration")
+        safe_delay(minutes=15, msg="waiting for temperature equilibration")
 
     #added in v13 to avoid overflowing at cold temp during alcohol-water exchange
     pipette_300.flow_rate.dispense = default_flow_rate/3
@@ -254,7 +255,7 @@ def run(protocol: protocol_api.ProtocolContext):
         protocol.comment("applying MeOH")
         washSamples(pipette_300, codex_buffers.MeOH, sample_chambers, wash_volume, 1)
         # INCUBATE
-        protocol.delay(minutes=2.5, msg="MeOH incubation")
+        safe_delay(minutes=2.5, msg="MeOH incubation")
 
 
     # WASHING SAMPLES WITH PBS
@@ -263,9 +264,9 @@ def run(protocol: protocol_api.ProtocolContext):
 `
     if not (temp_mod is None) and cold_MeOH:
         temp_mod.set_temp(room_temp + overshot)
-        protocol.delay(minutes=3, msg="waiting for temperature equilibration")
+        safe_delay(minutes=3, msg="waiting for temperature equilibration")
         temp_mod.set_temp(room_temp)
-        protocol.delay(minutes=12, msg="waiting for temperature equilibration")
+        safe_delay(minutes=12, msg="waiting for temperature equilibration")
 
     #added in v13 to avoid overflowing at cold temp during alcohol-water exchange
     pipette_300.flow_rate.dispense = default_flow_rate
@@ -291,7 +292,7 @@ def run(protocol: protocol_api.ProtocolContext):
     if 'thermosheath' in omnistainer_type:
         closeShutter(protocol, pipette_300, omnistainer, keep_tip=True)
 
-    protocol.delay(minutes=10, msg="Reagent F incubation")
+    safe_delay(minutes=10, msg="Reagent F incubation")
 
     if 'thermosheath' in omnistainer_type:
         openShutter(protocol, pipette_300, omnistainer)
@@ -311,7 +312,7 @@ def run(protocol: protocol_api.ProtocolContext):
         for i in range(3):
             protocol.comment("tissue clearing round" + str(i + 1))
             washSamples(pipette_300, codex_buffers.Stripping_buffer, sample_chambers, wash_volume, 2)
-            protocol.delay(seconds=30)
+            safe_delay(seconds=30)
             washSamples(pipette_300, codex_buffers.Screening_Buffer, sample_chambers, wash_volume, 1)
             washSamples(pipette_300, codex_buffers.CODEX_buffer_1x, sample_chambers, wash_volume, 1)
 
@@ -327,7 +328,7 @@ def run(protocol: protocol_api.ProtocolContext):
             protocol.comment("Applying the rendering solution to the wells")
             washSamples(pipette_300, codex_rendering_wells[i], sample_chambers[i], wash_volume, 1)
         # INCUBATE
-        protocol.delay(minutes=10, msg="rendering hybridization")
+        safe_delay(minutes=10, msg="rendering hybridization")
 
         # WASH SAMPLES IN 1x CODEX buffer
         protocol.comment("Washing with rendering buffer")
