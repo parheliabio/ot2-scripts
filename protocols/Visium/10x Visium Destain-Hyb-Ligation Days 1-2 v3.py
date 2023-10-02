@@ -8,7 +8,6 @@ metadata = {
 
 ####################MODIFIABLE RUN PARAMETERS#########################
 
-
 ### VERAO VAR NAME='Destaining Temperature (C)' TYPE=NUMBER LBOUND=35 UBOUND=50 DECIMAL=FALSE
 destaining_temp = 42
 
