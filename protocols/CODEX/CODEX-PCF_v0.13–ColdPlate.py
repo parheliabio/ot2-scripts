@@ -261,7 +261,9 @@ def run(protocol: protocol_api.ProtocolContext):
     # WASHING SAMPLES WITH PBS
     protocol.comment("PBS wash")
     washSamples(pipette_300, codex_buffers.PBS, sample_chambers, wash_volume, 2, keep_tip=True)
-`
+
+    overshot = 10
+
     if not (temp_mod is None) and cold_MeOH:
         temp_mod.set_temp(room_temp + overshot)
         safe_delay(protocol, minutes=3, msg="waiting for temperature equilibration")
