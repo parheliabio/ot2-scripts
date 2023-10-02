@@ -143,13 +143,13 @@ def run(protocol: protocol_api.ProtocolContext):
     if baking:
         protocol.comment("baking at: " + str(baking_temp))
         temp_mod.set_temp(baking_temp)
-        protocol.delay(minutes=baking_time, msg="Baking")
+        safe_delay(protocol, minutes=baking_time, msg="Baking")
         dewax_equilib_delay -= 20
 
     protocol.comment("adjusting temp to {}C for dewaxing".format(dewax_temp))
     temp_mod.set_temp(dewax_temp)
 
-    protocol.delay(minutes=dewax_equilib_delay, msg = "equilibrating temp for to {}C for dewaxing".format(dewax_temp))
+    safe_delay(protocol, minutes=dewax_equilib_delay, msg = "equilibrating temp for to {}C for dewaxing".format(dewax_temp))
 
     openShutter(protocol, pipette, omnistainer)
 
@@ -164,20 +164,20 @@ def run(protocol: protocol_api.ProtocolContext):
     alc_wash_temp = 50
     temp_mod.set_temp(alc_wash_temp)
 
-    protocol.delay(minutes=10, msg = "equilibrating temp for to {}C for alcohol washes".format(alc_wash_temp))
+    safe_delay(protocol, minutes=10, msg = "equilibrating temp for to {}C for alcohol washes".format(alc_wash_temp))
 
     washSamples(pipette, buffers.EtOH_100, sample_chambers, wash_volume, 2, keep_tip=True)
-    protocol.delay(minutes=1, msg = "incubating in 100% EtOH")
+    safe_delay(protocol, minutes=1, msg = "incubating in 100% EtOH")
     washSamples(pipette, buffers.EtOH_100, sample_chambers, wash_volume, 2, keep_tip=True)
-    protocol.delay(minutes=1, msg = "incubating in 100% EtOH")
+    safe_delay(protocol, minutes=1, msg = "incubating in 100% EtOH")
     washSamples(pipette, buffers.EtOH_95, sample_chambers, wash_volume, 2, keep_tip=True)
-    protocol.delay(minutes=1, msg = "incubating in 95% EtOH")
+    safe_delay(protocol, minutes=1, msg = "incubating in 95% EtOH")
     washSamples(pipette, buffers.PBS, sample_chambers, wash_volume, 2, keep_tip=True)
-    protocol.delay(minutes=1, msg = "incubating in PBS")
+    safe_delay(protocol, minutes=1, msg = "incubating in PBS")
     pipette.drop_tip()
 
     washSamples(pipette, buffers.water, sample_chambers, wash_volume, 2, keep_tip=True)
-    protocol.delay(minutes=1, msg = "Incubating in water")
+    safe_delay(protocol, minutes=1, msg = "Incubating in water")
 
     if 'ER1' in ER_buffer:
         er_buff_well = buffers.ER1
@@ -194,10 +194,10 @@ def run(protocol: protocol_api.ProtocolContext):
     #According to the exp calibration, 20 minutes is enough to reach 99C from 50C (alc wash temp)
     reps = 4
     for i in range (reps):
-        protocol.delay(minutes=5, msg = "heating up to "+str(retrieval_temp)+", topping off ER buffer as we go" + str(i+1) +"/"+ str(reps))
+        safe_delay(protocol, minutes=5, msg = "heating up to "+str(retrieval_temp)+", topping off ER buffer as we go" + str(i+1) +"/"+ str(reps))
         distribute_between_samples(pipette, er_buff_well, sample_chambers, wash_volume/2, 1, keep_tip=True)
 
-    protocol.delay(minutes=retrieval_time, msg = "HIER in progress")
+    safe_delay(protocol, minutes=retrieval_time, msg = "HIER in progress")
 
     pbs_wash_temp = 37
 
@@ -208,14 +208,14 @@ def run(protocol: protocol_api.ProtocolContext):
     topoff_every_min = 5
 
     for i in range(cooldown_delay_min/topoff_every_min):
-        protocol.delay(minutes=topoff_every_min, msg = "adjusting temp to " + str(target_temp) + ", topping off ER buffer to prevent evap")
+        safe_delay(protocol, minutes=topoff_every_min, msg = "adjusting temp to " + str(target_temp) + ", topping off ER buffer to prevent evap")
         openShutter(protocol, pipette, omnistainer)
         distribute_between_samples(pipette, er_buff_well, sample_chambers, wash_volume/2, 1, keep_tip=True)
         closeShutter(protocol, pipette, omnistainer)
 
     temp_mod.set_temp(pbs_wash_temp)
 
-    protocol.delay(minutes=10, msg= "post-HIER equilibration")
+    safe_delay(protocol, minutes=10, msg= "post-HIER equilibration")
 
     protocol.comment("washing in PBS")
 
@@ -223,31 +223,31 @@ def run(protocol: protocol_api.ProtocolContext):
 
     for i in range (2):
         washSamples(pipette, buffers.PBS, sample_chambers, wash_volume, 2, keep_tip=True)
-        protocol.delay(minutes=5, msg = "Incubating in PBS #" + str(i))
+        safe_delay(protocol, minutes=5, msg = "Incubating in PBS #" + str(i))
 
     if not skip_prot_K:
         washSamples(pipette, buffers.prot_K, sample_chambers, wash_volume, 2, keep_tip=True)
-        protocol.delay(minutes=prot_K_time, msg = "Incubating in Proteinase K")
+        safe_delay(protocol, minutes=prot_K_time, msg = "Incubating in Proteinase K")
         washSamples(pipette, buffers.PBS, sample_chambers, wash_volume, 2, keep_tip=True)
 
     target_temp = room_temp-overshot
     delay_seconds = 360
     temp_mod.set_temp(target_temp)
-    protocol.delay(seconds=delay_seconds, msg = "adjusting temp to " + str(target_temp))
+    safe_delay(protocol, seconds=delay_seconds, msg = "adjusting temp to " + str(target_temp))
     temp_mod.set_temp(room_temp)
 
     washSamples(pipette, buffers.PBS, sample_chambers, wash_volume, 2, keep_tip=True)
-    protocol.delay(minutes=5, msg = "Incubating in PBS")
+    safe_delay(protocol, minutes=5, msg = "Incubating in PBS")
 
     if not skip_NBF:
         washSamples(pipette, buffers.NBF, sample_chambers, wash_volume, 2, keep_tip=True)
-        protocol.delay(minutes=5, msg = "Incubating in NBF")
+        safe_delay(protocol, minutes=5, msg = "Incubating in NBF")
 
         washSamples(pipette, buffers.NBF_stop, sample_chambers, wash_volume, 2, keep_tip=True)
-        protocol.delay(minutes=5, msg = "Incubating in NBF_Stop")
+        safe_delay(protocol, minutes=5, msg = "Incubating in NBF_Stop")
 
         washSamples(pipette, buffers.PBS, sample_chambers, wash_volume, 2, keep_tip=True)
-        protocol.delay(minutes=5, msg = "Incubating in PBS")
+        safe_delay(protocol, minutes=5, msg = "Incubating in PBS")
 
     temp_mod.set_temp(4)
     protocol.pause("storing at 4C - hit resume to turn the temp module off")

@@ -160,16 +160,16 @@ def run(protocol: protocol_api.ProtocolContext):
     #adding an overshot
     temp_mod.set_temp(destaining_temp+overshot)
     delay_seconds = 120
-    safe_delay(seconds=120, msg = "adjusting temp to " + str(destaining_temp+10))
+    safe_delay(protocol, seconds=120, msg = "adjusting temp to " + str(destaining_temp+10))
 
     temp_mod.set_temp(destaining_temp)
 
-    safe_delay(minutes=15, msg = "destaining at " + str(destaining_temp))
+    safe_delay(protocol, minutes=15, msg = "destaining at " + str(destaining_temp))
 
     target_temp = room_temp-overshot
     delay_seconds = 420
     temp_mod.set_temp(target_temp)
-    safe_delay(seconds=delay_seconds, msg = "adjusting temp to " + str(target_temp))
+    safe_delay(protocol, seconds=delay_seconds, msg = "adjusting temp to " + str(target_temp))
 
     temp_mod.set_temp(room_temp)
 
@@ -182,11 +182,11 @@ def run(protocol: protocol_api.ProtocolContext):
     target_temp = 99.9
     delay_seconds = 25*60
     temp_mod.set_temp(target_temp)
-    safe_delay(seconds=delay_seconds, msg = "adjusting temp to " + str(target_temp))
+    safe_delay(protocol, seconds=delay_seconds, msg = "adjusting temp to " + str(target_temp))
 
     temp_mod.set_temp(retrieval_temp)
 
-    safe_delay(minutes=retrieval_time, msg = "HIER in progress at " + str(retrieval_temp))
+    safe_delay(protocol, minutes=retrieval_time, msg = "HIER in progress at " + str(retrieval_temp))
 
     target_temp = room_temp-overshot
     temp_mod.set_temp(target_temp)
@@ -198,7 +198,7 @@ def run(protocol: protocol_api.ProtocolContext):
 
     for i in range(int(delay_seconds/time_increment)):
         currTemp = temp_mod.get_temp()
-        safe_delay(seconds=time_increment, msg = "adjusting temp to " + str(target_temp))
+        safe_delay(protocol, seconds=time_increment, msg = "adjusting temp to " + str(target_temp))
         if(prevTemp-currTemp>topoff_every_X_deg):
             openShutter(protocol, pipette, omnistainer)
             distribute_between_samples(pipette, buffers.decrosslinking, sample_chambers, wash_volume, 1, keep_tip=True)
@@ -206,7 +206,7 @@ def run(protocol: protocol_api.ProtocolContext):
             prevTemp = currTemp
     temp_mod.set_temp(room_temp)
 
-    safe_delay(minutes=10, msg = "Equilibrating")
+    safe_delay(protocol, minutes=10, msg = "Equilibrating")
 
     puncture_wells(pipette, wells.prehyb,keep_tip=True)
 
@@ -215,7 +215,7 @@ def run(protocol: protocol_api.ProtocolContext):
     for i in range (num_samples):
         washSamples(pipette, wells.prehyb[i], sample_chambers[i], probe_volume, 1, keep_tip=True)
 
-    safe_delay(minutes=10, msg = "Pre-hyb")
+    safe_delay(protocol, minutes=10, msg = "Pre-hyb")
 
     puncture_wells(pipette, wells.probe_hyb, keep_tip=True)
 
@@ -227,7 +227,7 @@ def run(protocol: protocol_api.ProtocolContext):
     target_temp = hyb_temp+overshot
     delay_seconds = 5*60
     temp_mod.set_temp(target_temp)
-    safe_delay(seconds=delay_seconds, msg = "adjusting temp to "+str(target_temp))
+    safe_delay(protocol, seconds=delay_seconds, msg = "adjusting temp to "+str(target_temp))
     temp_mod.set_temp(hyb_temp)
 
     protocol.pause(msg = "Paused for 16-24h Hybridization. Prepare the ligation mix and wash buffers and place them in the strip tube plate, then press Resume to continue the protocol")
@@ -239,26 +239,26 @@ def run(protocol: protocol_api.ProtocolContext):
         for i in range (num_samples):
             washSamples(pipette, phw[i], sample_chambers[i], wash_volume, 1, keep_tip=True)
         closeShutter(protocol, pipette, omnistainer)
-        safe_delay(minutes=5, msg="post hyb wash at " + str(hyb_temp))
+        safe_delay(protocol, minutes=5, msg="post hyb wash at " + str(hyb_temp))
 
     target_temp = room_temp-overshot
     delay_seconds = 480
     temp_mod.set_temp(target_temp)
-    safe_delay(seconds=delay_seconds, msg = "adjusting temp to " + str(target_temp))
+    safe_delay(protocol, seconds=delay_seconds, msg = "adjusting temp to " + str(target_temp))
     temp_mod.set_temp(room_temp)
 
     openShutter(protocol, pipette, omnistainer)
 
     for i in range (num_samples):
         washSamples(pipette, buffers.SSC, sample_chambers[i], probe_volume, 2, keep_tip=True)
-    safe_delay(minutes=5, msg="post hyb wash at room temp")
+    safe_delay(protocol, minutes=5, msg="post hyb wash at room temp")
 
     closeShutter(protocol, pipette, omnistainer)
 
     target_temp = ligation_temp+overshot
     delay_seconds = 120
     temp_mod.set_temp(target_temp)
-    safe_delay(seconds=delay_seconds, msg = "adjusting temp to " + str(target_temp))
+    safe_delay(protocol, seconds=delay_seconds, msg = "adjusting temp to " + str(target_temp))
     temp_mod.set_temp(ligation_temp)
 
     puncture_wells(pipette, wells.ligation,keep_tip=True)
@@ -267,13 +267,13 @@ def run(protocol: protocol_api.ProtocolContext):
     openShutter(protocol, pipette, omnistainer)
     for i in range (num_samples):
         washSamples(pipette, wells.ligation[i], sample_chambers[i], lig_volume, 1, keep_tip=True)
-    safe_delay(minutes=ligation_time, msg = "ligating at " + str(ligation_temp))
+    safe_delay(protocol, minutes=ligation_time, msg = "ligating at " + str(ligation_temp))
     closeShutter(protocol, pipette, omnistainer)
 
     target_temp = post_ligation_temp+overshot
     delay_seconds = 120
     temp_mod.set_temp(target_temp)
-    safe_delay(seconds=delay_seconds, msg = "adjusting temp to " + str(target_temp))
+    safe_delay(protocol, seconds=delay_seconds, msg = "adjusting temp to " + str(target_temp))
     temp_mod.set_temp(post_ligation_temp)
 
     protocol.comment("Post-Ligation Wash at " + str(post_ligation_temp))
@@ -283,27 +283,27 @@ def run(protocol: protocol_api.ProtocolContext):
         openShutter(protocol, pipette, omnistainer)
         for i in range (num_samples):
             washSamples(pipette, plw[i], sample_chambers[i], probe_volume, 1, keep_tip=True)
-        safe_delay(minutes=5, msg="post ligation wash at " + str(post_ligation_temp))
+        safe_delay(protocol, minutes=5, msg="post ligation wash at " + str(post_ligation_temp))
         closeShutter(protocol, pipette, omnistainer)
 
     target_temp = room_temp-overshot
     delay_seconds = 520
     temp_mod.set_temp(target_temp)
-    safe_delay(seconds=delay_seconds, msg = "adjusting temp to " + str(target_temp))
+    safe_delay(protocol, seconds=delay_seconds, msg = "adjusting temp to " + str(target_temp))
     temp_mod.set_temp(room_temp)
 
     openShutter(protocol, pipette, omnistainer)
     for rep in range(2):
         for i in range (num_samples):
             washSamples(pipette, buffers.SSC, sample_chambers[i], wash_volume, 2, keep_tip=True)
-        safe_delay(minutes=5, msg="SSC wash  at room temp #" + str(rep))
+        safe_delay(protocol, minutes=5, msg="SSC wash  at room temp #" + str(rep))
 
     for i in range (num_samples):
         washSamples(pipette, buffers.Eosin, sample_chambers[i], wash_volume, 1, keep_tip=True)
-        safe_delay(minutes=1, msg="Eosin staining")
+        safe_delay(protocol, minutes=1, msg="Eosin staining")
 
     for rep in range(3):
         for i in range (num_samples):
             washSamples(pipette, buffers.PBS, sample_chambers[i], wash_volume, 2, keep_tip=True)
-        safe_delay(minutes=5, msg="PBS wash #" + str(rep))
+        safe_delay(protocol, minutes=5, msg="PBS wash #" + str(rep))
     temp_mod.temp_off()
