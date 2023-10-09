@@ -1,3 +1,5 @@
+from opentrons import protocol_api.ProtocolContext
+from global_functions import *
 
 metadata = {
     'protocolName': 'Phenoptics/Opal protocol V4',
@@ -35,7 +37,7 @@ delayed_start = False
 preDAPI_pause = True
 
 ### VERAO VAR NAME='Protocol start delay time (minutes)' TYPE=NUMBER LBOUND=30 UBOUND=360 DECIMAL=FALSE
-protocol_delay_minutes = 30
+start_delay_min = 30
 
 ### VERAO VAR NAME='Preblock time (minutes)' TYPE=NUMBER LBOUND=1 UBOUND=90 DECIMAL=FALSE
 preblock_time_minutes = 10
@@ -84,6 +86,8 @@ storage_mode = False
 
 ### VERAO VAR NAME='Storage temperature' TYPE=NUMBER LBOUND=1 UBOUND=95 DECIMAL=FALSE
 storage_temp = 4
+
+
 
 ### VERAO VAR NAME='Deck position: Parhelia Omni-stainer / Thermosheath / ColdPlate' TYPE=NUMBER LBOUND=1 UBOUND=9 DECIMAL=FALSE
 omnistainer_position = 1
