@@ -15,13 +15,18 @@ omnistainer_type = 'omni_stainer_s12_slides_with_thermosheath_on_coldplate'
 ### VERAO VAR NAME='Well plate type' TYPE=CHOICE OPTIONS=['parhelia_skirted_96', 'parhelia_skirted_96_with_strips']
 type_of_96well_plate = 'parhelia_skirted_96_with_strips'
 
+#aspiration for 12 samples
+# aspiration_pause = [False, False, False, True, False, False]
+#aspiration for 8 samples
+# aspiration_pause = [False, False, False, False, True, False]
+#no aspiration 4 samples
+aspiration_pause = [False, False, False, False, False, False]
+double_add = [True, True, True, True, True, True]
 primary_times = [90, 90, 90, 90, 90, 90]
 secondary_times = [30, 30, 30, 30, 30, 30]
 retrieval = ['A2', 'A2', 'A2', 'A2', 'A1', 'A1']
 tyramide_times = [30, 30, 30, 30, 30, 30]
 
-### VERAO VAR NAME='Double application of key solutions' TYPE=BOOLEAN
-double_add = False
 
 ### VERAO VAR NAME='Delayed start' TYPE=BOOLEAN
 delayed_start = False
@@ -234,6 +239,9 @@ def run(protocol: protocol_api.ProtocolContext):
         puncture_wells(pipette_300, preblock_wells[:num_samples], keep_tip=True)
         puncture_wells(pipette_300, antibody_wells[:num_samples])
 
+        if aspiration_pause[z]:
+            protocol.pause(msg="The protocol is paused for aspiration")
+
         protocol.comment("preblocking")
         for i in range(num_samples):
             washSamples(pipette_300, preblock_wells[i], sample_chambers[i], ab_volume, keep_tip=True)
@@ -243,7 +251,7 @@ def run(protocol: protocol_api.ProtocolContext):
 
         # APPLYING ANTIBODY COCKTAILS TO SAMPLES
         protocol.comment("applying primary antibodies")
-        if double_add:
+        if double_add[z]:
             for i in range(num_samples):
                 washSamples(pipette_300, antibody_wells[i], sample_chambers[i], ab_volume)
             safe_delay(protocol, minutes=1)
@@ -270,7 +278,7 @@ def run(protocol: protocol_api.ProtocolContext):
         # APPLYING OPAL polymer HRP
         protocol.comment("applying opal secondary")
 
-        if double_add:
+        if double_add[z]:
             for i in range(num_samples):
                 washSamples(pipette_300, opal_polymer_wells[i], sample_chambers[i], ab_volume, keep_tip=True)
             safe_delay(protocol, minutes=1)
@@ -301,7 +309,7 @@ def run(protocol: protocol_api.ProtocolContext):
             dilute_and_apply_fixative(pipette_300, opal_fluorophore_wells[i], ampl_buffer_wells[i], sample_chambers[i],
                                       ab_volume)
 
-        if double_add:
+        if double_add[z]:
             for i in range(num_samples):
                 pipette_300.transfer(ab_volume, ampl_buffer_wells[i], opal_fluorophore_wells[i], new_tip='once',
                                      mix_after=(3, ab_volume))
@@ -309,7 +317,7 @@ def run(protocol: protocol_api.ProtocolContext):
             pipette_300.transfer(ab_volume, ampl_buffer_wells[i], opal_fluorophore_wells[i], new_tip='once',
                                  mix_after=(3, ab_volume))
 
-        if double_add:
+        if double_add[z]:
             for i in range(num_samples):
                 washSamples(pipette_300, opal_fluorophore_wells[i], sample_chambers[i], ab_volume, 1, keep_tip=True)
             safe_delay(protocol, minutes=1)
@@ -418,9 +426,16 @@ def run(protocol: protocol_api.ProtocolContext):
     puncture_wells(pipette_300, DAPI_wells[:num_samples], keep_tip=True)
     pipette_300.drop_tip()
     # Washing with DAPI
+
     for i in range(num_samples):
-        washSamples(pipette_300, DAPI_wells[i], sample_chambers[i], ab_volume, keep_tip=True)
+        washSamples(pipette_300, DAPI_wells[i], sample_chambers[i], ab_volume, 1, keep_tip=True)
+        safe_delay(protocol, minutes=1)
+    for i in range(num_samples):
+        washSamples(pipette_300, DAPI_wells[i], sample_chambers[i], ab_volume, 1, keep_tip=True)
+
     pipette_300.drop_tip()
+
+
     safe_delay(protocol, minutes=dapi_time, msg="incubation in DAPI")
 
     washSamples(pipette_300, buffers.water, sample_chambers, wash_volume, num_repeats=2)

@@ -5,7 +5,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3f1da4c3-d51e-4a23-9029-cafdead48ca7" name="Default Changelist" comment="Created H&amp;E protocol and layout">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/protocols/OPAL/Opal.py" beforeDir="false" afterPath="$PROJECT_DIR$/protocols/OPAL/Opal.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
