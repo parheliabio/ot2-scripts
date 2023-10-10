@@ -93,10 +93,10 @@ storage_temp = 4
 omnistainer_position = 1
 
 ### VERAO VAR NAME='labwarePositions.retrieval_buffers_plate' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE
-wash_buffers_plate_position = 3
+wash_buffers_plate_position = 5
 
 ### VERAO VAR NAME='labwarePositions.wash_buffers_plate' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE
-retrieval_buffers_plate_position = 5
+retrieval_buffers_plate_position = 4
 
 ### VERAO VAR NAME='labwarePositions.rna_reagents_plate_1 ' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE
 ab_reagents_plate_1_position = 7
@@ -115,6 +115,9 @@ tiprack_300_1_position = 10
 
 ### VERAO VAR NAME='labwarePositions.tiprack_300_2' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE
 tiprack_300_2_position = 11
+
+### VERAO VAR NAME='labwarePositions.tiprack_300_3' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE
+tiprack_300_3_position = 3
 
 ### VERAO VAR NAME='Tiprack starting position' TYPE=NUMBER LBOUND=1 UBOUND=95 DECIMAL=FALSE
 tiprack_300_starting_pos = 1
@@ -143,6 +146,7 @@ labwarePositions.ab_reagents_plate_3 = ab_reagents_plate_3_position
 labwarePositions.ab_reagents_plate_4 = ab_reagents_plate_4_position
 labwarePositions.tiprack_300_1 = tiprack_300_1_position
 labwarePositions.tiprack_300_2 = tiprack_300_2_position
+labwarePositions.tiprack_300_3 = tiprack_300_3_position
 labwarePositions.omnistainer = omnistainer_position
 
 ####################FIXED RUN PARAMETERS#########################
@@ -161,8 +165,10 @@ def run(protocol: protocol_api.ProtocolContext):
                                       'tiprack 200/300ul 1')
     tiprack_2 = protocol.load_labware(tip_type, labwarePositions.tiprack_300_2,
                                       'tiprack 200/300ul 2')
+    tiprack_3 = protocol.load_labware(tip_type, labwarePositions.tiprack_300_3,
+                                      'tiprack 200/300ul 3')
 
-    pipette_300 = protocol.load_instrument(pipette_type, pipette_300_location, tip_racks=[tiprack_1, tiprack_2])
+    pipette_300 = protocol.load_instrument(pipette_type, pipette_300_location, tip_racks=[tiprack_1, tiprack_2, tiprack_3])
     pipette_300.flow_rate.dispense = default_flow_rate
     pipette_300.flow_rate.aspirate = default_flow_rate
     pipette_300.starting_tip = tiprack_1.wells()[tiprack_300_starting_pos - 1]
