@@ -1,5 +1,3 @@
-from opentrons import protocol_api.ProtocolContext
-from global_functions import *
 
 metadata = {
     'protocolName': 'Phenoptics/Opal protocol V4',
