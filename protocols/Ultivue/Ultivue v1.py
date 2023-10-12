@@ -737,18 +737,29 @@ def run(protocol: protocol_api.ProtocolContext):
         temp_mod = ColdPlateSlimDriver(protocol,0)
         temp_mod.set_temp(room_temp)
 
-    apply_and_incubate(protocol, pipette, antibody_diluent_wells, "Antibody Diluent (Block)", sample_chambers,   ab_volume,      num_reps, antibody_diluent_incubation_min                                      )
+    apply_and_incubate(protocol, pipette, antibody_diluent_wells, "Antibody Diluent (Block)",       sample_chambers,   ab_volume,      num_reps, antibody_diluent_incubation_min                                      )
     
     if primary_staining:
-        apply_and_incubate(protocol, pipette, primary_ab_wells,     "1x (Primary) Ab solution",sample_chambers,   ab_volume,     num_reps, primary_ab_incubation                             )
-        apply_and_incubate(protocol, pipette, wash_buffer,          "1x PBS Wash"             ,sample_chambers,   wash_volume,   2,         wash_incubation,         step_repeats = 2                )
+        apply_and_incubate(protocol, pipette, primary_ab_wells,     "1x (Primary) Ab solution",     sample_chambers,   ab_volume,     num_reps, primary_ab_incubation                             )
+        apply_and_incubate(protocol, pipette, wash_buffer,          "1x PBS Wash",                  sample_chambers,   wash_volume,   2,         wash_incubation,         step_repeats = 2                )
     if secondary_staining:
-        apply_and_incubate(protocol, pipette, pre_amp_wells,        "Pre-Amp Mix"             ,sample_chambers,   ab_volume,     num_reps, amp_pretreatment_incubation                       )
-        apply_and_incubate(protocol, pipette, wash_buffer,          "1x PBS Wash"             ,sample_chambers,   wash_volume,   2,         wash_incubation,         step_repeats = 2, puncture=False)
+        apply_and_incubate(protocol, pipette, pre_amp_wells,        "Pre-Amp Mix",                  sample_chambers,   ab_volume,     num_reps, amp_pretreatment_incubation                       )
+        apply_and_incubate(protocol, pipette, wash_buffer,          "1x PBS Wash",                  sample_chambers,   wash_volume,   2,         wash_incubation,         step_repeats = 2, puncture=False)
+
+        if 'thermosheath' in omnistainer_type:
+            closeShutter(protocol, pipette, omnistainer)
         temp_mod.quick_temp(amp_temp)
-        apply_and_incubate(protocol, pipette, amp_wells,            "1x Amp Solution"         ,sample_chambers,   ab_volume,     num_reps, amp_incubation                                  )
+        if 'thermosheath' in omnistainer_type:
+            openShutter(protocol, pipette, omnistainer)
+        apply_and_incubate(protocol, pipette, amp_wells,            "1x Amp Solution",              sample_chambers,   ab_volume,    num_reps,   0)
+        if 'thermosheath' in omnistainer_type:
+            closeShutter(protocol, pipette, omnistainer)
+        protocol.delay(minutes=amp_incubation, msg = "Amplification in progress")
+
+        if 'thermosheath' in omnistainer_type:
+            openShutter(protocol, pipette, omnistainer)
         temp_mod.quick_temp(room_temp)
-        apply_and_incubate(protocol, pipette, wash_buffer,          "1x PBS Wash"             ,sample_chambers,   wash_volume,   2,         wash_incubation,         step_repeats = 2, puncture=False)
+        apply_and_incubate(protocol, pipette, wash_buffer,          "1x PBS Wash",                  sample_chambers,   wash_volume,   2,         wash_incubation,         step_repeats = 2, puncture=False)
 
     if probe_staining:
         apply_and_incubate(protocol, pipette, counterstain_wells,       "1x Nuclear Counterstain",  sample_chambers,   ab_volume,     num_reps, counterstain_incubation )
