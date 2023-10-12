@@ -144,6 +144,23 @@ class ColdPlateSlimDriver:
     def set_temperature(self, target_temp):
         self.set_temp_andWait(target_temp)
 
+
+    def quick_temp(self, temp_target, overshot=10):
+        if temp_target > 60 or temp_target < 0:
+            raise Exception("this function currently only works for temps btw 0C and 60C")
+        start_temp = self.get_temp()
+
+        if temp_target > start_temp:
+            overshot_temp = temp_target + overshot
+        else:
+            overshot_temp = temp_target - overshot
+
+        delay_seconds = abs(temp_target - start_temp) * (60 / 7)
+        self.set_temp(overshot_temp)
+        time.sleep(delay_seconds)
+        self.set_temp(temp_target)
+
+
     def set_temp_andWait(self, target_temp, timeout_min=30, tolerance=0.5):
         interval_sec = 10
         SEC_IN_MIN = 60
@@ -174,6 +191,8 @@ class ColdPlateSlimDriver:
             self.temp = 25
         else:
             self._send_command("tempOff")
+
+
 
     def deactivate(self):
         self.temp_off()

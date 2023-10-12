@@ -224,7 +224,6 @@ def run(protocol: protocol_api.ProtocolContext):
         ampl_buffer_wells = all_reag_rows[z * 5 + 3]
         opal_fluorophore_wells = all_reag_rows[z * 5 + 4]
 
-
         openShutter(protocol, pipette_300, omnistainer, use_tip=True)
 
         # WASHING SAMPLES WITH TBS

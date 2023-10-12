@@ -81,6 +81,9 @@ omnistainer_position = 1
 ### VERAO VAR NAME='labwarePositions.tiprack_300' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE
 tiprack_300_position = 6
 
+### VERAO VAR NAME='Test mode (all delays reduced to 30s)' TYPE=BOOLEAN
+testmode = False
+
 labwarePositions = Object()
 labwarePositions.buffers_plate = buffers_plate_position
 labwarePositions.omnistainer = omnistainer_position
@@ -195,7 +198,9 @@ def run(protocol: protocol_api.ProtocolContext):
     reps = 4
     for i in range (reps):
         safe_delay(protocol, minutes=5, msg = "heating up to "+str(retrieval_temp)+", topping off ER buffer as we go" + str(i+1) +"/"+ str(reps))
+        openShutter(protocol, pipette, omnistainer)
         distribute_between_samples(pipette, er_buff_well, sample_chambers, wash_volume/2, 1, keep_tip=True)
+        closeShutter(protocol, pipette, omnistainer)
 
     safe_delay(protocol, minutes=retrieval_time, msg = "HIER in progress")
 
