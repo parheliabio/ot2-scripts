@@ -38,10 +38,7 @@ class ColdPlateSlimDriver:
     def __init__(
             self,
             protocol_context,
-            my_device_name="/dev/ttyUSB0",
-            max_temp_lag=0,
-            heating_rate_deg_per_min=100,
-            cooling_rate_deg_per_min=100,
+            my_device_name="/dev/ttyUSB0"
     ):
         self.serial_number = "29517"
         self.device_name = my_device_name
@@ -54,9 +51,6 @@ class ColdPlateSlimDriver:
         self.height = 45
 
         self.temp = 0
-        self.max_temp_lag = max_temp_lag
-        self.heating_rate_deg_per_min = heating_rate_deg_per_min
-        self.cooling_rate_deg_per_min = cooling_rate_deg_per_min
         self.protocol = protocol_context
 
         # check context, skip if simulating Linux
@@ -144,7 +138,6 @@ class ColdPlateSlimDriver:
     def set_temperature(self, target_temp):
         self.set_temp_andWait(target_temp)
 
-
     def quick_temp(self, temp_target, overshot=10):
         if temp_target > 60 or temp_target < 0:
             raise Exception("this function currently only works for temps btw 0C and 60C")
@@ -157,9 +150,9 @@ class ColdPlateSlimDriver:
 
         delay_seconds = abs(temp_target - start_temp) * (60 / 7)
         self.set_temp(overshot_temp)
-        time.sleep(delay_seconds)
-        self.set_temp(temp_target)
-
+        if not self.protocol.is_simulating():
+            self.protocol.delay(seconds=delay_seconds, msg ="temperature equilibration delay")
+        self.set_temp_andWait(temp_target)
 
     def set_temp_andWait(self, target_temp, timeout_min=30, tolerance=0.5):
         interval_sec = 10
@@ -180,7 +173,8 @@ class ColdPlateSlimDriver:
             )
             if not self.protocol.is_simulating():  # Skip delay during simulation
                 time.sleep(interval_sec)
-            time_elapsed += interval_sec
+                time_elapsed += interval_sec
+
             if time_elapsed > timeout_min * SEC_IN_MIN:
                 raise Exception("Temperature timeout")
 
@@ -350,7 +344,7 @@ def dilute_and_apply_fixative(
     # Diluting fixative:
     pipette.aspirate(volume, dilutant_buffer_well, rate=well_flow_rate)
     pipette.dispense(volume, sourceSolutionWell, rate=well_flow_rate)
-    for iterator in range(0, 3):
+    for iterator in range(0, 5):
         pipette.aspirate(volume, sourceSolutionWell, rate=well_flow_rate)
         pipette.dispense(volume, sourceSolutionWell, rate=well_flow_rate)
 
@@ -438,7 +432,6 @@ def closeShutter(protocol, pipette, covered_lbwr, keep_tip=False, use_tip=False)
         )
     protocol.home()
 
-
 def apply_and_incubate(
         protocol,
         pipette,
@@ -505,12 +498,11 @@ def apply_and_incubate(
 
 
 def safe_delay(protocol, *args, **kwargs):
+    global testmode
     if testmode:
-        protocol.delay(minutes=0.5)
-        protocol.comment("TEST MODE! delay = 0.5 min")
+        protocol.delay(seconds=5, msg="TEST MODE! delay = 5 sec")
     else:
         protocol.delay(*args, **kwargs)
-
 
 def distribute_between_samples(
         pipette,
@@ -554,6 +546,5 @@ def distribute_between_samples(
 
     if not keep_tip:
         pipette.drop_tip()
-
 
 ### END VERAO GLOBAL
