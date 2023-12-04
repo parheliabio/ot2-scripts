@@ -737,7 +737,7 @@ def run(protocol: protocol_api.ProtocolContext):
         temp_mod = ColdPlateSlimDriver(protocol,0)
         temp_mod.set_temp(room_temp)
 
-    apply_and_incubate(protocol, pipette, antibody_diluent_wells, "Antibody Diluent (Block)",       sample_chambers,   ab_volume,      num_reps, antibody_diluent_incubation_min                                      )
+    apply_and_incubate(protocol, pipette, antibody_diluent_wells,   "Antibody Diluent (Block)",       sample_chambers,   ab_volume,      num_reps, antibody_diluent_incubation_min                                      )
     
     if primary_staining:
         apply_and_incubate(protocol, pipette, primary_ab_wells,     "1x (Primary) Ab solution",     sample_chambers,   ab_volume,     num_reps, primary_ab_incubation                             )
