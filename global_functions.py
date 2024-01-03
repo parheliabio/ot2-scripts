@@ -517,7 +517,7 @@ def distribute_between_samples(
         pipette.pick_up_tip()
 
     for i in num_repeats:
-        pipette.distribute(volume,sourceSolutionWell,samples, new_tip='Never')
+        pipette.distribute(volume, sourceSolutionWell, samples, new_tip='Never')
 
     if not keep_tip:
         pipette.drop_tip()
