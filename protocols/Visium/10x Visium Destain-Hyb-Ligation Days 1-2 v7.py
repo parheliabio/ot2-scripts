@@ -8,6 +8,21 @@ metadata = {
 
 ####################MODIFIABLE RUN PARAMETERS#########################
 
+### VERAO VAR NAME='Number of Samples' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE EXCEL_POSITION='B2'
+num_samples = 1
+
+### VERAO VAR NAME='Probe hyb volume (ul)' TYPE=NUMBER LBOUND=50 UBOUND=350 DECIMAL=FALSE EXCEL_POSITION='B3'
+probe_volume = 200
+
+### VERAO VAR NAME='Sample wash volume (ul)' TYPE=NUMBER LBOUND=50 UBOUND=350 DECIMAL=FALSE EXCEL_POSITION='B4'
+wash_volume = 150
+
+### VERAO VAR NAME='Ligation mix volume (ul)' TYPE=NUMBER LBOUND=50 UBOUND=350 DECIMAL=FALSE EXCEL_POSITION='B5'
+lig_volume = 130
+
+### VERAO VAR NAME='Apply eosin post-staining?' TYPE=BOOLEAN EXCEL_POSITION='B6'
+do_eosin = False
+
 ### VERAO VAR NAME='Destaining Temperature (C)' TYPE=NUMBER LBOUND=35 UBOUND=50 DECIMAL=FALSE
 destaining_temp = 42
 
@@ -35,33 +50,17 @@ post_ligation_temp = 57
 ### VERAO VAR NAME='Room temp (C)' TYPE=NUMBER LBOUND=60 UBOUND=99 DECIMAL=FALSE
 room_temp = 22
 
-### VERAO VAR NAME='Eosin staining?' TYPE=BOOLEAN
-do_eosin = False
-
 ### VERAO VAR NAME='Device type' TYPE=CHOICE OPTIONS=['omni_stainer_s12_slides_with_thermosheath_on_coldplate']
 omnistainer_type = 'omni_stainer_s12_slides_with_thermosheath_on_coldplate'
 
 ### VERAO VAR NAME='Well plate type' TYPE=CHOICE OPTIONS=['parhelia_skirted_96', 'parhelia_skirted_96_with_strips']
 type_of_96well_plate = 'parhelia_skirted_96_with_strips'
 
-### VERAO VAR NAME='Number of Samples' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE
-num_samples = 1
-
-### VERAO VAR NAME='Tiprack starting position' TYPE=NUMBER LBOUND=1 UBOUND=95 DECIMAL=FALSE
 tiprack_300_starting_pos = 1
-
 
 ### VERAO VAR NAME='Sample flow rate' TYPE=NUMBER LBOUND=0.05 UBOUND=1.0 DECIMAL=TRUE INCREMENT=0.05
 sample_flow_rate = 0.2
 
-### VERAO VAR NAME='Probe hyb volume (ul)' TYPE=NUMBER LBOUND=50 UBOUND=350 DECIMAL=FALSE
-probe_volume = 200
-
-### VERAO VAR NAME='Sample wash volume (ul)' TYPE=NUMBER LBOUND=50 UBOUND=350 DECIMAL=FALSE
-wash_volume = 150
-
-### VERAO VAR NAME='Ligation mix volume (ul)' TYPE=NUMBER LBOUND=50 UBOUND=350 DECIMAL=FALSE
-lig_volume = 150
 
 ####################LABWARE LAYOUT ON DECK#########################
 ### VERAO VAR NAME='P300 mounting' TYPE=CHOICE OPTIONS=['right', 'left']
@@ -76,19 +75,16 @@ else:
     pipette_type = 'p300_single'
 
 ### VERAO VAR NAME='labwarePositions.buffers_plate' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE
-buffers_plate_position = 10
+buffers_plate_position = 1
 
 ### VERAO VAR NAME='labwarePositions.buffers_plate' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE
-probes_plate_position = 7
+probes_plate_position = 2
 
 ### VERAO VAR NAME='labwarePositions.omnistainer' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE
-omnistainer_position = 1
+omnistainer_position = 3
 
 ### VERAO VAR NAME='labwarePositions.tiprack_300' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE
-tiprack_300_position = 6
-
-### VERAO VAR NAME='labwarePositions.tiprack_300_2' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE
-tiprack_300_position_2 = 9
+tiprack_300_position = 4
 
 ### VERAO VAR NAME='Test mode (all delays reduced to 30sec)' TYPE=BOOLEAN
 testmode = False
@@ -98,7 +94,6 @@ labwarePositions.buffers_plate = buffers_plate_position
 labwarePositions.probes_plate = probes_plate_position
 labwarePositions.omnistainer = omnistainer_position
 labwarePositions.tiprack_300 = tiprack_300_position
-labwarePositions.tiprack_300_2 = tiprack_300_position_2
 
 ###########################LABWARE SETUP#################################
 
