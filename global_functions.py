@@ -510,39 +510,14 @@ def distribute_between_samples(
         samples,
         volume,
         num_repeats=1,
-        height_offset=0,
-        aspiration_offset=0,
-        dispensing_offset=0,
-        keep_tip=False,
+        keep_tip=False
 ):
-    try:
-        iter(samples)
-    except TypeError:
-        samples = [samples]
-
-    print("Samples are:")
-    print(samples)
 
     if not pipette.has_tip:
         pipette.pick_up_tip()
 
-    aspiration_offset += aspiration_gap
-    dispensing_offset += dispensing_gap
-
-    for i in range(0, num_repeats):
-        pipette.aspirate(
-            volume,
-            sourceSolutionWell.bottom(height_offset + aspiration_offset),
-            rate=well_flow_rate,
-        )
-        for s in samples:
-            print(s)
-            print("Distributing into sample:" + str(s))
-            pipette.dispense(
-                volume / len(samples),
-                s.bottom(height_offset + dispensing_offset),
-                rate=sample_flow_rate,
-            )
+    for i in num_repeats:
+        pipette.distribute(volume,sourceSolutionWell,samples, new_tip='Never')
 
     if not keep_tip:
         pipette.drop_tip()

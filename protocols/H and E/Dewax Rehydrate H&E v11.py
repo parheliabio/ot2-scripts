@@ -8,23 +8,26 @@ metadata = {
 
 ####################MODIFIABLE RUN PARAMETERS#########################
 
-### VERAO VAR NAME='Device type' TYPE=CHOICE OPTIONS=['omni_stainer_s12_slides', 'omni_stainer_c12_cslps']
-omnistainer_type = 'omni_stainer_s12_slides'
+### VERAO VAR NAME='Device type' TYPE=CHOICE OPTIONS=['omni_stainer_s12_slides', 'omni_stainer_s12_slides_with_thermosheath', 'omni_stainer_s12_slides_with_thermosheath_on_coldplate', 'omni_stainer_c12_cslps', 'omni_stainer_c12_cslps_with_thermosheath']
+omnistainer_type = 'omni_stainer_s12_slides_with_thermosheath_on_coldplate'
 
 ### VERAO VAR NAME='Number of Samples' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE
 num_samples = 2
 
 ### VERAO VAR NAME='Do dewaxing' TYPE=BOOLEAN
-do_dewax = False
+do_dewax = True
+
+### VERAO VAR NAME='Dewaxing temp' TYPE=NUMBER LBOUND=60 UBOUND=80 DECIMAL=FALSE
+dewax_temp = 72
+
+### VERAO VAR NAME='Room temp' TYPE=NUMBER LBOUND=15 UBOUND=25 DECIMAL=FALSE
+room_temp = 20
 
 ### VERAO VAR NAME='Do rehydration' TYPE=BOOLEAN
-do_rehydration = False
+do_rehydration = True
 
 ### VERAO VAR NAME='Do clairfying' TYPE=BOOLEAN
 do_clarifying = False
-
-### VERAO VAR NAME='Tiprack starting position' TYPE=NUMBER LBOUND=1 UBOUND=95 DECIMAL=FALSE
-tiprack_300_starting_pos = 1
 
 ### VERAO VAR NAME='Wash buffer volume (uL)' TYPE=NUMBER LBOUND=25 UBOUND=300 DECIMAL=FALSE
 wash_volume = 150
@@ -41,9 +44,11 @@ hx_diff_time = 1
 ### VERAO VAR NAME='Eosin incubation time' TYPE=NUMBER LBOUND=1 UBOUND=5 DECIMAL=FALSE
 eosin_delay = 1.75
 
-### VERAO VAR NAME='post-Eosin differentiation in 95% EtOH time (min, 0=skip)' TYPE=NUMBER LBOUND=0 UBOUND=30 DECIMAL=TRUE
-eos_diff_time = 0
+### VERAO VAR NAME='Dehydrate (end in 100% EtOH)' TYPE=BOOLEAN
+dehydrate = False
 
+### VERAO VAR NAME='post-Eosin differentiation in 99.9% EtOH time (min, 0=skip)' TYPE=NUMBER LBOUND=0 UBOUND=30 DECIMAL=TRUE
+eos_diff_time = 0
 
 ####################LABWARE LAYOUT ON DECK#########################
 
@@ -57,8 +62,8 @@ pipette_300_GEN = 'GEN2'
 tip_type = 'opentrons_96_tiprack_300ul'
 
 labwarePositions = Object()
-labwarePositions.buffers_plate = 3
-labwarePositions.omnistainer = 2
+labwarePositions.buffers_plate = 1
+labwarePositions.omnistainer = 3
 labwarePositions.tiprack_300 = 6
 
 def run(protocol: protocol_api.ProtocolContext):
@@ -71,6 +76,17 @@ def run(protocol: protocol_api.ProtocolContext):
     pipette.flow_rate.aspirate = default_flow_rate * well_flow_rate
 
     omnistainer = protocol.load_labware(omnistainer_type, labwarePositions.omnistainer, 'Omni-stainer')
+
+    if 'thermosheath' in omnistainer_type:
+        if labwarePositions.omnistainer > 9:
+            raise Exception("The temperature module cannot be placed in the last row of the deck because the shutter ear will be unreachable by the pipette due to the gantry travel limits")
+        openShutter(protocol, pipette, omnistainer, keep_tip=True)
+
+    temp_mod = None
+
+    if 'coldplate' in omnistainer_type:
+        temp_mod = ColdPlateSlimDriver(protocol)
+        temp_mod.set_temp(room_temp)
 
     plate = protocol.load_labware('parhelia_12trough', labwarePositions.buffers_plate, 'Buffers plate')
 
@@ -91,12 +107,23 @@ def run(protocol: protocol_api.ProtocolContext):
 
     sample_chambers = getOmnistainerWellsList(omnistainer, num_samples)
 
-    reagent_sequence =  ['Dewax',   '100% EtOH',    '95% EtOH', '70% EtOH',     'Water',    'Hematoxylin',      'Water',            'Clarifying agent', 'Water',    'Blueing reagent',      'Water',        'Eosin',            'Diff (99.9% EtOH)',          '100% EtOH']
-    delay_mins =        [10,        3,              3,          3,              0,          hematox_delay,      hx_diff_time,       1,                      0,              2,                  0,          eosin_delay,        eos_diff_time,                  0]
-    reps =              [2,         2,              2,          2,              2,          2,                  2,                  1,                      2,              1,                  2,          2,                  1,                              4]
-    speeds =            [1,         0.7,            0.7,        0.7,            1,          1,                  1,                  1,                      1,              1,                  1,          0.7,                0.7,                            0.7]
+    reagent_sequence =  ['Dewax',   '100% EtOH',    '95% EtOH', '70% EtOH',     'Water',    'Hematoxylin',      'Water',            'Clarifying agent', 'Water',    'Blueing reagent',      'Water',        'Eosin',            'Diff (99.9% EtOH)', '100% EtOH',  'Water']
+    delay_mins =        [10,        3,              3,          3,              0,          hematox_delay,      hx_diff_time,           1,                  0,              2,                  0,          eosin_delay,        eos_diff_time,       0,                1]
+    reps =              [2,         2,              2,          2,              2,          2,                  2,                      1,                  2,              1,                  2,          2,                  1,                   3,                3]
+    speeds =            [0.3,       0.7,            0.7,        0.7,            1,          1,                  1,                      1,                  1,              1,                  1,          0.7,                0.7,                 0.7,              1]
+
+
+    if dehydrate:
+        reagent_sequence.pop(14)
+    else:
+        for k in [12, 13]:
+            reagent_sequence.pop(k)
+            delay_mins.pop(k)
+            reps.pop(k)
+            speeds.pop(k)
 
     starting_step = 0
+
     #################PROTOCOL####################
     protocol.comment("Starting the " + metadata['protocolName'] + " for samples:" + str(sample_chambers))
 
@@ -132,6 +159,9 @@ def run(protocol: protocol_api.ProtocolContext):
         if (eos_diff_time==0) and ('95% EtOH' in reag_name) and i > 4:
             continue
 
+        if do_dewax and 'Dewax' in reag_name and not (temp_mod is None):
+            temp_mod.quick_temp(dewax_temp)
+
         if not pipette.has_tip: pipette.pick_up_tip()
         reagent = reagent_sequence[i]
         well = reagent_map[reagent]
@@ -143,11 +173,13 @@ def run(protocol: protocol_api.ProtocolContext):
             protocol.comment("Applying reagent "  +  reagent + " from well " + str(well) + " to the sample, repeat "+ str(j+1) + " out of " + str(reps[i]))
             pipette.distribute(wash_volume, well, sample_chambers, new_tip = 'never', disposal_volume=0, blowout=False)
 
+        if do_dewax and 'Dewax' in reag_name and not (temp_mod is None):
+            temp_mod.quick_temp(room_temp)
 
         if pipette.has_tip:
             pipette.drop_tip()
 
-        elapsed  = min(1, int(time.time() - start))
+        elapsed = min(1, int(time.time() - start))
 
         delay_seconds = max(1, (delay_mins[i] * 60) - elapsed)
         protocol.comment("Dispensing took " + str(elapsed) + " sec, incubating for remaining: " + str(delay_seconds) + " out of total " + str(delay_mins[i] * 60) + " sec")

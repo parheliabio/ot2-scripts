@@ -32,9 +32,11 @@ ligation_time = 60
 ### VERAO VAR NAME='Post-Ligation Wash Temperature (C)' TYPE=NUMBER LBOUND=50 UBOUND=70 DECIMAL=FALSE
 post_ligation_temp = 57
 
-
 ### VERAO VAR NAME='Room temp (C)' TYPE=NUMBER LBOUND=60 UBOUND=99 DECIMAL=FALSE
 room_temp = 22
+
+### VERAO VAR NAME='Eosin staining?' TYPE=BOOLEAN
+do_eosin = False
 
 ### VERAO VAR NAME='Device type' TYPE=CHOICE OPTIONS=['omni_stainer_s12_slides_with_thermosheath_on_coldplate']
 omnistainer_type = 'omni_stainer_s12_slides_with_thermosheath_on_coldplate'
@@ -142,7 +144,6 @@ def run(protocol: protocol_api.ProtocolContext):
     wells.post_lig_wash1 = probes_96plate.rows()[5][:num_samples]
     wells.post_lig_wash2 = probes_96plate.rows()[6][:num_samples]
 
-
     sample_chambers = getOmnistainerWellsList(omnistainer, num_samples)
 
     overshot = 10
@@ -159,18 +160,11 @@ def run(protocol: protocol_api.ProtocolContext):
     #adding an overshot
     temp_mod.set_temp(destaining_temp+overshot)
     delay_seconds = 120
-    safe_delay(protocol, seconds=120, msg = "adjusting temp to " + str(destaining_temp+10))
+    safe_delay(protocol, seconds=delay_seconds, msg = "adjusting temp to " + str(destaining_temp+10))
 
     temp_mod.set_temp(destaining_temp)
 
     safe_delay(protocol, minutes=15, msg = "destaining at " + str(destaining_temp))
-
-    target_temp = room_temp-overshot
-    delay_seconds = 420
-    temp_mod.set_temp(target_temp)
-    safe_delay(protocol, seconds=delay_seconds, msg = "adjusting temp to " + str(target_temp))
-
-    temp_mod.set_temp(room_temp)
 
     openShutter(protocol, pipette, omnistainer)
 
@@ -178,14 +172,14 @@ def run(protocol: protocol_api.ProtocolContext):
 
     closeShutter(protocol, pipette, omnistainer)
 
-    target_temp = 99.9
+    target_temp = 98
     delay_seconds = 25*60
     temp_mod.set_temp(target_temp)
     safe_delay(protocol, seconds=delay_seconds, msg = "adjusting temp to " + str(target_temp))
 
     temp_mod.set_temp(retrieval_temp)
 
-    safe_delay(protocol, minutes=retrieval_time, msg = "HIER in progress at " + str(retrieval_temp))
+    safe_delay(protocol, minutes=retrieval_time, msg = "decrosslinking in progress at " + str(retrieval_temp))
 
     target_temp = room_temp-overshot
     temp_mod.set_temp(target_temp)
@@ -200,7 +194,7 @@ def run(protocol: protocol_api.ProtocolContext):
         safe_delay(protocol, seconds=time_increment, msg = "adjusting temp to " + str(target_temp))
         if(prevTemp-currTemp>topoff_every_X_deg):
             openShutter(protocol, pipette, omnistainer)
-            distribute_between_samples(pipette, buffers.decrosslinking, sample_chambers, wash_volume, 1, keep_tip=True)
+            distribute_between_samples(pipette, buffers.decrosslinking, sample_chambers, wash_volume/4, 1, keep_tip=True)
             closeShutter(protocol, pipette, omnistainer)
             prevTemp = currTemp
     temp_mod.set_temp(room_temp)
@@ -218,7 +212,7 @@ def run(protocol: protocol_api.ProtocolContext):
 
     puncture_wells(pipette, wells.probe_hyb, keep_tip=True)
 
-    for i in range (num_samples):
+    for i in range(num_samples):
         washSamples(pipette, wells.probe_hyb[i], sample_chambers[i], probe_volume, 1, keep_tip=True)
 
     closeShutter(protocol, pipette, omnistainer)
@@ -248,8 +242,7 @@ def run(protocol: protocol_api.ProtocolContext):
 
     openShutter(protocol, pipette, omnistainer)
 
-    for i in range (num_samples):
-        washSamples(pipette, buffers.SSC, sample_chambers[i], probe_volume, 2, keep_tip=True)
+    washSamples(pipette, buffers.SSC, sample_chambers, probe_volume, 2, keep_tip=True)
     safe_delay(protocol, minutes=5, msg="post hyb wash at room temp")
 
     closeShutter(protocol, pipette, omnistainer)
@@ -278,7 +271,7 @@ def run(protocol: protocol_api.ProtocolContext):
     protocol.comment("Post-Ligation Wash at " + str(post_ligation_temp))
     puncture_wells(pipette, wells.post_lig_wash1+wells.post_lig_wash2,keep_tip=True)
 
-    for plw in [wells.post_lig_wash1,wells.post_lig_wash2]:
+    for plw in [wells.post_lig_wash1, wells.post_lig_wash2]:
         openShutter(protocol, pipette, omnistainer)
         for i in range (num_samples):
             washSamples(pipette, plw[i], sample_chambers[i], probe_volume, 1, keep_tip=True)
@@ -293,16 +286,16 @@ def run(protocol: protocol_api.ProtocolContext):
 
     openShutter(protocol, pipette, omnistainer)
     for rep in range(2):
-        for i in range (num_samples):
-            washSamples(pipette, buffers.SSC, sample_chambers[i], wash_volume, 2, keep_tip=True)
+        washSamples(pipette, buffers.SSC, sample_chambers, wash_volume, 2, keep_tip=True)
         safe_delay(protocol, minutes=5, msg="SSC wash  at room temp #" + str(rep))
 
-    for i in range (num_samples):
-        washSamples(pipette, buffers.Eosin, sample_chambers[i], wash_volume, 1, keep_tip=True)
+    temp_mod.temp_off()
+
+    if do_eosin:
+        washSamples(pipette, buffers.Eosin, sample_chambers, wash_volume, 1, keep_tip=True)
         safe_delay(protocol, minutes=1, msg="Eosin staining")
 
-    for rep in range(3):
-        for i in range (num_samples):
-            washSamples(pipette, buffers.PBS, sample_chambers[i], wash_volume, 2, keep_tip=True)
-        safe_delay(protocol, minutes=5, msg="PBS wash #" + str(rep))
-    temp_mod.temp_off()
+        for rep in range(3):
+            washSamples(pipette, buffers.SSC, sample_chambers[i], wash_volume, 2, keep_tip=True)
+            safe_delay(protocol, minutes=5, msg="PBS wash #" + str(rep))
+

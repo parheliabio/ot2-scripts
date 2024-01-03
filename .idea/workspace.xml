@@ -4,9 +4,16 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3f1da4c3-d51e-4a23-9029-cafdead48ca7" name="Default Changelist" comment="Created H&amp;E protocol and layout">
+    <list default="true" id="3f1da4c3-d51e-4a23-9029-cafdead48ca7" name="Default Changelist" comment="Panel Mixer">
+      <change beforePath="$PROJECT_DIR$/.idea/.name" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.name" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/protocols/OPAL/Opal.py" beforeDir="false" afterPath="$PROJECT_DIR$/protocols/OPAL/Opal.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/global_functions.py" beforeDir="false" afterPath="$PROJECT_DIR$/global_functions.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/protocols/H and E/Dewax Rehydrate H&amp;E v10.py" beforeDir="false" afterPath="$PROJECT_DIR$/protocols/H and E/Dewax Rehydrate H&amp;E v11.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/protocols/H and E/Hematoxylin and EOsin_v0.01.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/protocols/Panel Mixing/Panel Mixer.py" beforeDir="false" afterPath="$PROJECT_DIR$/protocols/Panel Mixing/Panel Mixer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/protocols/Visium/10x Visium Destain-Hyb-Ligation Days 1-2 v5.py" beforeDir="false" afterPath="$PROJECT_DIR$/protocols/Visium/10x Visium Destain-Hyb-Ligation Days 1-2 v6.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/protocols/Visium/Labware Layout 10x Visium CytAssist prep Day 1 and 2 v5.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/protocols/Visium/Labware Layout 10x Visium CytAssist prep Day 1 and 2 v6.xlsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -58,28 +65,31 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/Users/Yury/PycharmProjects/ot2-scripts/protocols/CODEX&quot;,
-    &quot;run.code.analysis.last.selected.profile&quot;: &quot;aDefault&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "last_opened_file_path": "/Users/nsamusik/IdeaProjects/ot2-scripts/protocols/Ultivue",
+    "project.structure.last.edited": "Project",
+    "project.structure.proportion": "0.0",
+    "project.structure.side.proportion": "0.0",
+    "run.code.analysis.last.selected.profile": "aDefault"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/protocols/Ultivue" />
       <recent name="$PROJECT_DIR$/protocols/CODEX" />
       <recent name="$PROJECT_DIR$/protocols/OPAL" />
       <recent name="$PROJECT_DIR$/protocols/IHC" />
       <recent name="$PROJECT_DIR$/protocols/ACD RNA detection" />
-      <recent name="$PROJECT_DIR$/protocols/testzone" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/protocols/Panel Mixing" />
+      <recent name="$PROJECT_DIR$/protocols/Visium" />
       <recent name="C:\Users\Dana\PycharmProjects\ot2-scripts\protocols\CODEX multicycle" />
       <recent name="$PROJECT_DIR$/protocols/CODEX multicycle" />
       <recent name="$PROJECT_DIR$/protocols/CODEX single stain" />
-      <recent name="$PROJECT_DIR$/labware" />
-      <recent name="$PROJECT_DIR$/protocols/blue dye demo" />
     </key>
   </component>
   <component name="RunManager">
@@ -91,7 +101,6 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="/usr/bin/python3" />
-      <option name="SDK_NAME" value="Python 3.8" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/protocols/IMC" />
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
@@ -114,111 +123,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1618804622983</updated>
-    </task>
-    <task id="LOCAL-00022" summary="1.calibration position A1 is renamed to A0. This allows the first row of samples to start from A1&#10;2. New versions of slide labware tailored to 4.3. software update are introduced. Please download them and replace in the OT2 app (by deleting the existing files and adding new ones – using remove-add dialogue of the app)&#10;3. sample_z_correction_factor is introduced. Use it in case the adjustment to z-position of tip over the sample is needed.">
-      <created>1654638452400</created>
-      <option name="number" value="00022" />
-      <option name="presentableId" value="LOCAL-00022" />
-      <option name="project" value="LOCAL" />
-      <updated>1654638452400</updated>
-    </task>
-    <task id="LOCAL-00023" summary="1.calibration position A1 is renamed to A0. This allows the first row of samples to start from A1&#10;2. New versions of slide labware tailored to 4.3. software update are introduced. Please download them and replace in the OT2 app (by deleting the existing files and adding new ones – using remove-add dialogue of the app)&#10;3. sample_z_correction_factor is introduced. Use it in case the adjustment to z-position of tip over the sample is needed.">
-      <created>1654638824194</created>
-      <option name="number" value="00023" />
-      <option name="presentableId" value="LOCAL-00023" />
-      <option name="project" value="LOCAL" />
-      <updated>1654638824194</updated>
-    </task>
-    <task id="LOCAL-00024" summary="1.calibration position A1 is renamed to A0. This allows the first row of samples to start from A1&#10;2. New versions of slide labware tailored to 4.3. software update are introduced. Please download them and replace in the OT2 app (by deleting the existing files and adding new ones – using remove-add dialogue of the app)&#10;3. sample_z_correction_factor is introduced. Use it in case the adjustment to z-position of tip over the sample is needed.">
-      <created>1660883136848</created>
-      <option name="number" value="00024" />
-      <option name="presentableId" value="LOCAL-00024" />
-      <option name="project" value="LOCAL" />
-      <updated>1660883136848</updated>
-    </task>
-    <task id="LOCAL-00025" summary="1.calibration position A1 is renamed to A0. This allows the first row of samples to start from A1&#10;2. New versions of slide labware tailored to 4.3. software update are introduced. Please download them and replace in the OT2 app (by deleting the existing files and adding new ones – using remove-add dialogue of the app)&#10;3. sample_z_correction_factor is introduced. Use it in case the adjustment to z-position of tip over the sample is needed.">
-      <created>1669183610616</created>
-      <option name="number" value="00025" />
-      <option name="presentableId" value="LOCAL-00025" />
-      <option name="project" value="LOCAL" />
-      <updated>1669183610616</updated>
-    </task>
-    <task id="LOCAL-00026" summary="1.calibration position A1 is renamed to A0. This allows the first row of samples to start from A1&#10;2. New versions of slide labware tailored to 4.3. software update are introduced. Please download them and replace in the OT2 app (by deleting the existing files and adding new ones – using remove-add dialogue of the app)&#10;3. sample_z_correction_factor is introduced. Use it in case the adjustment to z-position of tip over the sample is needed.">
-      <created>1669184229647</created>
-      <option name="number" value="00026" />
-      <option name="presentableId" value="LOCAL-00026" />
-      <option name="project" value="LOCAL" />
-      <updated>1669184229647</updated>
-    </task>
-    <task id="LOCAL-00027" summary="1.calibration position A1 is renamed to A0. This allows the first row of samples to start from A1&#10;2. New versions of slide labware tailored to 4.3. software update are introduced. Please download them and replace in the OT2 app (by deleting the existing files and adding new ones – using remove-add dialogue of the app)&#10;3. sample_z_correction_factor is introduced. Use it in case the adjustment to z-position of tip over the sample is needed.">
-      <created>1671515102080</created>
-      <option name="number" value="00027" />
-      <option name="presentableId" value="LOCAL-00027" />
-      <option name="project" value="LOCAL" />
-      <updated>1671515102080</updated>
-    </task>
-    <task id="LOCAL-00028" summary="1.calibration position A1 is renamed to A0. This allows the first row of samples to start from A1&#10;2. New versions of slide labware tailored to 4.3. software update are introduced. Please download them and replace in the OT2 app (by deleting the existing files and adding new ones – using remove-add dialogue of the app)&#10;3. sample_z_correction_factor is introduced. Use it in case the adjustment to z-position of tip over the sample is needed.">
-      <created>1671585954976</created>
-      <option name="number" value="00028" />
-      <option name="presentableId" value="LOCAL-00028" />
-      <option name="project" value="LOCAL" />
-      <updated>1671585954976</updated>
-    </task>
-    <task id="LOCAL-00029" summary="1.calibration position A1 is renamed to A0. This allows the first row of samples to start from A1&#10;2. New versions of slide labware tailored to 4.3. software update are introduced. Please download them and replace in the OT2 app (by deleting the existing files and adding new ones – using remove-add dialogue of the app)&#10;3. sample_z_correction_factor is introduced. Use it in case the adjustment to z-position of tip over the sample is needed.">
-      <created>1671593618413</created>
-      <option name="number" value="00029" />
-      <option name="presentableId" value="LOCAL-00029" />
-      <option name="project" value="LOCAL" />
-      <updated>1671593618413</updated>
-    </task>
-    <task id="LOCAL-00030" summary="allowed to keep tip in dilute and apply">
-      <created>1672033220336</created>
-      <option name="number" value="00030" />
-      <option name="presentableId" value="LOCAL-00030" />
-      <option name="project" value="LOCAL" />
-      <updated>1672033220336</updated>
-    </task>
-    <task id="LOCAL-00031" summary="IHC protocol switched for stainworks and layout updated">
-      <created>1672204062615</created>
-      <option name="number" value="00031" />
-      <option name="presentableId" value="LOCAL-00031" />
-      <option name="project" value="LOCAL" />
-      <updated>1672204062615</updated>
-    </task>
-    <task id="LOCAL-00032" summary="Created H&amp;E protocol and layout">
-      <created>1672287998572</created>
-      <option name="number" value="00032" />
-      <option name="presentableId" value="LOCAL-00032" />
-      <option name="project" value="LOCAL" />
-      <updated>1672287998572</updated>
-    </task>
-    <task id="LOCAL-00033" summary="Created H&amp;E protocol and layout">
-      <created>1672355923962</created>
-      <option name="number" value="00033" />
-      <option name="presentableId" value="LOCAL-00033" />
-      <option name="project" value="LOCAL" />
-      <updated>1672355923962</updated>
-    </task>
-    <task id="LOCAL-00034" summary="Created H&amp;E protocol and layout">
-      <created>1672357031993</created>
-      <option name="number" value="00034" />
-      <option name="presentableId" value="LOCAL-00034" />
-      <option name="project" value="LOCAL" />
-      <updated>1672357031993</updated>
-    </task>
-    <task id="LOCAL-00035" summary="Created H&amp;E protocol and layout">
-      <created>1672358699317</created>
-      <option name="number" value="00035" />
-      <option name="presentableId" value="LOCAL-00035" />
-      <option name="project" value="LOCAL" />
-      <updated>1672358699317</updated>
-    </task>
-    <task id="LOCAL-00036" summary="Created H&amp;E protocol and layout">
-      <created>1672376172495</created>
-      <option name="number" value="00036" />
-      <option name="presentableId" value="LOCAL-00036" />
-      <option name="project" value="LOCAL" />
-      <updated>1672376172495</updated>
     </task>
     <task id="LOCAL-00037" summary="Created H&amp;E protocol and layout">
       <created>1683876995426</created>
@@ -444,21 +348,126 @@
       <option name="project" value="LOCAL" />
       <updated>1695949482287</updated>
     </task>
-    <task id="LOCAL-00069" summary="Created H&amp;E protocol and layout">
-      <created>1696869886708</created>
+    <task id="LOCAL-00069" summary="Added NSTG DSP Dewax v4&#10;Addeed 10x Visium v3&#10;CODEX-PCF ColdPlate  12.1-&gt;13">
+      <created>1696256708494</created>
       <option name="number" value="00069" />
       <option name="presentableId" value="LOCAL-00069" />
       <option name="project" value="LOCAL" />
-      <updated>1696869886709</updated>
+      <updated>1696256708494</updated>
     </task>
-    <task id="LOCAL-00070" summary="Created H&amp;E protocol and layout">
-      <created>1696960184689</created>
+    <task id="LOCAL-00070" summary="Added NSTG DSP Dewax v4&#10;Addeed 10x Visium v3&#10;CODEX-PCF ColdPlate  12.1-&gt;13">
+      <created>1696257279561</created>
       <option name="number" value="00070" />
       <option name="presentableId" value="LOCAL-00070" />
       <option name="project" value="LOCAL" />
-      <updated>1696960184689</updated>
+      <updated>1696257279561</updated>
     </task>
-    <option name="localTasksCounter" value="71" />
+    <task id="LOCAL-00071" summary="Added NSTG DSP Dewax v4&#10;Addeed 10x Visium v3&#10;CODEX-PCF ColdPlate  12.1-&gt;13">
+      <created>1696257567587</created>
+      <option name="number" value="00071" />
+      <option name="presentableId" value="LOCAL-00071" />
+      <option name="project" value="LOCAL" />
+      <updated>1696257567587</updated>
+    </task>
+    <task id="LOCAL-00072" summary="Added NSTG DSP Dewax v4&#10;Addeed 10x Visium v3&#10;CODEX-PCF ColdPlate  12.1-&gt;13">
+      <created>1696257913637</created>
+      <option name="number" value="00072" />
+      <option name="presentableId" value="LOCAL-00072" />
+      <option name="project" value="LOCAL" />
+      <updated>1696257913637</updated>
+    </task>
+    <task id="LOCAL-00073" summary="Added NSTG DSP Dewax v4&#10;Addeed 10x Visium v3&#10;CODEX-PCF ColdPlate  12.1-&gt;13">
+      <created>1696258096701</created>
+      <option name="number" value="00073" />
+      <option name="presentableId" value="LOCAL-00073" />
+      <option name="project" value="LOCAL" />
+      <updated>1696258096701</updated>
+    </task>
+    <task id="LOCAL-00074" summary="Added NSTG DSP Dewax v4&#10;Addeed 10x Visium v4&#10;CODEX-PCF ColdPlate  12.1-&gt;13">
+      <created>1696258847990</created>
+      <option name="number" value="00074" />
+      <option name="presentableId" value="LOCAL-00074" />
+      <option name="project" value="LOCAL" />
+      <updated>1696258847990</updated>
+    </task>
+    <task id="LOCAL-00075" summary="Added NSTG DSP Dewax v4&#10;Addeed 10x Visium v4&#10;CODEX-PCF ColdPlate  12.1-&gt;13">
+      <created>1696259146313</created>
+      <option name="number" value="00075" />
+      <option name="presentableId" value="LOCAL-00075" />
+      <option name="project" value="LOCAL" />
+      <updated>1696259146313</updated>
+    </task>
+    <task id="LOCAL-00076" summary="Added NSTG DSP Dewax v4&#10;Addeed 10x Visium v3&#10;CODEX-PCF ColdPlate  12.1-&gt;13">
+      <created>1696259448295</created>
+      <option name="number" value="00076" />
+      <option name="presentableId" value="LOCAL-00076" />
+      <option name="project" value="LOCAL" />
+      <updated>1696259448295</updated>
+    </task>
+    <task id="LOCAL-00077" summary="Added NSTG DSP Dewax v4&#10;Addeed 10x Visium v3&#10;CODEX-PCF ColdPlate  12.1-&gt;13">
+      <created>1696260088244</created>
+      <option name="number" value="00077" />
+      <option name="presentableId" value="LOCAL-00077" />
+      <option name="project" value="LOCAL" />
+      <updated>1696260088244</updated>
+    </task>
+    <task id="LOCAL-00078" summary="Added NSTG DSP Dewax v4&#10;Addeed 10x Visium v3&#10;CODEX-PCF ColdPlate  12.1-&gt;13">
+      <created>1696260453958</created>
+      <option name="number" value="00078" />
+      <option name="presentableId" value="LOCAL-00078" />
+      <option name="project" value="LOCAL" />
+      <updated>1696260453958</updated>
+    </task>
+    <task id="LOCAL-00079" summary="Added Ultivue v1&#10;Added quick_temp to global_functions.py">
+      <created>1697151031627</created>
+      <option name="number" value="00079" />
+      <option name="presentableId" value="LOCAL-00079" />
+      <option name="project" value="LOCAL" />
+      <updated>1697151031627</updated>
+    </task>
+    <task id="LOCAL-00080" summary="Added Ultivue v1&#10;Added quick_temp to global_functions.py">
+      <created>1697151828415</created>
+      <option name="number" value="00080" />
+      <option name="presentableId" value="LOCAL-00080" />
+      <option name="project" value="LOCAL" />
+      <updated>1697151828415</updated>
+    </task>
+    <task id="LOCAL-00081" summary="*changed dilute_and_apply mixing to 5x&#10;*improved safe_delay&#10;*updated quick_temp to use protocol.delay and skip delay during incubation, and use&#10;set_temp_and_Wait at the end">
+      <created>1701684996312</created>
+      <option name="number" value="00081" />
+      <option name="presentableId" value="LOCAL-00081" />
+      <option name="project" value="LOCAL" />
+      <updated>1701684996313</updated>
+    </task>
+    <task id="LOCAL-00082" summary="CODEX v12.5 includes improved mixing, washing and incubation times harmonized with Akoya's protocol. &#10;All other versions have been deleted because having them defeats the purpose of havihg Git bversion control&#10;Added EXCEL_POSITION references to num_samples, screening_mode, ab_volume in order to auto-bind them to the labware layout">
+      <created>1701685328817</created>
+      <option name="number" value="00082" />
+      <option name="presentableId" value="LOCAL-00082" />
+      <option name="project" value="LOCAL" />
+      <updated>1701685328817</updated>
+    </task>
+    <task id="LOCAL-00083" summary="Visium updated to v5, corrected room temp VERAO LBOUND value&#10;Added labware layout">
+      <created>1702372086933</created>
+      <option name="number" value="00083" />
+      <option name="presentableId" value="LOCAL-00083" />
+      <option name="project" value="LOCAL" />
+      <updated>1702372086933</updated>
+    </task>
+    <task id="LOCAL-00084" summary="Panel Mixer">
+      <created>1702414434162</created>
+      <option name="number" value="00084" />
+      <option name="presentableId" value="LOCAL-00084" />
+      <option name="project" value="LOCAL" />
+      <updated>1702414434162</updated>
+    </task>
+    <task id="LOCAL-00085" summary="Panel Mixer">
+      <created>1702414531241</created>
+      <option name="number" value="00085" />
+      <option name="presentableId" value="LOCAL-00085" />
+      <option name="project" value="LOCAL" />
+      <updated>1702414531241</updated>
+    </task>
+    <option name="localTasksCounter" value="86" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -483,6 +492,14 @@
     <MESSAGE value="allowed to keep tip in dilute and apply" />
     <MESSAGE value="IHC protocol switched for stainworks and layout updated" />
     <MESSAGE value="Created H&amp;E protocol and layout" />
-    <option name="LAST_COMMIT_MESSAGE" value="Created H&amp;E protocol and layout" />
+    <MESSAGE value="Added NSTG DSP Dewax v4&#10;Addeed 10x Visium v4&#10;CODEX-PCF ColdPlate  12.1-&gt;13" />
+    <MESSAGE value="Added NSTG DSP Dewax v4&#10;Addeed 10x Visium v3&#10;CODEX-PCF ColdPlate  12.1-&gt;13" />
+    <MESSAGE value="Added Ultivue v1&#10;Added quick_temp to global_functions.py" />
+    <MESSAGE value="*changed dilute_and_apply mixing to 5x&#10;*improved safe_delay&#10;*updated quick_temp to use protocol.delay and skip delay during incubation, and use&#10;set_temp_and_Wait at the end" />
+    <MESSAGE value="CODEX v12.5 includes improved mixing, washing and incubation times harmonized with Akoya's protocol. &#10;All other versions have been deleted because having them defeats the purpose of havihg Git bversion control" />
+    <MESSAGE value="CODEX v12.5 includes improved mixing, washing and incubation times harmonized with Akoya's protocol. &#10;All other versions have been deleted because having them defeats the purpose of havihg Git bversion control&#10;Added EXCEL_POSITION references to num_samples, screening_mode, ab_volume in order to auto-bind them to the labware layout" />
+    <MESSAGE value="Visium updated to v5, corrected room temp VERAO LBOUND value&#10;Added labware layout" />
+    <MESSAGE value="Panel Mixer" />
+    <option name="LAST_COMMIT_MESSAGE" value="Panel Mixer" />
   </component>
 </project>
