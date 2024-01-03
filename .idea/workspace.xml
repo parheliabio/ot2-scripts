@@ -4,16 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3f1da4c3-d51e-4a23-9029-cafdead48ca7" name="Default Changelist" comment="Panel Mixer">
-      <change beforePath="$PROJECT_DIR$/.idea/.name" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.name" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="3f1da4c3-d51e-4a23-9029-cafdead48ca7" name="Default Changelist" comment="10x Visium v5-&gt;v6&#10;Dewax Rehydrate H&amp;E v10-&gt;v11">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/global_functions.py" beforeDir="false" afterPath="$PROJECT_DIR$/global_functions.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/protocols/H and E/Dewax Rehydrate H&amp;E v10.py" beforeDir="false" afterPath="$PROJECT_DIR$/protocols/H and E/Dewax Rehydrate H&amp;E v11.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/protocols/H and E/Hematoxylin and EOsin_v0.01.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/protocols/Panel Mixing/Panel Mixer.py" beforeDir="false" afterPath="$PROJECT_DIR$/protocols/Panel Mixing/Panel Mixer.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/protocols/Visium/10x Visium Destain-Hyb-Ligation Days 1-2 v5.py" beforeDir="false" afterPath="$PROJECT_DIR$/protocols/Visium/10x Visium Destain-Hyb-Ligation Days 1-2 v6.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/protocols/Visium/Labware Layout 10x Visium CytAssist prep Day 1 and 2 v5.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/protocols/Visium/Labware Layout 10x Visium CytAssist prep Day 1 and 2 v6.xlsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -123,13 +115,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1618804622983</updated>
-    </task>
-    <task id="LOCAL-00037" summary="Created H&amp;E protocol and layout">
-      <created>1683876995426</created>
-      <option name="number" value="00037" />
-      <option name="presentableId" value="LOCAL-00037" />
-      <option name="project" value="LOCAL" />
-      <updated>1683876995426</updated>
     </task>
     <task id="LOCAL-00038" summary="Created H&amp;E protocol and layout">
       <created>1683877015872</created>
@@ -467,7 +452,14 @@
       <option name="project" value="LOCAL" />
       <updated>1702414531241</updated>
     </task>
-    <option name="localTasksCounter" value="86" />
+    <task id="LOCAL-00086" summary="10x Visium v5-&gt;v6&#10;Dewax Rehydrate H&amp;E v10-&gt;v11">
+      <created>1704277882140</created>
+      <option name="number" value="00086" />
+      <option name="presentableId" value="LOCAL-00086" />
+      <option name="project" value="LOCAL" />
+      <updated>1704277882141</updated>
+    </task>
+    <option name="localTasksCounter" value="87" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -500,6 +492,7 @@
     <MESSAGE value="CODEX v12.5 includes improved mixing, washing and incubation times harmonized with Akoya's protocol. &#10;All other versions have been deleted because having them defeats the purpose of havihg Git bversion control&#10;Added EXCEL_POSITION references to num_samples, screening_mode, ab_volume in order to auto-bind them to the labware layout" />
     <MESSAGE value="Visium updated to v5, corrected room temp VERAO LBOUND value&#10;Added labware layout" />
     <MESSAGE value="Panel Mixer" />
-    <option name="LAST_COMMIT_MESSAGE" value="Panel Mixer" />
+    <MESSAGE value="10x Visium v5-&gt;v6&#10;Dewax Rehydrate H&amp;E v10-&gt;v11" />
+    <option name="LAST_COMMIT_MESSAGE" value="10x Visium v5-&gt;v6&#10;Dewax Rehydrate H&amp;E v10-&gt;v11" />
   </component>
 </project>
