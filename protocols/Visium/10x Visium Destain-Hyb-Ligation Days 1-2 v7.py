@@ -151,7 +151,7 @@ def run(protocol: protocol_api.ProtocolContext):
 
     #################PROTOCOL####################
 
-    puncture_wells(pipette, vars(buffers).values())
+    puncture_wells(pipette, vars(buffers).values()[0:2])
 
     openShutter(protocol, pipette, omnistainer)
     washSamples(pipette, buffers.destain, sample_chambers, wash_volume, 2, keep_tip=True)
@@ -239,6 +239,8 @@ def run(protocol: protocol_api.ProtocolContext):
     temp_mod.set_temp(target_temp)
     safe_delay(protocol, seconds=delay_seconds, msg = "adjusting temp to " + str(target_temp))
     temp_mod.set_temp(room_temp)
+
+    puncture_wells(pipette, vars(buffers).values()[2:])
 
     openShutter(protocol, pipette, omnistainer)
 
