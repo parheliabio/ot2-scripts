@@ -1,6 +1,6 @@
 ### END VERAO GLOBAL
 metadata = {
-    'protocolName': 'Parhelia H&E staining v10',
+    'protocolName': 'Parhelia H&E staining v11',
     'author': 'Parhelia Bio <info@parheliabio.com>',
     'description': 'Parhelia Universal Dewaxing, Rehydration & H&E protocol for slides (incl. 10x Visium) and coverslips',
     'apiLevel': '2.14'
@@ -8,13 +8,13 @@ metadata = {
 
 ####################MODIFIABLE RUN PARAMETERS#########################
 
-### VERAO VAR NAME='Device type' TYPE=CHOICE OPTIONS=['omni_stainer_s12_slides', 'omni_stainer_s12_slides_with_thermosheath', 'omni_stainer_s12_slides_with_thermosheath_on_coldplate', 'omni_stainer_c12_cslps', 'omni_stainer_c12_cslps_with_thermosheath']
+### VERAO VAR NAME='Device type' TYPE=CHOICE OPTIONS=['omni_stainer_s12_slides', 'omni_stainer_s12_slides_with_thermosheath_on_coldplate', 'omni_stainer_c12_cslps']
 omnistainer_type = 'omni_stainer_s12_slides_with_thermosheath_on_coldplate'
 
-### VERAO VAR NAME='Number of Samples' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE
+### VERAO VAR NAME='Number of Samples' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE EXCEL_POSITION='D3'
 num_samples = 2
 
-### VERAO VAR NAME='Do dewaxing' TYPE=BOOLEAN
+### VERAO VAR NAME='Do dewaxing' TYPE=BOOLEAN EXCEL_POSITION='D4'
 do_dewax = True
 
 ### VERAO VAR NAME='Dewaxing temp' TYPE=NUMBER LBOUND=60 UBOUND=80 DECIMAL=FALSE
@@ -23,13 +23,13 @@ dewax_temp = 72
 ### VERAO VAR NAME='Room temp' TYPE=NUMBER LBOUND=15 UBOUND=25 DECIMAL=FALSE
 room_temp = 20
 
-### VERAO VAR NAME='Do rehydration' TYPE=BOOLEAN
+### VERAO VAR NAME='Do rehydration' TYPE=BOOLEAN EXCEL_POSITION='D5'
 do_rehydration = True
 
-### VERAO VAR NAME='Do clairfying' TYPE=BOOLEAN
+### VERAO VAR NAME='Do clairfying' TYPE=BOOLEAN EXCEL_POSITION='D6'
 do_clarifying = False
 
-### VERAO VAR NAME='Wash buffer volume (uL)' TYPE=NUMBER LBOUND=25 UBOUND=300 DECIMAL=FALSE
+### VERAO VAR NAME='Wash buffer volume (uL)' TYPE=NUMBER LBOUND=25 UBOUND=300 DECIMAL=FALSE EXCEL_POSITION='D7'
 wash_volume = 150
 
 ### VERAO VAR NAME='Sample flow rate: set to 0.2 for slides, 0.07 for cslps' TYPE=NUMBER LBOUND=0.01 UBOUND=1 DECIMAL=TRUE INCREMENT=0.01
@@ -71,7 +71,6 @@ def run(protocol: protocol_api.ProtocolContext):
     tiprack_300 = protocol.load_labware(tip_type, labwarePositions.tiprack_300, 'tiprack 300ul')
 
     pipette = protocol.load_instrument('p300_single_gen2' if pipette_300_GEN == 'GEN2' else 'p300_single', pipette_300_location, tip_racks = [tiprack_300])
-    pipette.starting_tip = tiprack_300.wells()[tiprack_300_starting_pos-1]
     pipette.flow_rate.dispense = default_flow_rate * sample_flow_rate
     pipette.flow_rate.aspirate = default_flow_rate * well_flow_rate
 
@@ -87,6 +86,9 @@ def run(protocol: protocol_api.ProtocolContext):
     if 'coldplate' in omnistainer_type:
         temp_mod = ColdPlateSlimDriver(protocol)
         temp_mod.set_temp(room_temp)
+    else:
+        if do_dewax:
+            raise Exception("Unable to do dewaxing without the temperature module. Switch off the 'do dewax' variable in StainWorks.
 
     plate = protocol.load_labware('parhelia_12trough', labwarePositions.buffers_plate, 'Buffers plate')
 
@@ -116,7 +118,7 @@ def run(protocol: protocol_api.ProtocolContext):
     if dehydrate:
         reagent_sequence.pop(14)
     else:
-        for k in [12, 13]:
+        for k in [13, 12]:
             reagent_sequence.pop(k)
             delay_mins.pop(k)
             reps.pop(k)
