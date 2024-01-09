@@ -1,15 +1,14 @@
-
 metadata = {
-    'protocolName': '10x Visium CytAssist prep, Day 1 and 2, v3',
+    'protocolName': '10x Visium CytAssist prep Days 1-2 v9',
     'author': 'Parhelia Bio <info@parheliabio.com>',
-    'description': 'Parhelia protocol for 10x Visium CytAssist prep, Day 1 and 2',
+    'description': 'Parhelia protocol for 10x Visium CytAssist prep, Day 1 and 2, v9',
     'apiLevel': '2.14'
 }
 
 ####################MODIFIABLE RUN PARAMETERS#########################
 
 ### VERAO VAR NAME='Number of Samples' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE EXCEL_POSITION='B2'
-num_samples = 1
+num_samples = 2
 
 ### VERAO VAR NAME='Probe hyb volume (ul)' TYPE=NUMBER LBOUND=50 UBOUND=350 DECIMAL=FALSE EXCEL_POSITION='B3'
 probe_volume = 200
@@ -47,20 +46,19 @@ ligation_time = 60
 ### VERAO VAR NAME='Post-Ligation Wash Temperature (C)' TYPE=NUMBER LBOUND=50 UBOUND=70 DECIMAL=FALSE
 post_ligation_temp = 57
 
-### VERAO VAR NAME='Room temp (C)' TYPE=NUMBER LBOUND=60 UBOUND=99 DECIMAL=FALSE
+### VERAO VAR NAME='Room temp (C)' TYPE=NUMBER LBOUND=15 UBOUND=25 DECIMAL=FALSE
 room_temp = 22
 
 ### VERAO VAR NAME='Device type' TYPE=CHOICE OPTIONS=['omni_stainer_s12_slides_with_thermosheath_on_coldplate']
 omnistainer_type = 'omni_stainer_s12_slides_with_thermosheath_on_coldplate'
 
-### VERAO VAR NAME='Well plate type' TYPE=CHOICE OPTIONS=['parhelia_skirted_96', 'parhelia_skirted_96_with_strips']
-type_of_96well_plate = 'parhelia_skirted_96_with_strips'
+### VERAO VAR NAME='Well plate type' TYPE=CHOICE OPTIONS=['parhelia_skirted_96', 'parhelia_skirted_96_with_strips', 'parhelia_96_skirted_gilead']
+type_of_96well_plate = ''
 
 tiprack_300_starting_pos = 1
 
 ### VERAO VAR NAME='Sample flow rate' TYPE=NUMBER LBOUND=0.05 UBOUND=1.0 DECIMAL=TRUE INCREMENT=0.05
 sample_flow_rate = 0.2
-
 
 ####################LABWARE LAYOUT ON DECK#########################
 ### VERAO VAR NAME='P300 mounting' TYPE=CHOICE OPTIONS=['right', 'left']
@@ -75,25 +73,25 @@ else:
     pipette_type = 'p300_single'
 
 ### VERAO VAR NAME='labwarePositions.buffers_plate' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE
-buffers_plate_position = 1
+buffers_plate_position = 4
 
-### VERAO VAR NAME='labwarePositions.buffers_plate' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE
-probes_plate_position = 2
+### VERAO VAR NAME='labwarePositions.reagents_plate' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE
+probes_plate_position = 1
 
 ### VERAO VAR NAME='labwarePositions.omnistainer' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE
 omnistainer_position = 3
 
 ### VERAO VAR NAME='labwarePositions.tiprack_300' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE
-tiprack_300_position = 4
+tiprack_300_position = 9
 
-### VERAO VAR NAME='Test mode (all delays reduced to 30sec)' TYPE=BOOLEAN
+### VERAO VAR NAME='Test mode (all delays reduced to 5sec)' TYPE=BOOLEAN
 testmode = False
 
 labwarePositions = Object()
 labwarePositions.buffers_plate = buffers_plate_position
-labwarePositions.probes_plate = probes_plate_position
-labwarePositions.omnistainer = omnistainer_position
-labwarePositions.tiprack_300 = tiprack_300_position
+labwarePositions.probes_plate  = probes_plate_position
+labwarePositions.omnistainer   = omnistainer_position
+labwarePositions.tiprack_300   = tiprack_300_position
 
 ###########################LABWARE SETUP#################################
 
@@ -135,18 +133,19 @@ def run(protocol: protocol_api.ProtocolContext):
     wells.probe_hyb      = probes_96plate.rows()[1][:num_samples]
     wells.post_hyb_wash1 = probes_96plate.rows()[2][:num_samples]
     wells.post_hyb_wash2 = probes_96plate.rows()[3][:num_samples]
-    wells.ligation       = probes_96plate.rows()[4][:num_samples]
-    wells.post_lig_wash1 = probes_96plate.rows()[5][:num_samples]
-    wells.post_lig_wash2 = probes_96plate.rows()[6][:num_samples]
+    wells.post_hyb_wash3 = probes_96plate.rows()[4][:num_samples]
+    wells.ligation       = probes_96plate.rows()[5][:num_samples]
+    wells.post_lig_wash1 = probes_96plate.rows()[6][:num_samples]
+    wells.post_lig_wash2 = probes_96plate.rows()[7][:num_samples]
 
     sample_chambers = getOmnistainerWellsList(omnistainer, num_samples)
 
     overshot = 10
-    time_increment = 10
+    time_increment = 60
 
     #################PROTOCOL####################
 
-    puncture_wells(pipette, vars(buffers).values()[0:2])
+    puncture_wells(pipette, list(vars(buffers).values())[0:2])
 
     openShutter(protocol, pipette, omnistainer)
     washSamples(pipette, buffers.destain, sample_chambers, wash_volume, 2, keep_tip=True)
@@ -176,37 +175,36 @@ def run(protocol: protocol_api.ProtocolContext):
 
     safe_delay(protocol, minutes=retrieval_time, msg = "decrosslinking in progress at " + str(retrieval_temp))
 
+    protocol.comment("cooling off to room temp:" + str(room_temp))
     target_temp = room_temp-overshot
     temp_mod.set_temp(target_temp)
-    topoff_every_X_deg = 10
 
-    delay_seconds = 20*60
-    prevTemp = temp_mod.get_temp()
-    temp_mod.set_temp(target_temp)
+    steps = 7
+    step_len = 3
 
-    for i in range(int(delay_seconds/time_increment)):
-        currTemp = temp_mod.get_temp()
-        safe_delay(protocol, seconds=time_increment, msg = "adjusting temp to " + str(target_temp))
-        if(prevTemp-currTemp>topoff_every_X_deg):
-            openShutter(protocol, pipette, omnistainer)
-            distribute_between_samples(pipette, buffers.decrosslinking, sample_chambers, wash_volume/4, 1, keep_tip=True)
-            closeShutter(protocol, pipette, omnistainer)
-            prevTemp = currTemp
+    for i in range(steps):
+        safe_delay(protocol, seconds=step_len*60, msg = "topping off DCL to prevent evaporation during cooloff")
+        openShutter(protocol, pipette, omnistainer)
+        distribute_between_samples(pipette, buffers.decrosslinking, sample_chambers, wash_volume/4, 1)
+        closeShutter(protocol, pipette, omnistainer)
     temp_mod.set_temp(room_temp)
 
-    safe_delay(protocol, minutes=10, msg = "Equilibrating")
+    safe_delay(protocol, minutes=10, msg = "Equilibrating to room temp: ")
 
-    puncture_wells(pipette, wells.prehyb,keep_tip=True)
-
+    protocol.comment("Puncturing prehyb")
+    puncture_wells(pipette, wells.prehyb, keep_tip=True)
     openShutter(protocol, pipette, omnistainer)
 
+    protocol.comment("Applying prehyb")
     for i in range (num_samples):
         washSamples(pipette, wells.prehyb[i], sample_chambers[i], probe_volume, 1, keep_tip=True)
 
     safe_delay(protocol, minutes=10, msg = "Pre-hyb")
 
-    puncture_wells(pipette, wells.probe_hyb, keep_tip=True)
+    protocol.comment("Puncturing hyb")
+    puncture_wells(pipette, wells.probe_hyb)
 
+    protocol.comment("Applying hyb")
     for i in range(num_samples):
         washSamples(pipette, wells.probe_hyb[i], sample_chambers[i], probe_volume, 1, keep_tip=True)
 
@@ -220,9 +218,11 @@ def run(protocol: protocol_api.ProtocolContext):
 
     protocol.pause(msg = "Paused for 16-24h Hybridization. Prepare the ligation mix and wash buffers and place them in the strip tube plate, then press Resume to continue the protocol")
 
-    puncture_wells(pipette, wells.post_hyb_wash1+wells.post_hyb_wash2,keep_tip=True)
+    protocol.comment("Puncturing post-hyb wash")
+    puncture_wells(pipette, wells.post_hyb_wash1+wells.post_hyb_wash2+wells.post_hyb_wash3,keep_tip=True)
 
-    for phw in [wells.post_hyb_wash1,wells.post_hyb_wash1,wells.post_hyb_wash2]:
+    protocol.comment("Applying post-hyb wash")
+    for phw in [wells.post_hyb_wash1,wells.post_hyb_wash2,wells.post_hyb_wash3]:
         openShutter(protocol, pipette, omnistainer)
         for i in range (num_samples):
             washSamples(pipette, phw[i], sample_chambers[i], wash_volume, 1, keep_tip=True)
@@ -235,14 +235,17 @@ def run(protocol: protocol_api.ProtocolContext):
     safe_delay(protocol, seconds=delay_seconds, msg = "adjusting temp to " + str(target_temp))
     temp_mod.set_temp(room_temp)
 
-    puncture_wells(pipette, vars(buffers).values()[2:])
+    protocol.comment("Puncturing day2 buffers")
+    puncture_wells(pipette, list(vars(buffers).values())[2:])
 
     openShutter(protocol, pipette, omnistainer)
 
+    protocol.comment("Washing samples with SSC")
     washSamples(pipette, buffers.SSC, sample_chambers, probe_volume, 2, keep_tip=True)
+    closeShutter(protocol, pipette, omnistainer)
     safe_delay(protocol, minutes=5, msg="post hyb wash at room temp")
 
-    closeShutter(protocol, pipette, omnistainer)
+
 
     target_temp = ligation_temp+overshot
     delay_seconds = 120
@@ -250,14 +253,19 @@ def run(protocol: protocol_api.ProtocolContext):
     safe_delay(protocol, seconds=delay_seconds, msg = "adjusting temp to " + str(target_temp))
     temp_mod.set_temp(ligation_temp)
 
+    protocol.comment("Puncturing ligation mix")
     puncture_wells(pipette, wells.ligation,keep_tip=True)
 
     protocol.comment("Applying the ligation mix")
     openShutter(protocol, pipette, omnistainer)
+    pipette.flow_rate.aspirate = default_flow_rate/3
+
     for i in range (num_samples):
         washSamples(pipette, wells.ligation[i], sample_chambers[i], lig_volume, 1, keep_tip=True)
-    safe_delay(protocol, minutes=ligation_time, msg = "ligating at " + str(ligation_temp))
+
+    pipette.flow_rate.aspirate = default_flow_rate
     closeShutter(protocol, pipette, omnistainer)
+    safe_delay(protocol, minutes=ligation_time, msg = "ligating at " + str(ligation_temp))
 
     target_temp = post_ligation_temp+overshot
     delay_seconds = 120
@@ -265,15 +273,16 @@ def run(protocol: protocol_api.ProtocolContext):
     safe_delay(protocol, seconds=delay_seconds, msg = "adjusting temp to " + str(target_temp))
     temp_mod.set_temp(post_ligation_temp)
 
-    protocol.comment("Post-Ligation Wash at " + str(post_ligation_temp))
+    protocol.comment("Puncturing post-ligation wash")
     puncture_wells(pipette, wells.post_lig_wash1+wells.post_lig_wash2,keep_tip=True)
 
+    protocol.comment("Applying Post-Ligation Wash")
     for plw in [wells.post_lig_wash1, wells.post_lig_wash2]:
         openShutter(protocol, pipette, omnistainer)
         for i in range (num_samples):
             washSamples(pipette, plw[i], sample_chambers[i], probe_volume, 1, keep_tip=True)
-        safe_delay(protocol, minutes=5, msg="post ligation wash at " + str(post_ligation_temp))
         closeShutter(protocol, pipette, omnistainer)
+        safe_delay(protocol, minutes=5, msg="post ligation wash at " + str(post_ligation_temp))
 
     target_temp = room_temp-overshot
     delay_seconds = 520
@@ -282,6 +291,7 @@ def run(protocol: protocol_api.ProtocolContext):
     temp_mod.set_temp(room_temp)
 
     openShutter(protocol, pipette, omnistainer)
+    protocol.comment("Applying SSC")
     for rep in range(2):
         washSamples(pipette, buffers.SSC, sample_chambers, wash_volume, 2, keep_tip=True)
         safe_delay(protocol, minutes=5, msg="SSC wash  at room temp #" + str(rep))
@@ -295,4 +305,3 @@ def run(protocol: protocol_api.ProtocolContext):
         for rep in range(3):
             washSamples(pipette, buffers.SSC, sample_chambers[i], wash_volume, 2, keep_tip=True)
             safe_delay(protocol, minutes=5, msg="PBS wash #" + str(rep))
-
