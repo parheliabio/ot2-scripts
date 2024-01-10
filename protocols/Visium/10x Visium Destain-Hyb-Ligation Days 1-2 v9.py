@@ -52,8 +52,8 @@ room_temp = 22
 ### VERAO VAR NAME='Device type' TYPE=CHOICE OPTIONS=['omni_stainer_s12_slides_with_thermosheath_on_coldplate']
 omnistainer_type = 'omni_stainer_s12_slides_with_thermosheath_on_coldplate'
 
-### VERAO VAR NAME='Well plate type' TYPE=CHOICE OPTIONS=['parhelia_skirted_96', 'parhelia_skirted_96_with_strips', 'parhelia_96_skirted_gilead']
-type_of_96well_plate = ''
+### VERAO VAR NAME='Well plate type' TYPE=CHOICE OPTIONS=['parhelia_skirted_96', 'parhelia_skirted_96_with_strips']
+type_of_96well_plate = 'parhelia_skirted_96'
 
 tiprack_300_starting_pos = 1
 
@@ -111,7 +111,6 @@ def run(protocol: protocol_api.ProtocolContext):
     pipette = protocol.load_instrument(pipette_type, pipette_location, tip_racks=[tiprack_300])
     pipette.flow_rate.dispense = default_flow_rate
     pipette.flow_rate.aspirate = default_flow_rate
-    pipette.starting_tip = tiprack_300.wells()[tiprack_300_starting_pos - 1]
 
     trough12 = protocol.load_labware('parhelia_12trough', labwarePositions.buffers_plate, '12-trough buffers reservoir')
 
