@@ -313,7 +313,7 @@ def washSamples(
                 sourceWell.bottom(height_offset + aspiration_offset),
                 rate=well_flow_rate,
             )
-            for k in range (2):
+            for k in range(2):
                 pipette.move_to(sourceWell.bottom(k+1))
                 time.sleep(0.33)
             pipette.dispense(
