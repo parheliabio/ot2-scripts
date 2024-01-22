@@ -20,6 +20,9 @@ do_dewax = True
 ### VERAO VAR NAME='Dewaxing temp' TYPE=NUMBER LBOUND=60 UBOUND=80 DECIMAL=FALSE
 dewax_temp = 72
 
+### VERAO VAR NAME='Alcohol wash temp' TYPE=NUMBER LBOUND=20 UBOUND=60 DECIMAL=FALSE
+alc_temp = 72
+
 ### VERAO VAR NAME='Room temp' TYPE=NUMBER LBOUND=15 UBOUND=25 DECIMAL=FALSE
 room_temp = 20
 
@@ -85,7 +88,9 @@ def run(protocol: protocol_api.ProtocolContext):
 
     if 'coldplate' in omnistainer_type:
         temp_mod = ColdPlateSlimDriver(protocol)
-        temp_mod.set_temp(room_temp)
+
+    if do_dewax and temp_mod is None:
+        raise Exception("Dewaxing cannot be performed without a temperature module.")
 
     plate = protocol.load_labware('parhelia_12trough', labwarePositions.buffers_plate, 'Buffers plate')
 
@@ -110,6 +115,7 @@ def run(protocol: protocol_api.ProtocolContext):
     delay_mins =        [10,        3,              3,          3,              0,          hematox_delay,      hx_diff_time,           1,                  0,              2,                  0,          eosin_delay,        eos_diff_time,       0,                1]
     reps =              [2,         2,              2,          2,              2,          2,                  2,                      1,                  2,              1,                  2,          2,                  1,                   3,                3]
     speeds =            [0.3,       0.7,            0.7,        0.7,            1,          1,                  1,                      1,                  1,              1,                  1,          0.7,                0.7,                 0.7,              1]
+    temps =            [dewax_temp, alc_temp,       alc_temp,   alc_temp,       room_temp,  room_temp,         room_temp,               room_temp,         room_temp,      room_temp,           room_temp, room_temp,           room_temp,           room_temp,         room_temp]
 
 
     if dehydrate:
@@ -158,8 +164,8 @@ def run(protocol: protocol_api.ProtocolContext):
         if (eos_diff_time==0) and ('95% EtOH' in reag_name) and i > 4:
             continue
 
-        if do_dewax and 'Dewax' in reag_name and not (temp_mod is None):
-            temp_mod.quick_temp(dewax_temp)
+        if do_dewax and not (temp_mod is None) and (i==0 or temps[i-1]!=temps[i]):
+            temp_mod.quick_temp(temps[i])
 
         if not pipette.has_tip: pipette.pick_up_tip()
         reagent = reagent_sequence[i]
@@ -171,9 +177,6 @@ def run(protocol: protocol_api.ProtocolContext):
         for j in range(reps[i]):
             protocol.comment("Applying reagent "  +  reagent + " from well " + str(well) + " to the sample, repeat "+ str(j+1) + " out of " + str(reps[i]))
             pipette.distribute(wash_volume, well, sample_chambers, new_tip = 'never', disposal_volume=0, blowout=False)
-
-        if do_dewax and 'Dewax' in reag_name and not (temp_mod is None):
-            temp_mod.quick_temp(room_temp)
 
         if pipette.has_tip:
             pipette.drop_tip()
