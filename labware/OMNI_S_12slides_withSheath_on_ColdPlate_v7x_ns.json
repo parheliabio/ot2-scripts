@@ -1,6 +1,6 @@
 {"ordering":[["A1","A2","A3","A4","A5"],["B1","B2","B3","B4"],["C1","C2","C3","C4"], ["D1","D2","D3"]],
 	"brand":{"brand":"Parhelia","brandId":["Omni-Stainer S12 on Parhelia Thermal Module OT-2 v7.x"]},
-	"metadata":{"displayName":"Omni-Stainer S12 (for slides) on Thermal Module OT-2 v7.x_7.2","displayCategory":"wellPlate","displayVolumeUnits":"µL","tags":[]},
+	"metadata":{"displayName":"Omni-Stainer S12 (for slides) on Thermal Module OT-2 v7.x_ns","displayCategory":"wellPlate","displayVolumeUnits":"µL","tags":[]},
 	"dimensions":{"xDimension":127.71,"yDimension":85.43,"zDimension": 141},
 	"wells":{"A1":{"depth":0,"totalLiquidVolume":300,"shape":"circular","diameter":10,"x":10,"y":74.43,"z":141},
 	"A2":{"depth":31,"totalLiquidVolume":300,"shape":"circular","diameter":10,"x":41.7,"y":69.5,"z": 110},
