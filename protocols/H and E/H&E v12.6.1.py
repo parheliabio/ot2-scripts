@@ -5,7 +5,7 @@ from opentrons import protocol_api
 ### END VERAO GLOBAL
 
 metadata = {
-    'protocolName': 'Parhelia H&E v12.6.1',
+    'protocolName': 'Parhelia H&E v12.6.1.1',
     'author': 'Parhelia Bio <info@parheliabio.com>',
     'description': 'H&E protocol (no dewax) for slides (incl. 10x Visium) and coverslips',
     'apiLevel': '2.14'
