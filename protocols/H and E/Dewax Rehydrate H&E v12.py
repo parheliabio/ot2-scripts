@@ -1,5 +1,6 @@
 ## VERAO GLOBAL
 from global_functions import *
+from opentrons import protocol_api
 ### END VERAO GLOBAL
 
 metadata = {

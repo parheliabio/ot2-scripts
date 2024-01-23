@@ -1,9 +1,11 @@
 ## VERAO GLOBAL
 from global_functions import *
+from opentrons import protocol_api
+
 ### END VERAO GLOBAL
 
 metadata = {
-    'protocolName': 'Parhelia H&E v12',
+    'protocolName': 'Parhelia H&E v12.6.1',
     'author': 'Parhelia Bio <info@parheliabio.com>',
     'description': 'H&E protocol (no dewax) for slides (incl. 10x Visium) and coverslips',
     'apiLevel': '2.14'
@@ -36,7 +38,7 @@ wash_volume = 150
 ### VERAO VAR NAME='Sample flow rate: set to 0.2 for slides, 0.07 for cslps' TYPE=NUMBER LBOUND=0.01 UBOUND=1 DECIMAL=TRUE INCREMENT=0.01
 sample_flow_rate = 0.4
 
-### VERAO VAR NAME='Hematoxylin incubation time' TYPE=NUMBER LBOUND=1 UBOUND=5 DECIMAL=FALSE
+### VERAO VAR NAME='Hematoxylin incubation time' TYPE=NUMBER LBOUND=1 UBOUND=5 DECIMAL=TRUE
 hematox_delay = 2.5
 
 ### VERAO VAR NAME='post-Hematoxylin differentiation in water time (min)' TYPE=NUMBER LBOUND=0 UBOUND=5 DECIMAL=TRUE
@@ -50,6 +52,9 @@ dehydrate = False
 
 ### VERAO VAR NAME='post-Eosin differentiation in 99.9% EtOH time (min, 0=skip)' TYPE=NUMBER LBOUND=0 UBOUND=30 DECIMAL=TRUE
 eos_diff_time = 0
+
+### VERAO VAR NAME='ttyUSB_ temp_mod number (usually is 0)' TYPE=NUMBER LBOUND=0 UBOUND=10 DECIMAL=FALSE
+temp_mod_number = 1
 
 ####################LABWARE LAYOUT ON DECK#########################
 
@@ -87,18 +92,18 @@ def run(protocol: protocol_api.ProtocolContext):
 
     omnistainer = protocol.load_labware(omnistainer_type, labwarePositions.omnistainer, 'Omni-stainer')
 
-    if 'thermosheath' in omnistainer_type:
-        if labwarePositions.omnistainer > 9:
-            raise Exception("The temperature module cannot be placed in the last row of the deck because the shutter ear will be unreachable by the pipette due to the gantry travel limits")
-        openShutter(protocol, pipette, omnistainer, keep_tip=True)
-
     temp_mod = None
     plate = protocol.load_labware('parhelia_12trough', labwarePositions.buffers_plate, 'Buffers plate')
 
     wells = plate.wells_by_name()
 
     if 'coldplate' in omnistainer_type:
-        temp_mod = ColdPlateSlimDriver(protocol)
+        temp_mod = ColdPlateSlimDriver(protocol, temp_mode_number=temp_mod_number)
+
+    if 'thermosheath' in omnistainer_type:
+        if labwarePositions.omnistainer > 9:
+            raise Exception("The temperature module cannot be placed in the last row of the deck because the shutter ear will be unreachable by the pipette due to the gantry travel limits")
+        openShutter(protocol, pipette, omnistainer, keep_tip=True)
 
     if do_dewax and temp_mod is None:
         raise Exception("Dewaxing cannot be performed without a temperature module.")
@@ -196,4 +201,4 @@ def run(protocol: protocol_api.ProtocolContext):
         if delay_seconds > 1:
             protocol.delay(seconds=delay_seconds)
 
-
+        protocol.home()
