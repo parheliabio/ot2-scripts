@@ -5,7 +5,7 @@ from opentrons import protocol_api
 ### END VERAO GLOBAL
 
 metadata = {
-    'protocolName': 'Parhelia H&E v12.6.1.1',
+    'protocolName': 'Parhelia H&E v12.6.1.0',
     'author': 'Parhelia Bio <info@parheliabio.com>',
     'description': 'H&E protocol (no dewax) for slides (incl. 10x Visium) and coverslips',
     'apiLevel': '2.14'
@@ -14,7 +14,7 @@ metadata = {
 ####################MODIFIABLE RUN PARAMETERS#########################
 
 ### VERAO VAR NAME='Device type' TYPE=CHOICE OPTIONS=['omni_stainer_s12_slides', 'omni_stainer_s12_slides_with_thermosheath', 'omni_stainer_s12_slides_with_thermosheath_on_coldplate', 'omni_stainer_c12_cslps', 'omni_stainer_c12_cslps_with_thermosheath']
-omnistainer_type = 'omni_stainer_s12_slides_with_thermosheath_on_coldplate'
+omnistainer_type = 'omni_stainer_s12_slides'
 
 ### VERAO VAR NAME='Number of Samples' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE EXCEL_POSITION='D2'
 num_samples = 4
