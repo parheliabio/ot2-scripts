@@ -1,6 +1,9 @@
+## VERAO GLOBAL
+from global_functions import *
+### END VERAO GLOBAL
 
 metadata = {
-    'protocolName': 'Parhelia Dewax Regydrate H&E v11',
+    'protocolName': 'Parhelia Dewax Rehydrate H&E v12',
     'author': 'Parhelia Bio <info@parheliabio.com>',
     'description': 'Parhelia Universal Dewaxing, Rehydration & H&E protocol for slides (incl. 10x Visium) and coverslips',
     'apiLevel': '2.14'
@@ -9,7 +12,7 @@ metadata = {
 ####################MODIFIABLE RUN PARAMETERS#########################
 
 ### VERAO VAR NAME='Device type' TYPE=CHOICE OPTIONS=['omni_stainer_s12_slides', 'omni_stainer_s12_slides_with_thermosheath', 'omni_stainer_s12_slides_with_thermosheath_on_coldplate', 'omni_stainer_c12_cslps', 'omni_stainer_c12_cslps_with_thermosheath']
-omnistainer_type = 'omni_stainer_s12_slides'
+omnistainer_type = 'omni_stainer_s12_slides_with_thermosheath_on_coldplate'
 
 ### VERAO VAR NAME='Number of Samples' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE EXCEL_POSITION='D2'
 num_samples = 4
@@ -17,14 +20,14 @@ num_samples = 4
 ### VERAO VAR NAME='Do dewaxing' TYPE=BOOLEAN EXCEL_POSITION='D3'
 do_dewax = True
 
-### VERAO VAR NAME='Dewaxing temp' TYPE=NUMBER LBOUND=60 UBOUND=80 DECIMAL=FALSE
+### VERAO VAR NAME='Dewaxing temp (C)' TYPE=NUMBER LBOUND=60 UBOUND=80 DECIMAL=FALSE
 dewax_temp = 72
 
-### VERAO VAR NAME='Alcohol wash temp' TYPE=NUMBER LBOUND=20 UBOUND=60 DECIMAL=FALSE
-alc_temp = 72
+### VERAO VAR NAME='Alcohol wash temp (C)' TYPE=NUMBER LBOUND=20 UBOUND=60 DECIMAL=FALSE
+alc_temp = 50
 
-### VERAO VAR NAME='Room temp' TYPE=NUMBER LBOUND=15 UBOUND=25 DECIMAL=FALSE
-room_temp = 20
+### VERAO VAR NAME='Room temp (C)' TYPE=NUMBER LBOUND=10 UBOUND=45 DECIMAL=TRUE
+room_temp = 25.0
 
 ### VERAO VAR NAME='Do rehydration' TYPE=BOOLEAN EXCEL_POSITION='D4'
 do_rehydration = True
@@ -64,10 +67,20 @@ pipette_300_GEN = 'GEN2'
 ### VERAO VAR NAME='Tip type' TYPE=CHOICE OPTIONS=['opentrons_96_tiprack_300ul','opentrons_96_filtertiprack_200ul']
 tip_type = 'opentrons_96_tiprack_300ul'
 
+### VERAO VAR NAME='DECK POSITION: Reagent/Buffers plate' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE
+HE_buffers_plate_position = 3
+
+### VERAO VAR NAME='DECK POSITION: Staining Module' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE
+omnistainer_position = 1
+
+### VERAO VAR NAME='DECK POSITION: Tip rack' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE
+tiprack_position = 6
+
 labwarePositions = Object()
-labwarePositions.buffers_plate = 1
-labwarePositions.omnistainer = 3
-labwarePositions.tiprack_300 = 6
+labwarePositions.buffers_plate = HE_buffers_plate_position
+labwarePositions.omnistainer = omnistainer_position
+labwarePositions.tiprack_300 = tiprack_position
+
 
 def run(protocol: protocol_api.ProtocolContext):
     ###########################LABWARE SETUP#################################
@@ -85,6 +98,9 @@ def run(protocol: protocol_api.ProtocolContext):
         openShutter(protocol, pipette, omnistainer, keep_tip=True)
 
     temp_mod = None
+    plate = protocol.load_labware('parhelia_12trough', labwarePositions.buffers_plate, 'Buffers plate')
+
+    wells = plate.wells_by_name()
 
     if 'coldplate' in omnistainer_type:
         temp_mod = ColdPlateSlimDriver(protocol)
@@ -92,9 +108,6 @@ def run(protocol: protocol_api.ProtocolContext):
     if do_dewax and temp_mod is None:
         raise Exception("Dewaxing cannot be performed without a temperature module.")
 
-    plate = protocol.load_labware('parhelia_12trough', labwarePositions.buffers_plate, 'Buffers plate')
-
-    wells = plate.wells_by_name()
 
     reagent_map = {
         'Dewax': wells['A1'],

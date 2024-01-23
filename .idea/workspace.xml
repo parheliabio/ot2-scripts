@@ -5,7 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3f1da4c3-d51e-4a23-9029-cafdead48ca7" name="Default Changelist" comment="10x Visium v5-&gt;v6&#10;Dewax Rehydrate H&amp;E v10-&gt;v11">
+      <change afterPath="$PROJECT_DIR$/protocols/H and E/H&amp;E v12.5.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/protocols/ACD RNA detection/RNAscope Multiplex V2 on ColdPlate with global functions.py" beforeDir="false" afterPath="$PROJECT_DIR$/protocols/ACD RNA detection/RNAscope Multiplex V2 on ColdPlate with global functions.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/protocols/H and E/Dewax Rehydrate H&amp;E v11.py" beforeDir="false" afterPath="$PROJECT_DIR$/protocols/H and E/Dewax Rehydrate H&amp;E v12.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -61,7 +64,7 @@
   "keyToString": {
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "last_opened_file_path": "/Users/nsamusik/IdeaProjects/ot2-scripts/protocols/Ultivue",
+    "last_opened_file_path": "/Users/nelsonwedin/PycharmProjects/ParheliaBio/protocols/H and E",
     "project.structure.last.edited": "Project",
     "project.structure.proportion": "0.0",
     "project.structure.side.proportion": "0.0",
@@ -70,11 +73,11 @@
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/protocols/H and E" />
       <recent name="$PROJECT_DIR$/protocols/Ultivue" />
       <recent name="$PROJECT_DIR$/protocols/CODEX" />
       <recent name="$PROJECT_DIR$/protocols/OPAL" />
       <recent name="$PROJECT_DIR$/protocols/IHC" />
-      <recent name="$PROJECT_DIR$/protocols/ACD RNA detection" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/protocols/Panel Mixing" />
