@@ -10,7 +10,6 @@ metadata = {
     'description': 'IHC tertiary staining added',
     'apiLevel': '2.14'
 }
-
 ####################MODIFIABLE RUN PARAMETERS#########################
 
 # The type of Parhelia Omni-Stainer
