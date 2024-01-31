@@ -1,3 +1,4 @@
+from collections import defaultdict
 
 metadata = {
     'protocolName': 'Antibody panel mixing + black plate prep v0',
@@ -153,7 +154,8 @@ class Table:
         lines.pop(0)
         lines = [x.split("[\t\s]+") for x in lines]
         rows = [x.pop(0) for x in lines]
-        values  = [[(y.equals(".")?None:y.split("|")) for y in x] for x in lines]
+
+        values  = [[(y.equals(".") if None else y.split("|")) for y in x] for x in lines]
         self.rows       = rows
         self.columns    = columns
         self.values     = values
@@ -229,7 +231,8 @@ def run(protocol: protocol_api.ProtocolContext):
             ab_vol = titer * num_samples
             panel_wells_vol.append((ab_well, ab_vol))
 
-            rep_vol = detectors.append((det_well, det_vol))
+
+            #rep_vol = detectors.append((det_well, det_vol))
 
     #################PROTOCOL####################
     protocol.comment("Starting the "+ metadata["protocolName"] +" for panel" + panel_name)
