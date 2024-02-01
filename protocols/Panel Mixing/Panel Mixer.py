@@ -1,5 +1,50 @@
 from collections import defaultdict
 
+class Table:
+    def __init__(self, rows, columns, values):
+        self.rows = rows
+        self.columns = columns
+        self.values = values
+        self.populate_wells_dict()
+
+    def __init__(self, text):
+        lines = text.splitlines()
+        #deleting the first line if it's empty
+        if not lines[0]:
+            lines.pop(0)
+        #print ('lines:')
+        #print(lines)
+        columns = lines[0].split()
+        #print ('columns:')
+        #print(columns)
+        lines.pop(0)
+        #print ('lines after pop(0):')
+        #print(lines)
+        lines = [x.split() for x in lines]
+        #print ('lines after splitting:')
+        #print(lines)
+        rows = [x.pop(0) for x in lines]
+        #print ('rows:')
+        #print(rows)
+
+        values  = [[(None if y == "." else y.split("|")) for y in x] for x in lines]
+        #print ('values:')
+        #print(values)
+        self.rows       = rows
+        self.columns    = columns
+        self.values     = values
+        self.populate_wells_dict()
+
+    def populate_wells_dict(self):
+        self.key_vals = defaultdict()
+        for i in range (len(self.rows)):
+            for j in range (len(self.columns)):
+                key_val = self.values[i][j]
+                if key_val is None: continue
+                key = key_val[0]
+                if key in self.key_vals: raise Exception("Duplicate key: " + key)
+                self.key_vals[key]=(i,j)
+
 metadata = {
     'protocolName': 'Antibody panel mixing + black plate prep v0',
     'author': 'Parhelia Bio <info@parheliabio.com>',
@@ -82,8 +127,8 @@ testmode = True
 ### VERAO VAR NAME='Antibody plate' TYPE=TABLE
 antibody_plate_layout = """
     1             2             3             4             5             6             7             8             9             10            11            12         
-A   HLA-DR|001    CD8|003       CD7|005       CD8|007       CD9|011       CD15|002      CD32|020      CD64|019      CD69|018      CD28|017      CD54|012      FcRIe|016  
-B   PD-1|031      HLA-ABC|044   CD66|041      CD5|008       .             .             .             .             .             .             .             .             AbC|022    
+A   HLA-DR|001    CD8|003       CD7|005       CD79a|007     CD9|011       CD15|002      CD32|020      CD64|019      CD69|018      CD28|017      CD54|012      FcRIe|016  
+B   PD-1|031      HLA-ABC|044   CD66|041      CD5|008       CD11b|108     .             .             .             .             .             .             .          
 C   .             .             .             .             .             .             .             .             .             .             .             .          
 D   .             .             .             .             .             .             .             .             .             .             .             .          
 E   .             .             .             .             .             .             .             .             .             .             .             .          
@@ -96,7 +141,7 @@ H   .             .             .             .             .             .     
 reporter_source_plate_layout = """
     1         2         3         4         5         6         7         8         9         10        11        12     
 A   001|Cy3   003|Cy5   003|Cy7   007|Cy3   011|Cy5   002|Cy7   020|Cy3   019|Cy5   017|Cy7   012|Cy3   016|Cy5   045|Cy5
-B   031|Cy7   044|Cy3   041|Cy5   008|Cy7   .         .         .         .         .         .         .         .      
+B   031|Cy7   044|Cy3   041|Cy5   008|Cy7   108|Cy3   .         .         .         .         .         .         .      
 C   .         .         .         .         .         .         .         .         .         .         .         .      
 D   .         .         .         .         .         .         .         .         .         .         .         .      
 E   .         .         .         .         .         .         .         .         .         .         .         .      
@@ -109,7 +154,7 @@ H   .         .         .         .         .         .         .         .     
 panel_layout = """
      Cy3         Cy5         Cy7      
 1    HLA-DR|1    CD8|0.7     CD7|0.5  
-2    CD8|1       CD9|1       CD15|1   
+2    CD11b|1     CD9|1       CD15|1   
 3    CD32|1      CD64|1      CD69|1.7 
 4    CD28|0.5    CD54|1      FcRIe|2  
 5    HLA-ABC|1   CD66|1.5    CD5|0.5  
@@ -126,53 +171,6 @@ panel_layout = """
 16   .           .           .        
 """
 
-comm = """
-class antibody:
-    def __init__(self, name, barcode, well):
-        self.name = name
-        self.barcode = barcode
-        self.well = well
-
-class barcode:
-    def __init__(self, barcode, fluor, well):
-        self.barcode = barcode
-        self.fluor = fluor
-        self.well = well
-
-
-"""
-class Table:
-    def __init__(self, rows, columns, values):
-        self.rows = rows
-        self.columns = columns
-        self.values = values
-        self.populate_wells_dict()
-
-    def __init__(self, text):
-        lines = text.split("\n")
-        columns = lines[0].split("[\t\s]+")
-        lines.pop(0)
-        lines = [x.split("[\t\s]+") for x in lines]
-        rows = [x.pop(0) for x in lines]
-
-        values  = [[(y.equals(".") if None else y.split("|")) for y in x] for x in lines]
-        self.rows       = rows
-        self.columns    = columns
-        self.values     = values
-        self.populate_wells_dict()
-
-    def populate_wells_dict(self):
-        self.key_vals = defaultdict()
-        for i in range (len(self.rows)):
-            for j in range (len(self.columns)):
-                val = self.values[i,j]
-                if val is None: continue
-                key_val = val.split("|")
-                key = key_val[0]
-                if self.key_vals.keys.contains(key): raise Exception("Duplicate key: " + key)
-                self.key_vals[key]=(i,j)
-                if(len(key_val>0)): self.values[i,j] = key_val
-
 
 # protocol run function. the part after the colon lets your editor know
 # where to look for autocomplete suggestions
@@ -186,10 +184,9 @@ def run(protocol: protocol_api.ProtocolContext):
     pipette_type = 'p300_single_gen2'
     pipette = protocol.load_instrument(pipette_type, pipette_location, tip_racks=[tiprack_300])
 
-
     buffers_trough = protocol.load_labware(buffers_reservoir_type, buffers_reservoir_position,
                                            '12-trough PBS reservoir')
-    panel_source_plate = protocol.load_labware(panel_source_plate_type, panel_source_plate_position,
+    antibody_source_plate = protocol.load_labware(panel_source_plate_type, panel_source_plate_position,
                                                '96-well-plate')
 
     panel_dest_plate = protocol.load_labware(panel_dest_plate_type, panel_source_plate_position,
@@ -201,40 +198,40 @@ def run(protocol: protocol_api.ProtocolContext):
     reporter_dest_plate = protocol.load_labware(panel_dest_plate_type, reporter_dest_plate_position,
                                                 '96-well-plate')
 
-    panel_dest = buffers_trough.wells("A12")
+    panel_dest_tube = buffers_trough.wells_by_name()['A12']
 
-    ##parse the source plate layout
-    ##parse the reporter plate layout
     ##parse the panel
-
     panel_tab = Table(panel_layout)
 
+    ##parse the reporter plate layout
     reporters = Table(reporter_source_plate_layout)
 
-    abs = Table(antibody_plate_layout)
+    ##parse the source plate layout
+    antibody_plate_tab = Table(antibody_plate_layout)
 
     #mixing the panel
-    panel_wells_vol = []
-    detector_wells_vol = []
+    ab_volumes = []
+    ab_wells = []
+
+    reporter_volumes = []
+    reporter_wells = []
 
     for i in range(len(panel_tab.rows)):
         row = panel_tab.values[i]
-        detectors = []
+
         for j in range(len(row)):
             ab_titer = row[j]
             if ab_titer is None: continue
             ab      = ab_titer[0]
-            titer   = ab_titer[1]
-            if abs.key_vals[ab] is None: raise Exception("Antibody not found in the source plate: " + ab)
-            xy = abs.key_vals[ab]
-            ab_well = panel_source_plate.rows()[xy[0]][xy[1]]
+            titer   = float(ab_titer[1])
+            if not ab in antibody_plate_tab.key_vals: raise Exception("Antibody not found in the source plate: " + ab)
+            xy = antibody_plate_tab.key_vals[ab]
+            ab_well = antibody_source_plate.rows()[xy[0]][xy[1]]
             ab_vol = titer * num_samples
-            panel_wells_vol.append((ab_well, ab_vol))
-
-
-            #rep_vol = detectors.append((det_well, det_vol))
+            ab_volumes.append(ab_vol)
+            ab_wells.append(ab_well)
 
     #################PROTOCOL####################
     protocol.comment("Starting the "+ metadata["protocolName"] +" for panel" + panel_name)
 
-    protocol.home()
+    pipette.transfer(ab_volumes, ab_wells, panel_dest_tube)
