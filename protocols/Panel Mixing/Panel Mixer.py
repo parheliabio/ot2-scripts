@@ -189,9 +189,6 @@ def run(protocol: protocol_api.ProtocolContext):
     antibody_source_plate = protocol.load_labware(panel_source_plate_type, panel_source_plate_position,
                                                '96-well-plate')
 
-    panel_dest_plate = protocol.load_labware(panel_dest_plate_type, panel_source_plate_position,
-                                             '96-well-plate')
-
     reporter_source_plate = protocol.load_labware(panel_source_plate_type, reporter_source_plate_position,
                                                   '96-well-plate')
 
