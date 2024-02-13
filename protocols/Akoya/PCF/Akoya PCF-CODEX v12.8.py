@@ -1,19 +1,18 @@
-
 metadata = {
-    'protocolName': 'Akoya PCF-CODEX v12.5 with Temperature Control',
+    'protocolName': 'Akoya PCF-CODEX v12.8 with Temperature Control',
     'author': 'Parhelia Bio <info@parheliabio.com>',
-    'description': '20m Fixative incubation, 3x PBS wash after MeOH',
+    'description': '20m Fixative incubation, RT MeOH, 3x PBS wash after MeOH',
     'apiLevel': '2.14'
 }
 
-####################MODIFIABLE RUN PARAMETERS#########################
+########################MODIFIABLE RUN PARAMETERS#######################
 
 # The type of Parhelia Omni-Stainer
 ### VERAO VAR NAME='Device type' TYPE=CHOICE OPTIONS=['omni_stainer_s12_slides', 'omni_stainer_s12_slides_with_thermosheath', 'omni_stainer_s12_slides_with_thermosheath_on_coldplate', 'omni_stainer_c12_cslps', 'omni_stainer_c12_cslps_with_thermosheath']
 omnistainer_type = 'omni_stainer_s12_slides_with_thermosheath_on_coldplate'
 
 ### VERAO VAR NAME='Well plate type' TYPE=CHOICE OPTIONS=['parhelia_skirted_96', 'parhelia_skirted_96_with_strips']
-type_of_96well_plate = 'parhelia_skirted_96'
+type_of_96well_plate = 'parhelia_skirted_96_with_strips'
 
 ### VERAO VAR NAME='Delayed start' TYPE=BOOLEAN
 delayed_start = False
@@ -22,10 +21,10 @@ delayed_start = False
 protocol_delay_minutes = 30
 
 ### VERAO VAR NAME='Overnight incubation: enable manual pausing at the antibody incubation step?' TYPE=BOOLEAN
-protocol_pause = True
+protocol_pause = False
 
 ### VERAO VAR NAME='Number of Samples' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE EXCEL_POSITION='D3'
-num_samples = 10
+num_samples = 5
 
 ### VERAO VAR NAME='Tiprack starting position' TYPE=NUMBER LBOUND=1 UBOUND=95 DECIMAL=FALSE
 tiprack_300_starting_pos = 1
@@ -36,8 +35,6 @@ ab_incubation_time_minutes = 600
 ### VERAO VAR NAME='Preblock (Blocking Buffer) incubation time (minutes)' TYPE=NUMBER LBOUND=30 UBOUND=2000 DECIMAL=FALSE
 preblock_incubation_time_minutes = 15
 
-
-
 """
 Antibody screening involves additional rendering step at the end, where the tissue is cleared and then
 fluorescent detection probes are applied to the tissue directly in the omnistainer device.
@@ -47,20 +44,20 @@ If this option is enabled, make sure that
     see labware_layout.xlsx for details
 """
 
-### VERAO VAR NAME='Antibody screening mode (involves additional fluorescent detection probes)' TYPE=BOOLEAN EXCEL_POSITION='D4'
+### VERAO VAR NAME='Antibody screening mode (involves additional fluorescent detection probes)' TYPE=BOOLEAN EXCEL_POSITION='D5'
 Antibody_Screening = True
 
-### VERAO VAR NAME='Perform ONLY Antibody screening mode? Only used if working with previouslly stained samples' TYPE=BOOLEAN
+### VERAO VAR NAME='Perform ONLY Antibody screening mode? Only used if working with previouslly stained samples' TYPE=BOOLEAN 
 Ab_Screening_Only = False
 
 ### VERAO VAR NAME='*For Ab testing mode* Probe (Detector Master Mix) incubation time (minutes)' TYPE=NUMBER LBOUND=30 UBOUND=2000 DECIMAL=FALSE
-probe_incubation_time_minutes = 10
+probe_incubation_time_minutes = 15
 
-### VERAO VAR NAME='Sample wash volume (150ul for slides/100ul for coverslips)' TYPE=NUMBER LBOUND=50 UBOUND=350 DECIMAL=FALSE
+### VERAO VAR NAME='Sample wash volume (150ul for slides/100ul for coverslips)' TYPE=NUMBER LBOUND=50 UBOUND=350 DECIMAL=FALSE EXCEL_POSITION='D7'
 wash_volume = 150
 
-### VERAO VAR NAME='Antibody mix volume (120ul for slides/60ul for coverslips)' TYPE=NUMBER LBOUND=50 UBOUND=350 DECIMAL=FALSE EXCEL_POSITION='D5'
-ab_volume = 111
+### VERAO VAR NAME='Antibody mix volume (120ul for slides/60ul for coverslips)' TYPE=NUMBER LBOUND=50 UBOUND=350 DECIMAL=FALSE EXCEL_POSITION='D6'
+ab_volume = 110
 
 ### VERAO VAR NAME='Aspiration height offset(mm, for calibration debugging)'  TYPE=NUMBER LBOUND=0 UBOUND=100 DECIMAL=TRUE INCREMENT=0.1
 aspiration_gap = 0
@@ -80,17 +77,17 @@ room_temp = 22
 ### VERAO VAR NAME='Storage temperature' TYPE=NUMBER LBOUND=2 UBOUND=25
 storage_temp = 4
 
-### VERAO VAR NAME='Perform MeOH fixation at 4C?' TYPE=BOOLEAN
+### not exposing this one due to the lack of validation and potential problems with the fixation consistency
 cold_MeOH = False
 
 ### VERAO VAR NAME='Deck position: 12-trough buffers reservoir' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE
-codex_buffers_plate_position = 10
+codex_buffers_plate_position = 8
 
 ### VERAO VAR NAME='Deck position: Parhelia Omni-stainer S12/C12 module' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE
 omnistainer_position = 1
 
 ### VERAO VAR NAME='Deck position: Preblock/Antibody/F reagents plate' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE
-codex_reagents_plate_position = 7
+codex_reagents_plate_position = 3
 
 ### VERAO VAR NAME='labwarePositions.tiprack_300_1' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE
 tiprack_300_1_position = 6
@@ -186,12 +183,13 @@ def run(protocol: protocol_api.ProtocolContext):
 
     if 'coldplate' in omnistainer_type:
         temp_mod = ColdPlateSlimDriver(protocol)
-        temp_mod.set_temp(room_temp)
+        temp_mod.quick_temp(room_temp)
 
     protocol.comment("puncturing first fix")
     puncture_wells(pipette_300, codex_buffers.Hydration_PFA_1pt6pct)
     protocol.comment("first fix")
     washSamples(pipette_300, codex_buffers.Hydration_PFA_1pt6pct, sample_chambers, wash_volume, 1)
+    
     # INCUBATE
     safe_delay(protocol, minutes=10, msg="first fix incubation")
 
@@ -225,32 +223,33 @@ def run(protocol: protocol_api.ProtocolContext):
             openShutter(protocol, pipette_300, omnistainer)
 
         protocol.comment("applying antibody cocktail(s)")
+        
         for i in range(num_samples):
             protocol.comment("puncturing antibodies")
             puncture_wells(pipette_300, codex_antibody_wells[i])
             protocol.comment("applying antibodies")
             washSamples(pipette_300, codex_antibody_wells[i], sample_chambers[i], ab_volume, 1)
+            
         # INCUBATE
         if 'thermosheath' in omnistainer_type:
-            closeShutter(protocol, pipette_300, omnistainer, keep_tip=True)
+            closeShutter(protocol, pipette_300, omnistainer)
 
         if not (temp_mod is None):
-            temp_mod.set_temp(antibody_staining_temp)
-            if protocol_pause:
-                protocol.pause(msg="The protocol is paused for primary ab incubation")
-            else:
-                safe_delay(protocol, minutes=ab_incubation_time_minutes,
-                           msg=f"staining incubation for {ab_incubation_time_minutes} minutes ")
-            temp_mod.set_temp(room_temp)
+            temp_mod.quick_temp(antibody_staining_temp)
+            
+        if protocol_pause:
+            protocol.pause(msg="The protocol is paused for primary ab incubation")
         else:
-            if protocol_pause:
-                protocol.pause(msg="The protocol is paused for primary ab incubation")
-            else:
-                safe_delay(protocol, minutes=ab_incubation_time_minutes,
-                           msg=f"staining incubation for {ab_incubation_time_minutes} minutes ")
+            safe_delay(protocol, minutes=ab_incubation_time_minutes, msg=f"staining incubation for {ab_incubation_time_minutes} minutes ")
+
+        if not (temp_mod is None):
+            temp_mod.quick_temp(room_temp)
+        
 
         if 'thermosheath' in omnistainer_type:
-            openShutter(protocol, pipette_300, omnistainer, keep_tip=True)
+            openShutter(protocol, pipette_300, omnistainer)
+
+            
         for i in range(2):
             # WASHING SAMPLES WITH Staining buffer
             protocol.comment("washing with Staining buffer #" + str(i))
@@ -258,28 +257,25 @@ def run(protocol: protocol_api.ProtocolContext):
             # INCUBATE
             safe_delay(protocol, minutes=5, msg="incubation in Staining Buffer" + str(i))
 
+            
         # POST STAINING FIXING SAMPLES WITH PFA
         protocol.comment("puncturing the second fix")
         puncture_wells(pipette_300, codex_buffers.Storage_PFA_1pt6pct)
         protocol.comment("second fix")
-        washSamples(pipette_300, codex_buffers.Storage_PFA_1pt6pct, sample_chambers, wash_volume, 1)
+        washSamples(pipette_300, codex_buffers.Storage_PFA_1pt6pct, sample_chambers, wash_volume, 2)
         # INCUBATE
         safe_delay(protocol, minutes=10, msg="10 min incubation with Post-Staining Fixation Solution")
+        
 
         # WASHING SAMPLES WITH PBS
         protocol.comment("puncture the PBS wash")
         puncture_wells(pipette_300, codex_buffers.PBS)
         protocol.comment("3x PBS wash")
         for i in range(3):
-            washSamples(pipette_300, codex_buffers.PBS, sample_chambers, wash_volume, 1, keep_tip=True)
+            washSamples(pipette_300, codex_buffers.PBS, sample_chambers, wash_volume, 1)
             safe_delay(protocol, minutes=1, msg = "PBS wash #" + str(i+1))
 
         # FIXING SAMPLES WITH Methanol
-
-        if not((temp_mod is None) and cold_MeOH):
-            protocol.comment("cooling down for the MeOH step")
-            temp_mod.set_temp(4)
-            safe_delay(protocol, minutes=15, msg="waiting for temperature equilibration")
 
         protocol.comment("puncturing the Methanol")
         puncture_wells(pipette_300, codex_buffers.MeOH)
@@ -290,18 +286,10 @@ def run(protocol: protocol_api.ProtocolContext):
             # INCUBATE
             safe_delay(protocol, minutes=2.5, msg="MeOH incubation")
 
-        if not (temp_mod is None) and cold_MeOH:
-            protocol.comment("warming up after the MeOH step")
-            temp_mod.set_temp(room_temp+10)
-
+        # WASHING SAMPLES WITH PBS
         for i in range(3):
             washSamples(pipette_300, codex_buffers.PBS, sample_chambers, wash_volume, 1, keep_tip=True)
             safe_delay(protocol, minutes=1, msg = "PBS wash #" + str(i+1))
-
-        if not (temp_mod is None) and cold_MeOH:
-            safe_delay(protocol, minutes=5, msg="waiting for overshot")
-            temp_mod.set_temp(room_temp)
-            safe_delay(protocol, minutes=10, msg="waiting for temperature equilibration")
 
         # PUNCTURING THE FIXATIVE
         protocol.comment("puncturing the fixative")
@@ -336,6 +324,7 @@ def run(protocol: protocol_api.ProtocolContext):
         protocol.comment("puncture the Stripping Buffer")
         puncture_wells(pipette_300, codex_buffers.Stripping_buffer)
         # PRE-CLEARING THE TISSUE
+        
         for i in range(3):
             protocol.comment("tissue clearing round" + str(i + 1))
             washSamples(pipette_300, codex_buffers.Stripping_buffer, sample_chambers, wash_volume, 2)
@@ -356,7 +345,7 @@ def run(protocol: protocol_api.ProtocolContext):
             washSamples(pipette_300, codex_rendering_wells[i], sample_chambers[i], wash_volume, 1)
         # INCUBATE
         safe_delay(protocol, minutes=probe_incubation_time_minutes,
-                   msg=f"Detector Mix (Probe) hybridization {probe_incubation_time_minutes} minutes ")
+                       msg=f"Detector Mix (Probe) hybridization {probe_incubation_time_minutes} minutes ")
 
         # WASH SAMPLES IN 1x CODEX buffer
         protocol.comment("Washing with screening buffer")
@@ -378,3 +367,6 @@ def run(protocol: protocol_api.ProtocolContext):
             msg=f"Protocol is paused for {storage_temp} C storage. "
                 f"Hit Resume to end the protocol and turn off the thermal module")
         temp_mod.temp_off()
+
+
+

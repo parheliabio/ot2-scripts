@@ -734,7 +734,7 @@ def run(protocol: protocol_api.ProtocolContext):
         protocol.delay(minutes=protocol_delay_minutes, msg = "Delaying the start by " + str(protocol_delay_minutes) + " minutes" )
 
     if 'coldplate' in omnistainer_type:
-        temp_mod = ColdPlateSlimDriver(protocol,0)
+        temp_mod = ColdPlateSlimDriver(protocol, 0)
         temp_mod.set_temp(room_temp)
 
     apply_and_incubate(protocol, pipette, antibody_diluent_wells,   "Antibody Diluent (Block)",       sample_chambers,   ab_volume,      num_reps, antibody_diluent_incubation_min                                      )
@@ -758,6 +758,7 @@ def run(protocol: protocol_api.ProtocolContext):
 
         if 'thermosheath' in omnistainer_type:
             openShutter(protocol, pipette, omnistainer)
+
         temp_mod.quick_temp(room_temp)
         apply_and_incubate(protocol, pipette, wash_buffer,          "1x PBS Wash",                  sample_chambers,   wash_volume,   2,         wash_incubation,         step_repeats = 2, puncture=False)
 
