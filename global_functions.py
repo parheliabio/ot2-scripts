@@ -11,6 +11,7 @@ from collections import defaultdict
 import serial
 import opentrons.protocol_api
 import time
+from itertools import chain
 
 ####################GENERAL SETUP###############################
 volume_counter = defaultdict(int)
@@ -26,7 +27,6 @@ extra_bottom_gap = 0
 
 testmode = False
 
-
 class Object:
     # constructor
     def __init__(self, dict1=None):
@@ -35,6 +35,50 @@ class Object:
         else:
             pass
 
+class Table:
+    def __init__(self, rows, columns, values):
+        self.rows = rows
+        self.columns = columns
+        self.values = values
+        self.populate_wells_dict()
+
+    def __init__(self, text):
+        lines = text.splitlines()
+        #deleting the first line if it's empty
+        if not lines[0]:
+            lines.pop(0)
+        #print ('lines:')
+        #print(lines)
+        columns = lines[0].split()
+        #print ('columns:')
+        #print(columns)
+        lines.pop(0)
+        #print ('lines after pop(0):')
+        #print(lines)
+        lines = [x.split() for x in lines]
+        #print ('lines after splitting:')
+        #print(lines)
+        rows = [x.pop(0) for x in lines]
+        #print ('rows:')
+        #print(rows)
+
+        values  = [[(None if y == "." else y.split("|")) for y in x] for x in lines]
+        #print ('values:')
+        #print(values)
+        self.rows       = rows
+        self.columns    = columns
+        self.values     = values
+        self.populate_wells_dict()
+
+    def populate_wells_dict(self):
+        self.xy_index = defaultdict()
+        for i in range (len(self.rows)):
+            for j in range (len(self.columns)):
+                key_val = self.values[i][j]
+                if key_val is None: continue
+                key = key_val[0]
+                if key in self.xy_index: raise Exception("Duplicate key: " + key)
+                self.xy_index[key]=(i, j)
 
 class ColdPlateSlimDriver:
     def __init__(
@@ -516,7 +560,6 @@ def apply_and_incubate(
             protocol.comment("TEST MODE!!! Incubation skipped")
         else:
             protocol.delay(minutes=incubation_time, msg=reagent_name + " incubation")
-
 
 def safe_delay(protocol, *args, **kwargs):
     if testmode:

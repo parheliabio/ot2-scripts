@@ -1,7 +1,8 @@
+
 metadata = {
-    'protocolName': 'Antibody panel mixing + black plate prep v3',
+    'protocolName': 'Antibody panel mixing + black plate prep v5',
     'author': 'Parhelia Bio <info@parheliabio.com>',
-    'description': 'Antibody panel mixing + black plate prep v3',
+    'description': 'Antibody panel mixing + black plate prep v5',
     'apiLevel': '2.14'
 }
 
@@ -21,7 +22,6 @@ buffers_reservoir_position = 6
 
 ### VERAO VAR NAME='Panel source plate type' TYPE=CHOICE OPTIONS=['parhelia_skirted_96']
 antibody_source_plate_type = 'parhelia_skirted_96'
-
 
 ### VERAO VAR NAME='Panel source plate position' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE
 panel_source_plate_position = 1
@@ -59,8 +59,10 @@ reporter_mix_volume = 250
 ### VERAO VAR NAME='First reporter row' TYPE=CHOICE OPTIONS=['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
 reporter_row = 'A'
 
-### VERAO VAR NAME='Blank row' TYPE=CHOICE OPTIONS=['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
-blank_row = 'H'
+### VERAO VAR NAME='First blank cycle column in row H' TYPE=NUMBER LBOUND=1 UBOUND=11 DECIMAL=FALSE
+blank_col = 1
+
+blank_col -= 1
 
 ### VERAO VAR NAME='P20 excess volumne' TYPE=NUMBER LBOUND=0 UBOUND=1 DECIMAL=TRUE
 pipette_excess_vol = 0.5
@@ -116,14 +118,12 @@ H   .         .         .         .         .         .         .         .     
 ### VERAO VAR NAME='Panel' TYPE=TABLE
 panel_layout = """
     Cy3         Cy5         Cy7      
-1   .           .           .        
-2   HLA-DR|1    CD8|0.7     CD7|0.5  
-3   CD11b|1     CD9|1       CD15|1   
-4   CD32|1      CD64|1      CD69|1.7 
-5   CD28|0.5    CD54|1      FcRIe|2  
-6   HLA-ABC|1   CD66|1.5    CD5|0.5  
-7   PD-1|1      .           .        
-8   .           .           .        
+1   HLA-DR|1    CD8|0.7     CD7|0.5  
+2   CD11b|1     CD9|1       CD15|1   
+3   CD32|1      CD64|1      CD69|1.7 
+4   CD28|0.5    CD54|1      FcRIe|2  
+5   HLA-ABC|1   CD66|1.5    CD5|0.5  
+6   PD-1|1      .           .           
 """
 
 # protocol run function. the part after the colon lets your editor know
@@ -161,7 +161,7 @@ def run(protocol: protocol_api.ProtocolContext):
     black_plate_wells = list(chain.from_iterable(reporter_dest_plate.rows()[row_names.index(reporter_row):]))
 
     #flattening the rows list of lists in order to get a list of wells ordered by row
-    blank_wells = list(chain.from_iterable(reporter_dest_plate.rows()[row_names.index(blank_row):]))[0:2]
+    blank_wells = reporter_dest_plate.rows()[7][blank_col:blank_col + 2]
 
     panel_dest_tube = panel_dest_plate.wells_by_name()['A1']
 
@@ -169,7 +169,6 @@ def run(protocol: protocol_api.ProtocolContext):
 
     ##parse the panel
     panel_tab = Table(panel_layout)
-
 
     black_plate_wells = black_plate_wells[:len(panel_tab.rows)]
 
@@ -230,28 +229,26 @@ def run(protocol: protocol_api.ProtocolContext):
 
             reporter_source_wells.append(reporter_source_plate.rows()[x][y])
             reporter_dest_wells.append(black_plate_wells[cyc])
-            reporter_mix_volumes_per_well[cyc]-=reporter_mix_volume
-
+            reporter_mix_volumes_per_well[cyc] -= reporter_volume
 
     #################PROTOCOL####################
     protocol.comment("Starting the "+ metadata["protocolName"] )
 
-
     if do_panel_mixing:
         protocol.comment("Puncturing the antibody wells")
-        puncture_wells(pipette_300, ab_wells)
+        puncture_wells(pipette_20, ab_wells)
         protocol.comment("Sampling the antibodies")
-        pipette_20.transfer(ab_volumes, ab_wells, panel_dest_tube, new_tip="always", mix_after=(3, 10), disposal_vol=0)
+        pipette_20.transfer(ab_volumes, ab_wells, panel_dest_tube, new_tip="always", mix_after=(3, 10), disposal_vol=0,  blow_out=True, blowout_location = "destination well")
+        pipette_300.transfer(300, panel_dest_tube, panel_dest_tube, mix_before=(2, reporter_mix_volume/2), new_tip="always", disposal_vol=0, blow_out=True, blowout_location = "destination well")
 
     if do_reporter_plate_prep:
+        protocol.comment("Puncturing the reporter buffer")
+        puncture_wells(pipette_300, reporter_buffer)
         protocol.comment("Dispensing the reporter buffer into the black plate")
-        pipette_300.transfer(reporter_mix_volumes_per_well, reporter_buffer, black_plate_wells, new_tip="once", disposal_vol=0)
-        protocol.comment("Filling the blanks")
-        pipette_300.transfer(reporter_mix_volume, reporter_buffer, blank_wells, new_tip="once", disposal_vol=0)
+        pipette_300.transfer(reporter_mix_volumes_per_well+[reporter_mix_volume, reporter_mix_volume], reporter_buffer, black_plate_wells+blank_wells, new_tip="once", disposal_vol=0,  blow_out=True, blowout_location = "destination well")
         protocol.comment("Puncturing the wells")
-        puncture_wells(pipette_300, reporter_source_wells)
+        puncture_wells(pipette_20, reporter_source_wells)
         protocol.comment("Pipetting the reporters")
-        pipette_20.transfer(reporter_volume-pipette_excess_vol, reporter_source_wells, reporter_dest_wells, new_tip="always", disposal_vol=0)
+        pipette_20.transfer(reporter_volume-pipette_excess_vol, reporter_source_wells, reporter_dest_wells, mix_after=(3, 10), new_tip="always", disposal_vol=0,  blow_out=True, blowout_location = "destination well")
         protocol.comment("Mixing the reporters")
-        pipette_300.transfer(reporter_mix_volume/2, black_plate_wells, black_plate_wells, mix_before=(2, reporter_mix_volume/2), new_tip="always", disposal_vol=0)
-
+        pipette_300.transfer(reporter_mix_volume/2, black_plate_wells, black_plate_wells, mix_before=(2, reporter_mix_volume/2), new_tip="always", disposal_vol=0, blow_out=True, blowout_location = "destination well")
