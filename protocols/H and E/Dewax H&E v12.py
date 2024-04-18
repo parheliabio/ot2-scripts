@@ -119,6 +119,18 @@ def run(protocol: protocol_api.ProtocolContext):
     speeds =            [0.3,       0.7,            0.7,        0.7,            1,          1,                  1,                      1,                  1,              1,                  1,          0.7,                0.7,              1,                1]
     temps =            [dewax_temp, alc_temp,       alc_temp,   alc_temp,       room_temp,  room_temp,         room_temp,               room_temp,         room_temp,      room_temp,           room_temp, room_temp,           room_temp,        room_temp,       room_temp]
 
+    Dewax
+    100% EtOH
+    70% EtOH
+    MilliQ Water
+    Hematoxylin
+    MilliQ Water
+    Blueing
+    Water
+    Eosin
+    100% Alc
+    Water
+
     if dehydrate:
         for k in [14, 13]:
             reagent_sequence.pop(k)
