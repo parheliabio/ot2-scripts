@@ -30,7 +30,7 @@ dewax = False
 ### VERAO VAR NAME='Antigen retrieval?' TYPE=BOOLEAN EXCEL_POSITION='D3'
 agr = False
 
-### VERAO VAR NAME='Do Navinci protocol after HIER?' TYPE=BOOLEAN
+### VERAO VAR NAME='Do Navinci protocol after HIER?' TYPE=BOOLEAN EXCEL_POSITION='D4'
 do_navinci = True
 
 ### VERAO VAR NAME='Dewaxing temperature (C)' TYPE=NUMBER LBOUND=60 UBOUND=80 DECIMAL=FALSE
@@ -39,7 +39,7 @@ dewax_temp = 72
 ### VERAO VAR NAME='Dewax fill slowdown factor' TYPE=NUMBER LBOUND=1 UBOUND=20 DECIMAL=FALSE
 dispense_slowdown_factor = 3
 
-### VERAO VAR NAME='Antigen Retrieval Buffer' TYPE=CHOICE OPTIONS=['ER1','ER2'] EXCEL_POSITION='D6'
+### VERAO VAR NAME='Antigen Retrieval Buffer' TYPE=CHOICE OPTIONS=['ER1','ER2'] EXCEL_POSITION='D8'
 ER_buffer = 'ER2'
 
 ### VERAO VAR NAME='Retrival Temperature (C)' TYPE=NUMBER LBOUND=60 UBOUND=99 DECIMAL=FALSE
@@ -54,7 +54,7 @@ tiprack_300_starting_pos = 1
 ### VERAO VAR NAME='Sample flow rate' TYPE=NUMBER LBOUND=0.05 UBOUND=1.0 DECIMAL=TRUE INCREMENT=0.05
 sample_flow_rate = 0.2
 
-### VERAO VAR NAME='Double add?' TYPE=BOOLEAN EXCEL_POSITION='D4'
+### VERAO VAR NAME='Double add?' TYPE=BOOLEAN EXCEL_POSITION='D5'
 double_add = True
 
 ### VERAO VAR NAME='Number of washes post Navenibodies' TYPE=NUMBER LBOUND=1 UBOUND=30 DECIMAL=FALSE
@@ -72,7 +72,7 @@ amp_temp = 30
 ### VERAO VAR NAME='Incubation temp' TYPE=NUMBER LBOUND=20 UBOUND=40 DECIMAL=FALSE
 incubation_temp = 37
 
-### VERAO VAR NAME='Sample wash volume' TYPE=NUMBER LBOUND=50 UBOUND=300 DECIMAL=FALSE
+### VERAO VAR NAME='Sample wash volume' TYPE=NUMBER LBOUND=50 UBOUND=300 DECIMAL=FALSE EXCEL_POSITION='D8'
 wash_volume = 150
 
 ### VERAO VAR NAME='Staining volume' TYPE=NUMBER LBOUND=50 UBOUND=300 DECIMAL=FALSE

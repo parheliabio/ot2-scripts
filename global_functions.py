@@ -1,7 +1,8 @@
 ## VERAO GLOBAL
 ## (С) Parhelia Biosciences Corporation 2022-2023
-## Last updated by nsamusik Apr 17th 2024
+## Last updated by nsamusik Apr 22th 2024
 ## apply_and_incubate has 2 named parameters added: step_repeats and new_tip
+## fixed a bug in quick_temp where the temp was calculated in minutes, but time.delay was in seconds
 ### GLOBAL FUNCTIONS - AUTO-GENERATED - DO NOT MODIFY ###
 
 from opentrons import protocol_api
@@ -98,7 +99,7 @@ class ColdPlateSlimDriver:
         self.write_timeout = 2
         self.height = 45
 
-        self.temp = 0
+        self.temp = 20
         self.max_temp_lag = max_temp_lag
         self.heating_rate_deg_per_amin = heating_rate_deg_per_min
         self.cooling_rate_deg_per_min = cooling_rate_deg_per_min
@@ -208,10 +209,12 @@ class ColdPlateSlimDriver:
             overshot_temp = max(temp_target - overshot, -10)
             undershot_temp = delta_temp + undershot
 
-        delay_seconds = self.time_to_reach_sample_temp(undershot_temp)
+        delay_min = self.time_to_reach_sample_temp(undershot_temp)
 
         self.set_temp(overshot_temp)
-        time.sleep(delay_seconds)
+        if testmode:
+            delay_min = 0.1
+        self.protocol.delay(minutes=delay_min, msg="quick_temp from " + str(start_temp) + " to " + str(temp_target))
         self.set_temp(temp_target)
 
     def set_temp_andWait(self, target_temp, timeout_min=30, tolerance=0.5):
