@@ -1,8 +1,8 @@
 ## VERAO GLOBAL
 ## (С) Parhelia Biosciences Corporation 2022-2023
-## Last updated by nwedin December, 6th, 2023
-#protocol.home() added to safe_delay and apply_and_incubate
-#apply_and_incubate argument order changed so boolean is at end
+## Last updated by nsamusik Apr 22th 2024
+## apply_and_incubate has 2 named parameters added: step_repeats and new_tip
+## fixed a bug in quick_temp where the temp was calculated in minutes, but time.delay was in seconds
 ### GLOBAL FUNCTIONS - AUTO-GENERATED - DO NOT MODIFY ###
 
 from opentrons import protocol_api
@@ -11,6 +11,7 @@ from collections import defaultdict
 import serial
 import opentrons.protocol_api
 import time
+from itertools import chain
 
 ####################GENERAL SETUP###############################
 volume_counter = defaultdict(int)
@@ -26,7 +27,6 @@ extra_bottom_gap = 0
 
 testmode = False
 
-
 class Object:
     # constructor
     def __init__(self, dict1=None):
@@ -35,6 +35,50 @@ class Object:
         else:
             pass
 
+class Table:
+    def __init__(self, rows, columns, values):
+        self.rows = rows
+        self.columns = columns
+        self.values = values
+        self.populate_wells_dict()
+
+    def __init__(self, text):
+        lines = text.splitlines()
+        #deleting the first line if it's empty
+        if not lines[0]:
+            lines.pop(0)
+        #print ('lines:')
+        #print(lines)
+        columns = lines[0].split()
+        #print ('columns:')
+        #print(columns)
+        lines.pop(0)
+        #print ('lines after pop(0):')
+        #print(lines)
+        lines = [x.split() for x in lines]
+        #print ('lines after splitting:')
+        #print(lines)
+        rows = [x.pop(0) for x in lines]
+        #print ('rows:')
+        #print(rows)
+
+        values  = [[(None if y == "." else y.split("|")) for y in x] for x in lines]
+        #print ('values:')
+        #print(values)
+        self.rows       = rows
+        self.columns    = columns
+        self.values     = values
+        self.populate_wells_dict()
+
+    def populate_wells_dict(self):
+        self.xy_index = defaultdict()
+        for i in range (len(self.rows)):
+            for j in range (len(self.columns)):
+                key_val = self.values[i][j]
+                if key_val is None: continue
+                key = key_val[0]
+                if key in self.xy_index: raise Exception("Duplicate key: " + key)
+                self.xy_index[key]=(i, j)
 
 class ColdPlateSlimDriver:
     def __init__(
@@ -55,7 +99,7 @@ class ColdPlateSlimDriver:
         self.write_timeout = 2
         self.height = 45
 
-        self.temp = 0
+        self.temp = 20
         self.max_temp_lag = max_temp_lag
         self.heating_rate_deg_per_amin = heating_rate_deg_per_min
         self.cooling_rate_deg_per_min = cooling_rate_deg_per_min
@@ -149,9 +193,9 @@ class ColdPlateSlimDriver:
     def time_to_reach_sample_temp(self, delta_temp):
         x = delta_temp
         if(x>0):
-            time = 0.364 + 0.559*x -0.0315*x^2 + 1.29E-03*x^3 -2.46E-05*x^4 + 2.21E-07*x^5 -7.09E-10*x^6
+            time = 0.364 + 0.559*x -0.0315*x**2 + 1.29E-03*x**3 -2.46E-05*x**4 + 2.21E-07*x**5 -7.09E-10*x**6
         else:
-            time = -0.1 -0.329*x -0.00413*x^2 -0.0000569*x^3 + 0.0000000223*x^4
+            time = -0.1 -0.329*x -0.00413*x**2 -0.0000569*x**3 + 0.0000000223*x**4
         return time
 
     def quick_temp(self, temp_target, overshot = 10, undershot=3):
@@ -165,10 +209,12 @@ class ColdPlateSlimDriver:
             overshot_temp = max(temp_target - overshot, -10)
             undershot_temp = delta_temp + undershot
 
-        delay_seconds = self.time_to_reach_sample_temp(undershot_temp)
+        delay_min = self.time_to_reach_sample_temp(undershot_temp)
 
         self.set_temp(overshot_temp)
-        time.sleep(delay_seconds)
+        if testmode:
+            delay_min = 0.1
+        self.protocol.delay(minutes=delay_min, msg="quick_temp from " + str(start_temp) + " to " + str(temp_target))
         self.set_temp(temp_target)
 
     def set_temp_andWait(self, target_temp, timeout_min=30, tolerance=0.5):
@@ -458,11 +504,11 @@ def apply_and_incubate(
         reagent_name,
         target_wells,
         volume,
-        dispense_repeats,
+        step_repeats,
         incubation_time,
-        step_repeats=1,
-        puncture=True
-
+        dispense_repeats=1,
+        puncture=True,
+        new_tip='once'
 ):
     if puncture:
         puncture_wells(pipette, source)
@@ -496,7 +542,7 @@ def apply_and_incubate(
                     volume,
                     source,
                     target_wells,
-                    new_tip="once",
+                    new_tip=new_tip,
                     disposal_volume=0,
                     blowout=False
                 )
@@ -507,7 +553,7 @@ def apply_and_incubate(
                     volume,
                     source,
                     target_wells,
-                    new_tip="always",
+                    new_tip=new_tip,
                     disposal_volume=0,
                     blowout=False
                 )
@@ -516,7 +562,6 @@ def apply_and_incubate(
             protocol.comment("TEST MODE!!! Incubation skipped")
         else:
             protocol.delay(minutes=incubation_time, msg=reagent_name + " incubation")
-
 
 def safe_delay(protocol, *args, **kwargs):
     if testmode:
