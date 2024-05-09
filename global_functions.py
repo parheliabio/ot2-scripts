@@ -322,7 +322,6 @@ def loadLabwareFromDict(labwareName, protocol_or_tempmodule, position=-1, z_offs
 
 # End of jupyter notebook -specific functions
 
-
 def washSamples(
         pipette,
         sourceLiquid,
@@ -382,7 +381,7 @@ def washSamples(
         pipette.drop_tip()
 
 
-def puncture_wells(pipette, wells, height_offset=0, top_height_offset=-5, keep_tip=False):
+def puncture_wells(pipette,  wells,  height_offset=0,  top_height_offset = -5,  keep_tip=False):
     try:
         iter(wells)
     except TypeError:
@@ -451,51 +450,46 @@ def mix(pipette, sourceSolutionWell, volume, num_repeats):
 
     pipette.drop_tip()
 
-
-def openShutter(protocol, pipette, covered_lbwr, keep_tip=False, use_tip=False):
+def moveShutter(protocol, pipette, covered_lbwr, keep_tip, use_tip, rate, repeats, top_offset, move_open):
     protocol.comment("opening the shutter")
+
+    well1 = covered_lbwr.wells()[len(covered_lbwr.wells()) - 2]
+    well2 = covered_lbwr.wells()[len(covered_lbwr.wells()) - (1 if move_open else 3)]
+
     if use_tip:
         if not pipette.has_tip:
             pipette.pick_up_tip()
-        pipette.move_to(covered_lbwr.wells()[len(covered_lbwr.wells()) - 2].bottom(0))
-        pipette.move_to(
-            covered_lbwr.wells()[len(covered_lbwr.wells()) - 1].bottom(0),
-            force_direct=True,
-        )
-        if not keep_tip:
-            pipette.drop_tip()
+        loc1 = well1.bottom(0)
+        loc2 = well2.bottom(0)
     else:
         if pipette.has_tip:
             pipette.drop_tip()
-        pipette.move_to(covered_lbwr.wells()[len(covered_lbwr.wells()) - 2].top(-10))
-        pipette.move_to(
-            covered_lbwr.wells()[len(covered_lbwr.wells()) - 1].top(-10),
-            force_direct=True,
-        )
-    protocol.delay(seconds=1)
+        loc1 = well1.top(top_offset)
+        loc2 = well2.top(top_offset)
+
+    pipette.move_to(loc1)
+
+    speed = pipette.default_speed
+
+    pipette.default_speed = speed*rate
+
+    for i in range(repeats):
+        for l in [loc1, loc2]:
+            pipette.move_to(l, force_direct=True)
+
+    pipette.default_speed = speed
+
+    if use_tip and not keep_tip:
+        pipette.drop_tip()
+
+def openShutter(protocol, pipette, covered_lbwr, keep_tip=False, use_tip=False, rate=0.1, repeats=2, top_offset=-12):
+    moveShutter(protocol, pipette, covered_lbwr, keep_tip, use_tip, rate, repeats, top_offset, move_open=True)
 
 
-def closeShutter(protocol, pipette, covered_lbwr, keep_tip=False, use_tip=False):
-    protocol.comment("closing the shutter")
-    if use_tip:
-        if not pipette.has_tip:
-            pipette.pick_up_tip()
-        pipette.move_to(covered_lbwr.wells()[len(covered_lbwr.wells()) - 2].bottom(0))
-        pipette.move_to(
-            covered_lbwr.wells()[len(covered_lbwr.wells()) - 3].bottom(0),
-            force_direct=True,
-        )
-        if not keep_tip:
-            pipette.drop_tip()
-    else:
-        if pipette.has_tip:
-            pipette.drop_tip()
-        pipette.move_to(covered_lbwr.wells()[len(covered_lbwr.wells()) - 2].top(-10))
-        pipette.move_to(
-            covered_lbwr.wells()[len(covered_lbwr.wells()) - 3].top(-10),
-            force_direct=True,
-        )
-    protocol.home()
+def closeShutter(protocol, pipette, covered_lbwr, keep_tip=False, use_tip=False, rate=0.1, repeats=2, top_offset=-12):
+    moveShutter(protocol, pipette, covered_lbwr, keep_tip, use_tip, rate, repeats, top_offset, move_open=False)
+    pipette.move_to(protocol.fixed_trash["A1"].top(0))
+
 
 def apply_and_incubate(
         protocol,
@@ -586,5 +580,27 @@ def distribute_between_samples(
 
     if not keep_tip:
         pipette.drop_tip()
+
+
+def lift_coverpads(pipette, sample_chambers, z_offset = -2.85, rate = 0.01, reps = 3):
+    for s in sample_chambers:
+        pipette.move(s.bottom(0))
+        for i in range(reps):
+            pipette.move(s.bottom(z_offset) , rate = rate)
+            pipette.move(s.bottom(0)        , rate = rate)
+
+def set_gantry_speeds(protocol, XYrate, Zrate):
+    protocol.max_speeds.update({
+        'X': (600 * XYrate),
+        'Y': (400 * XYrate),
+        'Z': (125 * Zrate),
+        'A': (125 * Zrate),
+    })
+
+    speed_max = max(protocol.max_speeds.values())
+
+    for instr in protocol.loaded_instruments.values():
+        instr.default_speed = speed_max
+
 
 ### END VERAO GLOBAL
