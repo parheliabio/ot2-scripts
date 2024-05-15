@@ -381,7 +381,7 @@ def washSamples(
         pipette.drop_tip()
 
 
-def puncture_wells(pipette,  wells,  height_offset=0,  top_height_offset = -5,  keep_tip=False):
+def puncture_wells(pipette, wells, height_offset=0, top_height_offset=-5, keep_tip=False):
     try:
         iter(wells)
     except TypeError:
@@ -450,11 +450,12 @@ def mix(pipette, sourceSolutionWell, volume, num_repeats):
 
     pipette.drop_tip()
 
-def moveShutter(protocol, pipette, covered_lbwr, keep_tip, use_tip, rate, repeats, top_offset, move_open):
+
+def moveShutter(protocol, pipette, covered_lbwr, keep_tip=False, use_tip=False, rate = 1, repeats = 1, top_offset = -10, open=True):
     protocol.comment("opening the shutter")
 
     well1 = covered_lbwr.wells()[len(covered_lbwr.wells()) - 2]
-    well2 = covered_lbwr.wells()[len(covered_lbwr.wells()) - (1 if move_open else 3)]
+    well2 = covered_lbwr.wells()[len(covered_lbwr.wells()) - (1 if open else 3)]
 
     if use_tip:
         if not pipette.has_tip:
@@ -467,29 +468,25 @@ def moveShutter(protocol, pipette, covered_lbwr, keep_tip, use_tip, rate, repeat
         loc1 = well1.top(top_offset)
         loc2 = well2.top(top_offset)
 
-    pipette.move_to(loc1)
+    pipette.move_to(well1.top(top_offset))
 
-    speed = pipette.default_speed
-
-    pipette.default_speed = speed*rate
-
-    for i in range(repeats):
-        for l in [loc1, loc2]:
-            pipette.move_to(l, force_direct=True)
-
-    pipette.default_speed = speed
+    for i in range (repeats):
+        pipette.move_to(loc1, speed = pipette.default_speed * rate)
+        pipette.move_to(
+            loc2,
+            force_direct=True,
+            speed = pipette.default_speed * rate
+        )
 
     if use_tip and not keep_tip:
         pipette.drop_tip()
 
-def openShutter(protocol, pipette, covered_lbwr, keep_tip=False, use_tip=False, rate=1, repeats=2, top_offset=-12):
-    moveShutter(protocol, pipette, covered_lbwr, keep_tip, use_tip, rate, repeats, top_offset, move_open=True)
+def openShutter(protocol, pipette, covered_lbwr, keep_tip=False, use_tip=False, rate = 1, repeats = 1, top_offset = -10):
+    moveShutter(protocol, pipette, covered_lbwr, keep_tip, use_tip, rate, repeats, top_offset, open = True)
 
-
-def closeShutter(protocol, pipette, covered_lbwr, keep_tip=False, use_tip=False, rate=1, repeats=2, top_offset=-12):
-    moveShutter(protocol, pipette, covered_lbwr, keep_tip, use_tip, rate, repeats, top_offset, move_open=False)
+def closeShutter(protocol, pipette, covered_lbwr, keep_tip=False, use_tip=False, rate = 1, repeats = 1, top_offset = -10):
+    moveShutter(protocol, pipette, covered_lbwr, keep_tip, use_tip, rate, repeats, top_offset, open = False)
     pipette.move_to(protocol.fixed_trash["A1"].top(0))
-
 
 def apply_and_incubate(
         protocol,
@@ -581,14 +578,6 @@ def distribute_between_samples(
     if not keep_tip:
         pipette.drop_tip()
 
-
-def lift_coverpads(pipette, sample_chambers, z_offset = -2.85, rate = 0.01, reps = 3):
-    for s in sample_chambers:
-        pipette.move(s.bottom(0))
-        for i in range(reps):
-            pipette.move(s.bottom(z_offset) , rate = rate)
-            pipette.move(s.bottom(0)        , rate = rate)
-
 def set_gantry_speeds(protocol, XYrate, Zrate):
     protocol.max_speeds.update({
         'X': (600 * XYrate),
@@ -601,6 +590,89 @@ def set_gantry_speeds(protocol, XYrate, Zrate):
 
     for instr in protocol.loaded_instruments.values():
         instr.default_speed = speed_max
-
-
 ### END VERAO GLOBAL
+
+metadata = {
+    'protocolName': 'Shutter movement test',
+    'author': 'Parhelia Bio <info@parheliabio.com>',
+    'description': 'Temp test coldplate',
+    'apiLevel': '2.14'
+}
+
+####################MODIFIABLE RUN PARAMETERS#########################
+
+# The type of Parhelia Omni-Stainer
+### VERAO VAR NAME='Device type' TYPE=CHOICE OPTIONS=['omni_stainer_s12_slides', 'omni_stainer_s12_slides_with_thermosheath', 'omni_stainer_s12_slides_with_thermosheath_on_coldplate', 'omni_stainer_c12_cslps', 'omni_stainer_c12_cslps_with_thermosheath']
+omnistainer_type = 'omni_stainer_s12_slides_with_thermosheath_on_coldplate'
+
+
+### VERAO VAR NAME='labwarePositions.omni_stainer_s12_slides_with_thermosheath_on_coldplate' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE
+omnistainer_position = 3
+
+### VERAO VAR NAME='labwarePositions.tiprack_300' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE
+tiprack_position = 9
+
+####################LABWARE LAYOUT ON DECK#########################
+### VERAO VAR NAME='P300 mounting' TYPE=CHOICE OPTIONS=['right', 'left']
+pipette_300_location = 'left'
+
+### VERAO VAR NAME='P300 model' TYPE=CHOICE OPTIONS=['GEN2', 'GEN1']
+pipette_300_GEN = 'GEN2'
+
+if pipette_300_GEN == 'GEN2':
+    pipette_type = 'p300_single_gen2'
+else:
+    pipette_type = 'p300_single'
+
+labwarePositions = Object()
+labwarePositions.omnistainer = omnistainer_position
+labwarePositions.tiprack_300 = tiprack_position
+
+def run(protocol: protocol_api.ProtocolContext):
+    # Setting up ColdPlate temperature module and omni-stainer module
+    if 'coldplate' in omnistainer_type:
+        temp_mod = ColdPlateSlimDriver(protocol)
+        omnistainer = protocol.load_labware(omnistainer_type, labwarePositions.omnistainer, 'Omni-stainer')
+
+    tiprack_300 = protocol.load_labware('opentrons_96_tiprack_300ul', labwarePositions.tiprack_300, 'tiprack 300ul')
+
+    pipette = protocol.load_instrument('p300_single_gen2' if pipette_300_GEN == 'GEN2' else 'p300_single', pipette_300_location, tip_racks=[tiprack_300])
+
+    #################PROTOCOL####################
+
+    protocol.home()
+
+    top_temp = 99
+    top_temp_time = 40
+    topoff_every_min = 5
+
+    temp_mod.set_temp(top_temp)
+
+    #According to the exp calibration, 20 minutes is enough to reach 99C from 50C (alc wash temp)
+    reps = 4
+    for i in range (reps):
+        protocol.delay(minutes=topoff_every_min, msg = "heating up to "+str(top_temp))
+        openShutter(protocol, pipette, omnistainer, use_tip=True, keep_tip=True, repeats = 3, rate=0.1)
+        protocol.delay(minutes=0.1, msg = "delay")
+        closeShutter(protocol, pipette, omnistainer, use_tip=True, keep_tip=True, repeats = 3, rate=0.1)
+
+    safe_delay(protocol, minutes=top_temp_time, msg = "HIER in progress")
+
+    room_temp = 20
+
+    #how much to overshoot the temp by initially in order to hasten the temp equilibration
+    overshot = 10
+
+    target_temp = room_temp - overshot
+    temp_mod.set_temp(target_temp)
+
+    cooldown_delay_min = 15
+
+
+    for i in range(int(cooldown_delay_min/topoff_every_min)):
+        protocol.delay(minutes=topoff_every_min, msg = "cooling down to "+str(room_temp))
+        openShutter(protocol, pipette, omnistainer, use_tip=True, keep_tip=True, repeats = 3, rate=0.1)
+        protocol.delay(minutes=0.1, msg = "delay")
+        closeShutter(protocol, pipette, omnistainer, use_tip=True, keep_tip=True, repeats = 3, rate=0.1)
+
+    temp_mod.set_temp(room_temp)

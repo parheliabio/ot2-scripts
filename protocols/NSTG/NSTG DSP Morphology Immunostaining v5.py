@@ -1,3 +1,5 @@
+
+
 metadata = {
     'protocolName': 'Nanostring GeoMx DSP Morphology immunostaining v5',
     'author': 'Parhelia Bio <info@parheliabio.com>',
@@ -11,14 +13,17 @@ metadata = {
 ### VERAO VAR NAME='Device type' TYPE=CHOICE OPTIONS=['omni_stainer_s12_slides', 'omni_stainer_s12_slides_with_thermosheath_on_coldplate']
 omnistainer_type = 'omni_stainer_s12_slides_with_thermosheath_on_coldplate'
 
-### VERAO VAR NAME='Well plate type' TYPE=CHOICE OPTIONS=['parhelia_skirted_96', 'parhelia_skirted_96_with_strips']
-type_of_96well_plate = 'parhelia_skirted_96'
+
 
 ### VERAO VAR NAME='Number of Samples' TYPE=NUMBER LBOUND=1 UBOUND=12 DECIMAL=FALSE EXCEL_POSITION='C5'
 num_samples = 2
 
 ### VERAO VAR NAME='Tiprack starting position' TYPE=NUMBER LBOUND=1 UBOUND=95 DECIMAL=FALSE
 tiprack_300_starting_pos = 1
+
+
+### VERAO VAR NAME='Well plate type' TYPE=CHOICE OPTIONS=['parhelia_skirted_96', 'parhelia_skirted_96_with_strips']
+type_of_96well_plate = 'parhelia_skirted_96'
 
 ### VERAO VAR NAME='Primary Ab staining?' TYPE=BOOLEAN EXCEL_POSITION='C1'
 primary_staining = False
@@ -44,14 +49,15 @@ conj_syto_incubation = 60
 ### VERAO VAR NAME='SSC wash incubation time' TYPE=NUMBER LBOUND=1 UBOUND=30 DECIMAL=FALSE
 wash_incubation = 5
 
+### VERAO VAR NAME='Double add (uses 2x reagents, but may improve uniformity on large tissues)' TYPE=BOOLEAN
+double_add = False
+
 ### VERAO VAR NAME='Sample wash volume' TYPE=NUMBER LBOUND=50 UBOUND=300 DECIMAL=FALSE
 wash_volume = 150
 
 ### VERAO VAR NAME='Antibody staining volume' TYPE=NUMBER LBOUND=50 UBOUND=300 DECIMAL=FALSE
 ab_volume = 110
 
-### VERAO VAR NAME='Double add (uses 2x reagents, but may improve uniformity on large tissues)' TYPE=BOOLEAN
-double_add = False
 
 ### VERAO VAR NAME='Sample flow rate' TYPE=NUMBER LBOUND=0.05 UBOUND=1 DECIMAL=TRUE INCREMENT=0.05
 sample_flow_rate = 0.2
@@ -125,17 +131,17 @@ def run(protocol: protocol_api.ProtocolContext):
     if 'thermosheath' in omnistainer_type:
         openShutter(protocol, pipette, omnistainer)
 
-    apply_and_incubate(protocol, pipette, buffer_W_wells, "buffer W", sample_chambers,   ab_volume, num_reps, buffer_w_incubation                                      )
+    apply_and_incubate(protocol, pipette, buffer_W_wells, "buffer W", sample_chambers,   ab_volume, num_reps, buffer_w_incubation )
 
     if primary_staining:
-        apply_and_incubate(protocol, pipette, primary_ab_wells,     "primary Ab"    ,sample_chambers,   ab_volume,     num_reps, primary_ab_incubation, new_tip = 'always' )
-        apply_and_incubate(protocol, pipette, wash_buffer,          "2x SSC Wash"   ,sample_chambers,   wash_volume,   2, wash_incubation, dispense_repeats = 2                )
+        apply_and_incubate(protocol, pipette, primary_ab_wells,     "primary Ab"    ,sample_chambers,   ab_volume,     step_repeats = num_reps, primary_ab_incubation, new_tip = 'always' )
+        apply_and_incubate(protocol, pipette, wash_buffer,          "2x SSC Wash"   ,sample_chambers,   wash_volume,   step_repeats = 2       , wash_incubation,       dispense_repeats = 2)
     if secondary_staining:
-        apply_and_incubate(protocol, pipette, secondary_ab_wells,   "secondary Ab"  ,sample_chambers,   ab_volume,     num_reps, secondary_ab_incubation                                  )
-        apply_and_incubate(protocol, pipette, wash_buffer,          "2x SSC Wash"   ,sample_chambers,   wash_volume,   2, wash_incubation,         dispense_repeats = 2, puncture=False)
+        apply_and_incubate(protocol, pipette, secondary_ab_wells,   "secondary Ab"  ,sample_chambers,   ab_volume,     step_repeats = num_reps, secondary_ab_incubation, new_tip = 'always' )
+        apply_and_incubate(protocol, pipette, wash_buffer,          "2x SSC Wash"   ,sample_chambers,   wash_volume,   step_repeats = 2       , wash_incubation, dispense_repeats = 2, puncture=False)
     if conj_staining:
-        apply_and_incubate(protocol, pipette, conj_syto_wells,      "conj + syto"   ,sample_chambers,   ab_volume,     num_reps, conj_syto_incubation                                     )
-        apply_and_incubate(protocol, pipette, wash_buffer,          "2x SSC Wash"   ,sample_chambers,   wash_volume,   2, wash_incubation,         dispense_repeats = 2, puncture=False)
+        apply_and_incubate(protocol, pipette, conj_syto_wells,      "conj + syto"   ,sample_chambers,   ab_volume,     step_repeats = num_reps, conj_syto_incubation, new_tip = 'always' )
+        apply_and_incubate(protocol, pipette, wash_buffer,          "2x SSC Wash"   ,sample_chambers,   wash_volume,   step_repeats = 2       , wash_incubation, dispense_repeats = 2, puncture=False)
 
     if 'thermosheath' in omnistainer_type:
         closeShutter(protocol, pipette, omnistainer)
