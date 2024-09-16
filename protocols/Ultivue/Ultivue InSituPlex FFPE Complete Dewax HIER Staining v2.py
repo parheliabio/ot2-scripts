@@ -356,15 +356,16 @@ def run(protocol: protocol_api.ProtocolContext):
         temp_mod.quick_temp(room_temp)
         wash()
 
+    num_reps = 2 if double_add else 1
     if probe_staining:
         apply_and_incubate(protocol, pipette, counterstain_wells, "1x Nuclear Counterstain", sample_chambers, ab_volume,
-                           2 if double_add else 1, counterstain_incubation)
+                           step_repeats =1, incubation_time = counterstain_incubation, dispense_repeat = num_reps)
         wash()
         apply_and_incubate(protocol, pipette, fluor_probe_wells, "Fluorescent Probe", sample_chambers, ab_volume,
-                           2 if double_add else 1, fluor_probe_incubation - 1)
+                           step_repeats =1, incubation_time = counterstain_incubation, dispense_repeat = num_reps)
         if double_add:
             apply_and_incubate(protocol, pipette, fluor_probe_2_wells, "Fluorescent Probe", sample_chambers, ab_volume,
-                               2 if double_add else 1, fluor_probe_incubation - 1)
+                         step_repeats =1, incubation_time = counterstain_incubation, dispense_repeat = 1)
         wash()
 
     if 'thermosheath' in omnistainer_type:
